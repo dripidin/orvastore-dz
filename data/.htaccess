@@ -1,0 +1,14 @@
+# ==============================================================================
+# ORVA STORE — Internal Data Directory Protection
+# Website: orva-store.com
+# ==============================================================================
+
+# Deny all direct HTTP requests to data files
+Deny from all
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+RewriteEngine On
+RewriteRule .* - [F,L]

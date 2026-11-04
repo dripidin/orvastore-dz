@@ -1,0 +1,24 @@
+1:"$Sreact.fragment"
+2:I[724181,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"ClientPageRoot"]
+3:I[499351,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js","/_next/static/chunks/42n5e5qn8sg6a.js"],"default"]
+6:I[159682,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+b:I[159682,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"ViewportBoundary"]
+c:I[159682,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"MetadataBoundary"]
+d:I[665147,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"IconMark"]
+f:I[740203,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"default"]
+10:I[668424,["/_next/static/chunks/19izl0-mai1uz.js","/_next/static/chunks/18_v4bcb4cpg8.js","/_next/static/chunks/3wg0q9l3uqija.js","/_next/static/chunks/1c9uih8af79yx.js","/_next/static/chunks/1pfw5xppnyrj2.js","/_next/static/chunks/1ref-5awpfvdg.js","/_next/static/chunks/2yl0_f5h_mm4a.js","/_next/static/chunks/2-gua19xxg9ou.js"],"default"]
+a:X
+12:X
+12:C
+0:{"buildId":"Cdp7P3irFTLAo-IJXcvBe","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/42n5e5qn8sg6a.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":"$@9","staleTime":"$a","varyParams":null},{"rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$Lb",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Studio Admin - Modern Next.js Dashboard Starter Template"}],["$","meta","1",{"name":"description","content":"Studio Admin is a modern, open-source dashboard starter template built with Next.js 16, Tailwind CSS v4, and shadcn/ui. Perfect for SaaS apps, admin panels, and internal tools—fully customizable and production-ready."}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$Ld","3",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@e","staleTime":"$a","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}]}]]}],"isPartial":"$@11","staleTime":"$a","varyParams":"$12"}],"isUpgradeableISRFallback":false,"a":"$@13","rootVaryParams":null,"needsRuntimeRequest":"$@14"}
+4:{}
+5:"$0:data:0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null
+14:true
+a:300
+a:C
+13:0
+e:"$undefined"
+11:"$undefined"
+9:"$undefined"

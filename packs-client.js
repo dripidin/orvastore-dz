@@ -418,7 +418,7 @@
                     const finalOrderId = data.orderId || orderId;
                     const sharedEventId = data.eventId || eventId;
 
-                    // Track Meta Pixel Purchase Event (Unified Pixel 2340414976777036 segmented by content_name)
+                    // Track Meta Pixel Purchase Event (Unified Pixel 9988776655443322 segmented by content_name)
                     if (!purchaseFired && typeof window.fbq === 'function') {
                         purchaseFired = true;
                         try {

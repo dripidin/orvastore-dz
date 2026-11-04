@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80" fill="none">
+  <defs>
+    <linearGradient id="orvaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#2563eb" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <!-- Icon Badge Box -->
+  <rect x="8" y="10" width="60" height="60" rx="14" fill="url(#orvaGrad)" filter="url(#shadow)" />
+  <!-- Storefront Emblem SVG inside Box -->
+  <path d="M23 27L25 21H51L53 27M23 27H53M23 27V49C23 50.1 23.9 51 25 51H51C52.1 51 53 50.1 53 49V27M32 51V37H44V51M21 27H55" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <!-- Brand Text -->
+  <text x="82" y="44" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="28" letter-spacing="-0.5" fill="#0f172a">ORVA<tspan fill="#2563eb" dx="4">STORE</tspan></text>
+  <text x="83" y="60" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="700" font-size="10" letter-spacing="2" fill="#64748b">OFFICIAL STORE DZ</text>
+</svg>

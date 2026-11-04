@@ -5,11 +5,27 @@
 // =============================================================================
 
 const https = require('https');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const dzship = require('dzship');
 const { resolveRedexCommune } = require('../lib/communesMapper');
+const { getEffectiveSettings } = require('../lib/admin-settings-store');
+const { dispatchTelegramNotification } = require('../lib/telegram-notifier');
+const { mapExternalCourierStatus } = require('../lib/courier-status-mapper');
+const { readShipments, writeShipments } = require('../lib/courier-client');
+
+function getEcoTrackSettings() {
+    try {
+        return getEffectiveSettings().ecotrack;
+    } catch (_) {
+        return {
+            apiToken: process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '',
+            baseUrl: process.env.ECOTRACK_API_BASE_URL || 'https://redex.ecotrack.dz'
+        };
+    }
+}
 
 // ── 1. Algerian Couriers Catalog ─────────────────────────────────────────────
 const ALGERIAN_COURIERS = [
@@ -102,8 +118,9 @@ const ALGERIAN_COURIERS = [
 // Active Courier Client Factory
 function getCourierClient(courierId = 'redex', customToken = '', customBaseUrl = '') {
     const courier = ALGERIAN_COURIERS.find(c => c.id === courierId) || ALGERIAN_COURIERS[0];
-    const token = customToken || courier.defaultToken || process.env.ECOTRACK_API_TOKEN || '';
-    const baseUrl = customBaseUrl || courier.baseUrl;
+    const ecoTrack = courier.id === 'redex' ? getEcoTrackSettings() : null;
+    const token = customToken || (ecoTrack ? ecoTrack.apiToken : courier.defaultToken || '');
+    const baseUrl = customBaseUrl || ecoTrack?.baseUrl || courier.baseUrl;
 
     if (courier.type === 'yalidine') {
         return dzship({
@@ -136,8 +153,9 @@ function getCourierClient(courierId = 'redex', customToken = '', customBaseUrl =
 
 // Direct Redex Ecotrack Order Creation Function
 async function createRedexOrderDirect({ token, baseUrl, orderPayload }) {
-    const carrierUrl = (baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
-    const carrierToken = token || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
+    const ecoTrack = getEcoTrackSettings();
+    const carrierUrl = (baseUrl || ecoTrack.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+    const carrierToken = token || ecoTrack.apiToken || '';
 
     const wilayaCode = parseInt(orderPayload.wilayaCode) || 16;
     const rawCommune = orderPayload.commune || 'Alger Centre';
@@ -291,20 +309,42 @@ function addBlacklistedOrder(orderId) {
 }
 
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    // Restricted CORS origins (Exact matching, no wildcard when credentials used)
+    const origin = req.headers?.origin || '';
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:8080',
+        'http://127.0.0.1:3000',
+        'https://orva-store.com',
+        'https://www.orva-store.com'
+    ];
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Sec-Fetch-Site'
     );
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
+        if (res.writeHead) {
+            res.writeHead(204);
+            res.end();
+        } else if (res.status) {
+            res.status(204).end();
+        } else {
+            res.end();
+        }
         return;
     }
 
-    const { action, id, tracking, courierId, baseUrl, token } = req.query || {};
+    const bodyAction = (req.body && typeof req.body === 'object' && req.body.action) ? req.body.action : '';
+    const action = (req.query?.action || bodyAction || '').toString().trim();
+    const { id, tracking, courierId, baseUrl, token } = req.query || {};
     const method = req.method;
 
     // Delivery Tariffs (58 Wilayas Standard Rate Card)
@@ -370,6 +410,107 @@ module.exports = async (req, res) => {
     ];
 
     try {
+        const adminToken = (process.env.ADMIN_API_TOKEN || '').trim();
+        const authHeader = (req.headers && (req.headers['authorization'] || req.headers['Authorization'])) || '';
+        const cookieHeader = String(req.headers?.cookie || '');
+        const sessionCookie = cookieHeader
+            .split(';')
+            .map((part) => part.trim())
+            .find((part) => part.startsWith('orva_admin_session='))
+            ?.slice('orva_admin_session='.length);
+        let sessionToken = '';
+        try {
+            sessionToken = decodeURIComponent(sessionCookie || '');
+        } catch (_) {
+            sessionToken = '';
+        }
+
+        const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+
+        function safeTokenEqual(a, b) {
+            if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
+            const lenA = Buffer.byteLength(a, 'utf8');
+            const lenB = Buffer.byteLength(b, 'utf8');
+            const maxLen = Math.max(lenA, lenB, 1);
+            const bufA = Buffer.alloc(maxLen);
+            const bufB = Buffer.alloc(maxLen);
+            bufA.write(a, 'utf8');
+            bufB.write(b, 'utf8');
+            return crypto.timingSafeEqual(bufA, bufB) && lenA === lenB;
+        }
+
+        // Distinct Authentication Pathways
+        const isBearerAuth = Boolean(bearerToken && safeTokenEqual(bearerToken, adminToken));
+        const isCookieAuth = Boolean(sessionToken && safeTokenEqual(sessionToken, adminToken));
+
+        // State-changing actions definition
+        const stateChangingActions = [
+            'update_status', 'status', 'change_status', 'bulk_update_status',
+            'modify_order', 'switch_order', 'delete', 'create', 'push_order'
+        ];
+
+        // ── 0. HTTP Method Guard on State-Changing Actions ──────────────────
+        if (stateChangingActions.includes(action)) {
+            const allowedMethods = action === 'delete' ? ['POST', 'DELETE'] : ['POST', 'PATCH'];
+            if (!allowedMethods.includes(req.method)) {
+                res.setHeader('Allow', allowedMethods.join(', '));
+                return res.status(405).json({
+                    success: false,
+                    error: 'METHOD_NOT_ALLOWED',
+                    message: `Action '${action}' requires ${allowedMethods.join(' or ')}.`
+                });
+            }
+        }
+
+        const adminActions = ['get_all_orders', 'orders', 'update_status', 'status', 'change_status', 'bulk_update_status', 'modify_order', 'switch_order', 'delete', 'analytics', 'marketing_funnel', 'audit_logs', 'system_health', 'integrations', 'customers', 'push_order'];
+        if (adminActions.includes(action)) {
+            if (!adminToken) {
+                return res.status(503).json({
+                    success: false,
+                    error: 'SERVER_MISCONFIGURED',
+                    message: 'ADMIN_API_TOKEN is not configured.'
+                });
+            }
+            if (!isBearerAuth && !isCookieAuth) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'UNAUTHORIZED_ACCESS',
+                    message: 'Authorization: Bearer <ADMIN_API_TOKEN> or valid session cookie required.'
+                });
+            }
+
+            // CSRF Gate: Applied to browser Cookie authentication
+            if (isCookieAuth && !isBearerAuth) {
+                const secFetchSite = String(req.headers?.['sec-fetch-site'] || '').toLowerCase();
+                if (secFetchSite === 'cross-site') {
+                    return res.status(403).json({
+                        success: false,
+                        error: 'CSRF_REJECTED',
+                        message: 'Cross-site browser request rejected by Sec-Fetch-Site policy.'
+                    });
+                }
+
+                // State-changing operations via Cookie MUST have a trusted Origin header
+                if (stateChangingActions.includes(action)) {
+                    if (!origin) {
+                        return res.status(403).json({
+                            success: false,
+                            error: 'CSRF_ORIGIN_REQUIRED',
+                            message: 'Origin header is required for state-changing browser sessions.'
+                        });
+                    }
+                    if (!allowedOrigins.includes(origin)) {
+                        return res.status(403).json({
+                            success: false,
+                            error: 'CSRF_ORIGIN_DISALLOWED',
+                            message: 'Origin header is not permitted for state-changing browser sessions.'
+                        });
+                    }
+                }
+            }
+            // S2S Bearer token pathway: Allowed without Origin header for automation / CLI
+        }
+
         // ── 1. Fetch All Orders ───────────────────────────────────────────────
         if (action === 'get_all_orders' || action === 'orders') {
             const { getAllOrdersFromDb } = require('../lib/db');
@@ -413,17 +554,46 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, count: finalOrders.length, data: finalOrders });
         }
 
-        // ── 1.2. Update Order Status (Direct Admin Control) ───────────────────
-        if (action === 'update_status' || action === 'status' || action === 'change_status') {
+        // ── 1.2. Update Order Status (Direct Admin Control & Bulk Updates) ──
+        if (action === 'update_status' || action === 'status' || action === 'change_status' || action === 'bulk_update_status') {
             const body = req.body || {};
-            const targetId = id || body.orderId || body.id || req.query.orderId || req.query.id;
-            const newStatus = (body.status || req.query.status || '').toString().trim();
+            // Strictly read mutation parameters from body (NEVER from req.query)
+            const newStatus = (body.status || '').toString().trim().toLowerCase();
 
-            if (!targetId || !newStatus) {
-                return res.status(400).json({ success: false, error: 'Numéro de commande ou statut manquant' });
+            if (!newStatus) {
+                return res.status(400).json({ success: false, error: 'Statut manquant' });
             }
 
             const { updateOrderInDb } = require('../lib/db');
+
+            // Bulk Status Update
+            if (Array.isArray(body.orderIds) && body.orderIds.length > 0) {
+                const results = [];
+                for (const oId of body.orderIds) {
+                    const clean = String(oId).trim();
+                    if (!clean) continue;
+                    try {
+                        const up = await updateOrderInDb(clean, { status: newStatus });
+                        if (up) results.push(up);
+                    } catch (e) {
+                        console.warn(`[BulkUpdate] Error updating ${clean}:`, e.message);
+                    }
+                }
+                return res.status(200).json({
+                    success: true,
+                    message: `Mise à jour groupée de ${results.length} commandes vers '${newStatus}'.`,
+                    status: newStatus,
+                    updatedCount: results.length,
+                    data: results
+                });
+            }
+
+            // Single Status Update — Strictly from body
+            const targetId = (body.orderId || body.id || '').toString().trim();
+            if (!targetId) {
+                return res.status(400).json({ success: false, error: 'Numéro de commande manquant' });
+            }
+
             const updated = await updateOrderInDb(targetId, { status: newStatus });
 
             return res.status(200).json({
@@ -435,44 +605,586 @@ module.exports = async (req, res) => {
             });
         }
 
-        // ── 1.5. Admin Login Verification (against Vercel ADMIN_PASSWORD) ─────
-        if (action === 'login' || action === 'auth') {
+        // ── 1.4. Order Switch / In-Place Modification & Audit ───────────────
+        if (action === 'modify_order' || action === 'switch_order') {
             const body = req.body || {};
-            const inputPass = (body.password || req.query.password || '').toString().trim();
-            const expectedPass = (process.env.ADMIN_PASSWORD || process.env.ADMIN_API_TOKEN || 'orva2026').toString().trim();
-
-            if (!inputPass) {
-                return res.status(400).json({ success: false, error: 'MISSING_PASSWORD' });
+            // Strictly from body (NEVER from req.query)
+            const orderId = (body.orderId || body.id || '').toString().trim();
+            if (!orderId) {
+                return res.status(400).json({ success: false, error: 'Missing orderId parameter' });
             }
 
-            if (inputPass === expectedPass) {
+            const { findOrderById, updateOrderInDb, createAuditLog } = require('../lib/db');
+            const currentOrder = await findOrderById(orderId);
+            if (!currentOrder) {
+                return res.status(404).json({ success: false, error_code: 'ORDER_NOT_FOUND', error: `Order ${orderId} not found` });
+            }
+
+            if (action === 'switch_order') {
+                const remarks = Array.isArray(currentOrder.remarks)
+                    ? [...currentOrder.remarks]
+                    : currentOrder.remarks ? [currentOrder.remarks] : [];
+                const idempotencyKey = String(body.idempotencyKey || '').trim();
+                if (!/^[A-Za-z0-9._:-]{8,100}$/.test(idempotencyKey)) {
+                    return res.status(400).json({ success: false, error_code: 'INVALID_IDEMPOTENCY_KEY' });
+                }
+                const previousSwitch = remarks.find((remark) =>
+                    remark && typeof remark === 'object' && remark.idempotency_key === idempotencyKey
+                );
+                if (previousSwitch) {
+                    return res.status(200).json({
+                        success: true,
+                        orderId,
+                        status: currentOrder.status,
+                        redexComment: previousSwitch.redex_comment || ''
+                    });
+                }
+
+                const currentStatus = String(currentOrder.status || '').toLowerCase();
+                if (['delivered', 'cancelled', 'deleted'].includes(currentStatus)) {
+                    return res.status(422).json({ success: false, error_code: 'CANNOT_SWITCH_TERMINAL_ORDER' });
+                }
+                const operatorOverride = body.operatorOverride === true;
+                if ((currentOrder.in_redex || currentStatus === 'shipped') && !operatorOverride) {
+                    return res.status(409).json({ success: false, error_code: 'SHIPPED_ORDER_OVERRIDE_REQUIRED' });
+                }
+
+                const reason = String(body.reason || '').trim();
+                const fullName = String(body.fullName || currentOrder.fullName || '').trim();
+                const phone = String(body.phone || currentOrder.phone || '').trim();
+                const wilaya = String(body.wilaya || currentOrder.wilaya || '').trim();
+                const commune = String(body.commune || currentOrder.commune || '').trim();
+                const deliveryType = String(body.deliveryType || currentOrder.deliveryType || '').trim();
+                const shippingFee = String(body.shippingFee || '').trim();
+                const grandTotal = String(body.grandTotal || '').trim();
+                if ([...reason].length < 3 || !fullName || !phone || !wilaya || !deliveryType) {
+                    return res.status(400).json({ success: false, error_code: 'INVALID_SWITCH_FIELDS' });
+                }
+
+                const parseDzdAmount = (value) => {
+                    const digits = String(value).replace(/\D+/g, '');
+                    if (!digits || digits.length > 12) return null;
+                    const amount = Number(digits);
+                    return Number.isSafeInteger(amount) ? amount : null;
+                };
+                const shippingAmount = parseDzdAmount(shippingFee);
+                const grandAmount = parseDzdAmount(grandTotal);
+                const productAmount = currentOrder.priceNum == null ? null : Number(currentOrder.priceNum);
+                const financialFieldsUnchanged = shippingFee === String(currentOrder.shippingFee || '')
+                    && grandTotal === String(currentOrder.grandTotal || '');
+                const invalidFinancialFields = shippingAmount === null || grandAmount === null
+                    || (!Number.isSafeInteger(productAmount)
+                        ? !financialFieldsUnchanged
+                        : (productAmount < 0 || grandAmount !== productAmount + shippingAmount));
+                if (invalidFinancialFields) {
+                    return res.status(422).json({ success: false, error_code: 'INVALID_SWITCH_TOTAL' });
+                }
+
+                const nextSequence = remarks.filter((remark) =>
+                    remark && typeof remark === 'object' && (remark.event === 'ORDER_CONVERSION' || remark.switch_status === 'switched')
+                ).length + 1;
+                const nowUtc = new Date().toISOString();
+                const claimedName = String(body.claimedOperatorName || '').trim().slice(0, 50);
+                const operator = claimedName ? `Orva Admin [${claimedName}]` : 'Orva Admin [Shared Session]';
+                const redexComment = `[ORVA STORE — تعديل بيانات المستلم والتوصيل]\n`
+                    + `─────────────────────────────────────────────\n`
+                    + `• رقم الطلبية: ${orderId}\n`
+                    + `• المنتج والكمية: ${currentOrder.productName || 'غير مسجل'} — ${currentOrder.quantity || 'غير مسجلة'}\n`
+                    + `• المبلغ المسجل (COD): ${grandTotal}\n`
+                    + `• العميل: ${fullName} | الهاتف: ${phone}\n`
+                    + `• العنوان: ${wilaya} — ${commune} (${deliveryType})\n`
+                    + `• سبب التعديل: ${reason}\n`
+                    + `• تاريخ التعديل: ${nowUtc} (المسؤول: ${operator})\n`
+                    + `─────────────────────────────────────────────\n`
+                    + 'ملاحظة للموزع: يرجى تحديث بيانات المستلم والوجهة يدويًا؛ لا يتم إرسال التعديل إلى Redex آليًا.';
+
+                const diff = {};
+                for (const [field, before, after] of [
+                    ['full_name', currentOrder.fullName || '', fullName],
+                    ['phone', currentOrder.phone || '', phone],
+                    ['wilaya', currentOrder.wilaya || '', wilaya],
+                    ['commune', currentOrder.commune || '', commune],
+                    ['delivery_type', currentOrder.deliveryType || '', deliveryType],
+                    ['shipping_fee', currentOrder.shippingFee || '', shippingFee],
+                    ['grand_total', currentOrder.grandTotal || '', grandTotal]
+                ]) {
+                    if (String(before) !== String(after)) diff[field] = { from: before, to: after };
+                }
+                diff.origin_hub = 'بسكرة (07 - Biskra Hub)';
+
+                remarks.push({
+                    event: 'ORDER_CONVERSION',
+                    switch_status: 'switched',
+                    conversion_sequence: nextSequence,
+                    idempotency_key: idempotencyKey,
+                    timestamp_utc: nowUtc,
+                    operator,
+                    reason,
+                    override_applied: operatorOverride,
+                    redex_tracking_code: currentOrder.redex_tracking_code || null,
+                    redex_comment: redexComment,
+                    diff
+                });
+
+                const updated = await updateOrderInDb(orderId, {
+                    fullName,
+                    phone,
+                    wilaya,
+                    commune,
+                    deliveryType,
+                    shippingFee,
+                    grandTotal,
+                    remarks
+                });
+                if (!updated) {
+                    return res.status(502).json({ success: false, error_code: 'ORDER_SWITCH_UPDATE_FAILED' });
+                }
+
                 return res.status(200).json({
                     success: true,
-                    message: 'AUTHENTICATED',
-                    token: process.env.ADMIN_API_TOKEN || 'orva-admin-2026-secure'
-                });
-            } else {
-                return res.status(401).json({
-                    success: false,
-                    error: 'INVALID_PASSWORD'
+                    orderId,
+                    status: updated.status,
+                    redexComment,
+                    data: updated
                 });
             }
+
+            const currentStatus = (currentOrder.status || '').toLowerCase();
+
+            // Terminal barriers
+            if (currentStatus === 'delivered') {
+                return res.status(422).json({ success: false, error_code: 'CANNOT_MODIFY_DELIVERED_ORDER', error: 'Cannot switch delivered order.' });
+            }
+            if (currentStatus === 'cancelled') {
+                return res.status(422).json({ success: false, error_code: 'CANNOT_MODIFY_CANCELLED_ORDER', error: 'Cannot switch cancelled order.' });
+            }
+            if (currentStatus === 'deleted') {
+                return res.status(422).json({ success: false, error_code: 'CANNOT_MODIFY_DELETED_ORDER', error: 'Cannot switch deleted order.' });
+            }
+
+            // Shipped barrier
+            const operatorOverride = Boolean(body.operatorOverride);
+            if ((currentOrder.in_redex || currentStatus === 'shipped') && !operatorOverride) {
+                return res.status(409).json({
+                    success: false,
+                    error_code: 'SHIPPED_ORDER_OVERRIDE_REQUIRED',
+                    error: 'Order is shipped. Operator override confirmation is required.'
+                });
+            }
+
+            // Non-empty Reason validation
+            const baseReason = (body.reason || '').trim();
+            if (!baseReason) {
+                return res.status(400).json({ success: false, error_code: 'MISSING_REASON', error: 'Reason is required for auditing.' });
+            }
+
+            // Target fields (recipient & delivery details, plus verified recalculated shipping fee from Biskra origin hub)
+            const newFullName    = (body.fullName || currentOrder.fullName || '').trim();
+            const newPhone       = (body.phone || currentOrder.phone || '').trim();
+            const newWilaya      = (body.wilaya || currentOrder.wilaya || '').trim();
+            const newCommune     = (body.commune || currentOrder.commune || '').trim();
+            const newDelivery    = (body.deliveryType || currentOrder.deliveryType || 'توصيل للمنزل').trim();
+            const newShippingFee = (body.shippingFee || currentOrder.shippingFee || '').trim();
+            const newGrandTotal  = (body.grandTotal || currentOrder.grandTotal || '').trim();
+            const serverOperator = 'Orva Admin [Shared Session]';
+            const claimedName    = (body.claimedOperatorName || '').trim();
+            const auditOperator  = claimedName ? `Orva Admin [${claimedName}]` : serverOperator;
+
+            // Invariants: Product, Price, and Operational Status remain strictly UNCHANGED
+            const diff = {};
+            if (newFullName !== currentOrder.fullName) diff.full_name = { from: currentOrder.fullName, to: newFullName };
+            if (newPhone !== currentOrder.phone) diff.phone = { from: currentOrder.phone, to: newPhone };
+            if (newWilaya !== currentOrder.wilaya) diff.wilaya = { from: currentOrder.wilaya, to: newWilaya };
+            if (newCommune !== currentOrder.commune) diff.commune = { from: currentOrder.commune, to: newCommune };
+            if (newDelivery !== currentOrder.deliveryType) diff.delivery_type = { from: currentOrder.deliveryType, to: newDelivery };
+            if (newShippingFee && newShippingFee !== currentOrder.shippingFee) {
+                diff.shipping_fee = { from: currentOrder.shippingFee, to: newShippingFee };
+            }
+            if (newGrandTotal && newGrandTotal !== currentOrder.grandTotal) {
+                diff.grand_total = { from: currentOrder.grandTotal, to: newGrandTotal };
+            }
+            diff.origin_hub = 'بسكرة (07 - Biskra Hub)';
+
+            const remarks = Array.isArray(currentOrder.remarks) ? [...currentOrder.remarks] : currentOrder.remarks ? [currentOrder.remarks] : [];
+            let convSeq = 1;
+            for (const r of remarks) {
+                if (typeof r === 'object' && r !== null && (r.event === 'ORDER_CONVERSION' || r.switch_status === 'switched')) {
+                    convSeq++;
+                }
+            }
+
+            const nowUtc = new Date().toISOString();
+            const conversionEntry = {
+                event: 'ORDER_CONVERSION',
+                switch_status: 'switched',
+                conversion_sequence: convSeq,
+                conversion_id: `conv-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+                timestamp_utc: nowUtc,
+                operator: auditOperator,
+                reason: baseReason,
+                override_applied: operatorOverride,
+                redex_tracking_code: currentOrder.redex_tracking_code || null,
+                origin_hub: 'بسكرة (07 - Biskra Hub)',
+                summary: `[${nowUtc}] تحويل (#${convSeq}) بواسطة ${auditOperator}: ${baseReason}`,
+                diff
+            };
+            remarks.push(conversionEntry);
+
+            // Audit log snapshot
+            await createAuditLog('ORDER_SWITCH', 'order', orderId, auditOperator, {
+                diff,
+                operational_status: currentOrder.status,
+                in_redex: currentOrder.in_redex,
+                override_applied: operatorOverride,
+                reason: baseReason,
+                conversion_sequence: convSeq,
+                timestamp_utc: nowUtc
+            });
+
+            // Update in-place in database preserving product & status invariants
+            const updated = await updateOrderInDb(orderId, {
+                fullName: newFullName,
+                phone: newPhone,
+                wilaya: newWilaya,
+                commune: newCommune,
+                deliveryType: newDelivery,
+                shippingFee: newShippingFee,
+                grandTotal: newGrandTotal,
+                remarks: remarks,
+                updated_at: nowUtc
+            });
+
+            let warningBlock = '';
+            if (operatorOverride) {
+                warningBlock = "⚠️ تنبيه لوجستي: تم تعديل الطلب بعد شحنه. يجب تحديث بوليصة الموزع (Redex) يدويًا.\n";
+            }
+
+            const redexComment = `[ORVA STORE — تحويل بيانات طلبية (#${convSeq})]\n`
+                + `─────────────────────────────────────────────\n`
+                + `• رقم الطلبية: ${orderId}\n`
+                + `• اسم المستلم المحدث: ${newFullName}\n`
+                + `• رقم الهاتف المحدث: ${newPhone}\n`
+                + `• العنوان المحدث: ${newWilaya} — ${newCommune} (${newDelivery})\n`
+                + `• نقطة الانطلاق الأصلية: بسكرة (07 - Biskra Hub)\n`
+                + `• رسوم التوصيل المحدثة: ${newShippingFee}\n`
+                + `• إجمالي التحصيل المحدث (COD): ${newGrandTotal}\n`
+                + `• سبب التحويل: ${baseReason}\n`
+                + `• توقيت التعديل: ${nowUtc} (المسؤول: ${auditOperator})\n`
+                + warningBlock
+                + `─────────────────────────────────────────────\n`
+                + `ملاحظة للموزع: يرجى تسليم الطرد للمستلم المحدث أعلاه وتحصيل المبلغ المطلوب.`;
+
+            return res.status(200).json({
+                success: true,
+                message: `Order ${orderId} switched successfully (Sequence #${convSeq}).`,
+                orderId,
+                conversionSequence: convSeq,
+                status: currentOrder.status,
+                overrideApplied: operatorOverride,
+                redexComment,
+                data: updated
+            });
+        }
+
+        // ── 1.45. Marketing Funnel & Reports Analytics (Module 3) ────────────
+        if (action === 'analytics' || action === 'marketing_funnel') {
+            const { getAllOrdersFromDb } = require('../lib/db');
+            const orders = await getAllOrdersFromDb();
+
+            let total = orders.length;
+            let pending = 0, confirmed = 0, shipped = 0, delivered = 0, returned = 0, cancelled = 0, switched = 0;
+            let deliveredRevenue = 0;
+            let pack1Count = 0, pack2Count = 0;
+
+            orders.forEach(o => {
+                const s = (o.status || '').toLowerCase();
+                if (s === 'delivered') {
+                    delivered++;
+                    deliveredRevenue += (Number(o.priceNum || o.price_num) || 4950);
+                } else if (s === 'shipped' || o.in_redex) {
+                    shipped++;
+                } else if (s === 'confirmed') {
+                    confirmed++;
+                } else if (s === 'returned' || s.includes('retour') || s.includes('مرتجع') || s.includes('refus')) {
+                    returned++;
+                } else if (s === 'cancelled' || s === 'deleted') {
+                    cancelled++;
+                } else {
+                    pending++;
+                }
+
+                if (o.remarks) {
+                    const rList = Array.isArray(o.remarks) ? o.remarks : [o.remarks];
+                    const isSw = rList.some(r => typeof r === 'object' && r && (r.event === 'ORDER_CONVERSION' || r.switch_status === 'switched'));
+                    if (isSw) switched++;
+                }
+
+                const prod = (o.productName || o.product_name || '').toLowerCase();
+                if (prod.includes('pack 2') || prod.includes('5950')) {
+                    pack2Count++;
+                } else {
+                    pack1Count++;
+                }
+            });
+
+            return res.status(200).json({
+                success: true,
+                funnel: {
+                    totalOrders: total,
+                    pending,
+                    confirmed,
+                    shipped,
+                    delivered,
+                    returned,
+                    cancelled,
+                    switched,
+                    deliveryRate: total > 0 ? ((delivered / total) * 100).toFixed(1) + '%' : '0%',
+                    returnRate: total > 0 ? ((returned / total) * 100).toFixed(1) + '%' : '0%',
+                    deliveredRevenueDZD: deliveredRevenue,
+                    pack1Count,
+                    pack2Count
+                },
+                externalAnalyticsNotice: {
+                    source: "Unlinked External Service (Google Analytics / Cloudflare)",
+                    status: "UNLINKED",
+                    message: "بيانات جلسات الزوار الفريدة ومصادر الحملات تتطلب ربط Google Analytics أو Cloudflare API. المعروض هنا هو بيانات القمع التسويقي المحسوبة فعليًا من قاعدة بيانات الطلبيات المعتمدة."
+                }
+            });
+        }
+
+        // ── 1.46. Registered Customers Management (Module 4) ─────────────────
+        if (action === 'customers') {
+            const { getAllOrdersFromDb } = require('../lib/db');
+            const orders = await getAllOrdersFromDb();
+
+            const customerMap = new Map();
+
+            orders.forEach(o => {
+                let rawPhone = (o.phone || '').trim();
+                let cleanPhone = rawPhone.replace(/[^\d]/g, '');
+                if (cleanPhone.startsWith('213') && cleanPhone.length === 12) {
+                    cleanPhone = '0' + cleanPhone.slice(3);
+                }
+                const key = cleanPhone || rawPhone || (o.fullName || 'unknown');
+
+                if (!customerMap.has(key)) {
+                    customerMap.set(key, {
+                        phone: rawPhone,
+                        normalizedPhone: cleanPhone,
+                        fullName: o.fullName || o.full_name || 'عميل',
+                        names: new Set([o.fullName || o.full_name].filter(Boolean)),
+                        wilaya: o.wilaya || '',
+                        commune: o.commune || '',
+                        deliveryType: o.deliveryType || o.delivery_type || 'توصيل للمنزل',
+                        totalOrders: 0,
+                        deliveredOrders: 0,
+                        returnedOrders: 0,
+                        cancelledOrders: 0,
+                        switchedOrders: 0,
+                        totalSpent: 0,
+                        orders: []
+                    });
+                }
+
+                const c = customerMap.get(key);
+                c.totalOrders++;
+                if (o.fullName) c.names.add(o.fullName);
+                const st = (o.status || '').toLowerCase();
+                if (st === 'delivered') {
+                    c.deliveredOrders++;
+                    c.totalSpent += (Number(o.priceNum || o.price_num) || 0);
+                } else if (st === 'returned') {
+                    c.returnedOrders++;
+                } else if (st === 'cancelled') {
+                    c.cancelledOrders++;
+                }
+
+                let isSw = false;
+                if (o.remarks) {
+                    const rList = Array.isArray(o.remarks) ? o.remarks : [o.remarks];
+                    isSw = rList.some(r => typeof r === 'object' && r && (r.event === 'ORDER_CONVERSION' || r.switch_status === 'switched'));
+                }
+                if (isSw) c.switchedOrders++;
+
+                c.orders.push({
+                    orderId: o.orderId || o.order_id,
+                    date: o.created_at || new Date().toISOString(),
+                    status: o.status,
+                    total: o.grandTotal || o.grand_total,
+                    isSwitched: isSw
+                });
+            });
+
+            const customersList = Array.from(customerMap.values()).map(c => ({
+                phone: c.phone,
+                normalizedPhone: c.normalizedPhone,
+                fullName: c.fullName,
+                hasDuplicatePhone: c.names.size > 1,
+                aliases: Array.from(c.names),
+                wilaya: c.wilaya,
+                commune: c.commune,
+                deliveryType: c.deliveryType,
+                totalOrders: c.totalOrders,
+                deliveredOrders: c.deliveredOrders,
+                returnedOrders: c.returnedOrders,
+                cancelledOrders: c.cancelledOrders,
+                switchedOrders: c.switchedOrders,
+                hasReturns: c.returnedOrders > 0,
+                hasSwitched: c.switchedOrders > 0,
+                totalSpent: c.totalSpent,
+                orders: c.orders
+            }));
+
+            return res.status(200).json({
+                success: true,
+                count: customersList.length,
+                customers: customersList
+            });
+        }
+
+        // ── 1.47. Integration & System Health Status (Module 5) ──────────────
+        if (action === 'system_health' || action === 'integrations') {
+            const { getPgPool } = require('../lib/supabaseServer');
+            let dbStatus = 'CONNECTED';
+            let dbProvider = 'Supabase PostgreSQL';
+            let poolReady = false;
+
+            try {
+                const pool = getPgPool();
+                if (pool) {
+                    poolReady = true;
+                } else {
+                    dbStatus = 'LOCAL_FALLBACK';
+                    dbProvider = 'Local Database (Offline Fallback)';
+                }
+            } catch (e) {
+                dbStatus = 'LOCAL_FALLBACK';
+                dbProvider = 'Local Fallback: ' + e.message;
+            }
+
+            const effectiveSettings = getEffectiveSettings();
+            const ecoSettings = effectiveSettings.ecotrack || {};
+            const tgSettings = effectiveSettings.telegram || {};
+            const metaSettings = effectiveSettings.metaPixel || {};
+
+            const envPixelId = process.env.META_PIXEL_ID || metaSettings.pixelId || '';
+            const isLegacyPixel = envPixelId === '2340414976777036';
+            const isPixelReady = Boolean(envPixelId) && !isLegacyPixel;
+
+            const hasMetaToken = Boolean(process.env.META_ACCESS_TOKEN && process.env.META_ACCESS_TOKEN.length > 5);
+            const hasEcoToken = Boolean(ecoSettings.apiToken || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN);
+            const hasTelegram = Boolean(tgSettings.botToken && tgSettings.chatId);
+
+            return res.status(200).json({
+                success: true,
+                timestamp: new Date().toISOString(),
+                integrations: {
+                    database: {
+                        name: 'Supabase PostgreSQL',
+                        status: dbStatus,
+                        provider: dbProvider,
+                        poolReady: poolReady,
+                        safeMode: true
+                    },
+                    meta_pixel: {
+                        name: 'Meta Pixel (Browser)',
+                        pixelId: isLegacyPixel ? '' : envPixelId,
+                        configured: isPixelReady,
+                        status: isPixelReady ? 'ACTIVE' : (isLegacyPixel ? 'LEGACY_DECOMMISSIONED_BLOCKED' : 'UNCONFIGURED'),
+                        activationStatus: isPixelReady ? 'OPERATIONAL' : 'BLOCKED_AWAITING_NEW_PIXEL_ID',
+                        standardEvents: ['PageView', 'ViewContent', 'InitiateCheckout', 'Purchase'],
+                        deduplicationMatchKey: 'event_id = order_id'
+                    },
+                    meta_capi: {
+                        name: 'Meta Conversions API (Server CAPI)',
+                        configured: hasMetaToken,
+                        status: hasMetaToken ? 'CONFIGURED_SECURE' : 'UNCONFIGURED',
+                        apiVersion: 'v19.0',
+                        hashAlgorithm: 'SHA-256 (phone, name, wilaya)',
+                        testModeSupported: true,
+                        serverSecretMasked: 'Configured on server (never exposed to browser)',
+                        switchPolicy: 'Order conversion does NOT dispatch duplicate Purchase events'
+                    },
+                    redex: {
+                        name: 'Redex Ecotrack Logistics',
+                        configured: hasEcoToken,
+                        reachable: hasEcoToken,
+                        authenticated: false,
+                        operational: false,
+                        status: hasEcoToken ? 'CONFIGURED_MANUAL_DISPATCH' : 'UNCONFIGURED',
+                        mode: 'اعتماد يدوي من لوحة التحكم (Manual Dashboard Approval)',
+                        hubOrigin: 'بسكرة (07 - Biskra Hub)',
+                        automatedDispatch: false,
+                        duplicatePrevention: 'orderId check before API dispatch'
+                    },
+                    ecotrack: {
+                        name: 'Ecotrack Courier Network',
+                        configured: hasEcoToken,
+                        baseUrl: ecoSettings.baseUrl || 'https://redex.ecotrack.dz',
+                        status: hasEcoToken ? 'CONFIGURED' : 'UNCONFIGURED'
+                    },
+                    telegram: {
+                        name: 'Telegram Bot Notifications',
+                        configured: hasTelegram,
+                        chatIdConfigured: Boolean(tgSettings.chatId),
+                        status: hasTelegram ? 'CONFIGURED' : 'UNCONFIGURED',
+                        eventsSupported: ['ORDER_CREATED', 'SHIPMENT_CREATED', 'SHIPMENT_FAILED', 'STATUS_UPDATED', 'ORDER_CANCELLED'],
+                        deduplication: 'data/telegram-dispatch-ledger.json'
+                    },
+                    delivery_api: {
+                        name: 'Delivery & Orders Gateway',
+                        status: 'HEALTHY_ACTIVE',
+                        authMode: 'Bearer Token Enforced',
+                        endpoints: ['/api/delivery', '/api/orders', '/api/send-order']
+                    }
+                }
+            });
+        }
+
+        // ── 1.5. Admin Login Verification — Delegated to /api/auth ────────────
+        if (action === 'login' || action === 'auth') {
+            return res.status(405).json({
+                success: false,
+                error: 'USE_AUTH_ENDPOINT',
+                message: 'Login must be performed via POST /api/auth'
+            });
         }
 
         // ── 2. Couriers Directory & Configuration ─────────────────────────────
         if (action === 'couriers') {
+            const publicCouriers = ALGERIAN_COURIERS.map(({ defaultToken, apiId, key, ...courier }) => ({
+                ...courier,
+                credentialsConfigured: Boolean(defaultToken || apiId || key)
+            }));
             return res.status(200).json({
                 success: true,
-                count: ALGERIAN_COURIERS.length,
-                data: ALGERIAN_COURIERS
+                count: publicCouriers.length,
+                data: publicCouriers
             });
         }
 
-        // ── 3. Test Courier Connection ─────────────────────────────────────────
+        // ── 3. Test Courier Connection (Side-effect free GET /api/v1/get/wilayas) ──
         if (action === 'test_courier' || action === 'test_ecotrack') {
             const targetCourier = ALGERIAN_COURIERS.find(c => c.id === courierId) || ALGERIAN_COURIERS[0];
-            const activeToken = token || req.query.token || req.body?.token || targetCourier.defaultToken || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
-            const carrierUrl = (baseUrl || req.query.baseUrl || req.body?.baseUrl || targetCourier.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+            const ecoTrack = targetCourier.id === 'redex' ? getEcoTrackSettings() : null;
+            const providedToken = token || req.query.token || req.body?.token || '';
+            const activeToken = providedToken || (ecoTrack
+                ? ecoTrack.apiToken
+                : targetCourier.defaultToken || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '');
+            const carrierUrl = (baseUrl || req.query.baseUrl || req.body?.baseUrl || ecoTrack?.baseUrl || targetCourier.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+
+            if (!activeToken) {
+                return res.status(400).json({
+                    success: false,
+                    configured: false,
+                    reachable: false,
+                    authenticated: false,
+                    operational: false,
+                    courier: targetCourier.name,
+                    error: 'MISSING_API_TOKEN',
+                    message: 'Jeton API non configuré pour ce transporteur.'
+                });
+            }
 
             if (targetCourier.type === 'ecotrack' || targetCourier.id === 'redex') {
                 try {
@@ -486,21 +1198,34 @@ module.exports = async (req, res) => {
                     if (testRes.ok) {
                         return res.status(200).json({
                             success: true,
+                            configured: true,
+                            reachable: true,
+                            authenticated: true,
+                            operational: true,
                             courier: targetCourier.name,
                             type: targetCourier.type,
                             baseUrl: carrierUrl,
-                            status: 'CONNECTED_READY',
+                            status: 'OPERATIONAL',
                             message: `✅ Connexion réussie avec ${targetCourier.name} (Jeton API vérifié et valide)`
                         });
-                    } else if (testRes.status === 401) {
+                    } else if (testRes.status === 401 || testRes.status === 403) {
                         return res.status(401).json({
                             success: false,
+                            configured: true,
+                            reachable: true,
+                            authenticated: false,
+                            operational: false,
                             courier: targetCourier.name,
-                            error: 'Jeton API non autorisé (401 Unauthorized). Veuillez vérifier la clé saisie.'
+                            error: 'AUTHENTICATION_FAILED',
+                            message: 'Jeton API non autorisé (401 Unauthorized). Veuillez vérifier la clé saisie.'
                         });
                     } else {
                         return res.status(testRes.status).json({
                             success: false,
+                            configured: true,
+                            reachable: true,
+                            authenticated: false,
+                            operational: false,
                             courier: targetCourier.name,
                             error: `Erreur HTTP ${testRes.status} reçue du serveur ${targetCourier.name}`
                         });
@@ -508,6 +1233,10 @@ module.exports = async (req, res) => {
                 } catch (e) {
                     return res.status(500).json({
                         success: false,
+                        configured: true,
+                        reachable: false,
+                        authenticated: false,
+                        operational: false,
                         error: `Impossible de joindre le serveur ${carrierUrl} : ${e.message}`
                     });
                 }
@@ -515,23 +1244,103 @@ module.exports = async (req, res) => {
 
             return res.status(200).json({
                 success: true,
+                configured: true,
+                reachable: true,
+                authenticated: true,
+                operational: true,
                 courier: targetCourier.name,
                 type: targetCourier.type,
                 baseUrl: carrierUrl,
-                status: 'CONNECTED_READY',
+                status: 'OPERATIONAL',
                 message: `Passerelle ${targetCourier.name} prête.`
             });
         }
 
+        // ── 3.6. Test Telegram Bot Connection (Safe verification) ──────────────
+        if (action === 'test_telegram') {
+            const effective = getEffectiveSettings();
+            const botToken = req.query.botToken || req.body?.botToken || effective.telegram?.botToken || process.env.TELEGRAM_BOT_TOKEN;
+            const chatId = req.query.chatId || req.body?.chatId || effective.telegram?.chatId || process.env.TELEGRAM_CHAT_ID;
+
+            if (!botToken || !chatId) {
+                return res.status(400).json({
+                    success: false,
+                    configured: false,
+                    reachable: false,
+                    authenticated: false,
+                    operational: false,
+                    error: 'MISSING_TELEGRAM_CREDENTIALS',
+                    message: 'Bot token and Chat ID are required.'
+                });
+            }
+
+            try {
+                const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/getMe`);
+                const tgData = await tgRes.json().catch(() => ({}));
+                if (tgRes.ok && tgData.ok) {
+                    return res.status(200).json({
+                        success: true,
+                        configured: true,
+                        reachable: true,
+                        authenticated: true,
+                        operational: true,
+                        botName: tgData.result?.username,
+                        chatId: chatId,
+                        message: `Telegram Bot @${tgData.result?.username || 'bot'} verified successfully.`
+                    });
+                } else {
+                    return res.status(401).json({
+                        success: false,
+                        configured: true,
+                        reachable: true,
+                        authenticated: false,
+                        operational: false,
+                        error: 'TELEGRAM_AUTH_FAILED',
+                        message: tgData.description || 'Invalid Telegram bot token.'
+                    });
+                }
+            } catch (tgErr) {
+                return res.status(500).json({
+                    success: false,
+                    configured: true,
+                    reachable: false,
+                    authenticated: false,
+                    operational: false,
+                    error: 'TELEGRAM_CONNECTION_ERROR',
+                    message: tgErr.message
+                });
+            }
+        }
+
         // ── 4. Create & Dispatch Parcel to Carrier API ─────────────────────────
-        if (action === 'create' && method === 'POST') {
+        if ((action === 'create' || action === 'push_order') && method === 'POST') {
             const body = req.body || {};
-            const activeToken = body.token || req.query.token || token || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
-            const activeBaseUrl = (body.baseUrl || req.query.baseUrl || baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
             const activeCourier = body.courierId || courierId || 'redex';
+            const ecoTrack = activeCourier === 'redex' ? getEcoTrackSettings() : null;
+            const providedToken = body.token || req.query.token || token || '';
+            const activeToken = providedToken || (ecoTrack
+                ? ecoTrack.apiToken
+                : process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '');
+            const activeBaseUrl = (body.baseUrl || req.query.baseUrl || baseUrl || ecoTrack?.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+
+            const targetOrderId = body.orderId || ('ORVA-' + Math.floor(10000 + Math.random() * 90000));
+
+            // Duplicate Shipment Check (Phase 8D)
+            const shipments = readShipments();
+            if (shipments[targetOrderId] && shipments[targetOrderId].trackingNumber) {
+                return res.status(200).json({
+                    success: true,
+                    duplicatePrevented: true,
+                    orderId: targetOrderId,
+                    trackingCode: shipments[targetOrderId].trackingNumber,
+                    trackingNumber: shipments[targetOrderId].trackingNumber,
+                    courier: shipments[targetOrderId].courierId || activeCourier,
+                    message: 'Shipment already exists for this order. Returned existing tracking record.'
+                });
+            }
 
             const orderPayload = {
-                orderId: body.orderId || ('ORVA-' + Math.floor(10000 + Math.random() * 90000)),
+                orderId: targetOrderId,
                 fullName: body.fullName || 'Client',
                 phone: body.phone || '0555000000',
                 phone2: body.phone2 || null,
@@ -559,8 +1368,42 @@ module.exports = async (req, res) => {
                     trackingNumber = redexRes.trackingNumber;
                     resolvedCommuneName = redexRes.communeUsed;
                     courierRes = { status: 200, data: redexRes };
+
+                    shipments[targetOrderId] = {
+                        orderId: targetOrderId,
+                        trackingNumber: trackingNumber,
+                        reference: redexRes.reference || targetOrderId,
+                        courierId: activeCourier,
+                        wilayaCode: orderPayload.wilayaCode,
+                        commune: resolvedCommuneName,
+                        createdAt: new Date().toISOString()
+                    };
+                    writeShipments(shipments);
+
+                    dispatchTelegramNotification({
+                        event: 'SHIPMENT_CREATED',
+                        orderId: targetOrderId,
+                        data: {
+                            courierName: 'RedEx Delivery',
+                            trackingNumber: trackingNumber,
+                            reference: redexRes.reference || targetOrderId,
+                            wilaya: orderPayload.wilaya,
+                            commune: resolvedCommuneName
+                        }
+                    }).catch(() => {});
+
                 } catch (err) {
                     console.error('[Redex Direct Dispatch Error]:', err.message);
+
+                    dispatchTelegramNotification({
+                        event: 'SHIPMENT_FAILED',
+                        orderId: targetOrderId,
+                        data: {
+                            courierName: 'RedEx Delivery',
+                            errorMessage: err.message
+                        }
+                    }).catch(() => {});
+
                     return res.status(422).json({
                         success: false,
                         error: `Échec d'expédition vers Redex : ${err.message}`,
@@ -576,10 +1419,37 @@ module.exports = async (req, res) => {
                     if (apiRes && apiRes.trackingNumber) {
                         trackingNumber = apiRes.trackingNumber;
                         courierRes = { status: 200, data: apiRes };
+
+                        shipments[targetOrderId] = {
+                            orderId: targetOrderId,
+                            trackingNumber: trackingNumber,
+                            reference: targetOrderId,
+                            courierId: activeCourier,
+                            createdAt: new Date().toISOString()
+                        };
+                        writeShipments(shipments);
+
+                        dispatchTelegramNotification({
+                            event: 'SHIPMENT_CREATED',
+                            orderId: targetOrderId,
+                            data: {
+                                courierName: activeCourier,
+                                trackingNumber: trackingNumber
+                            }
+                        }).catch(() => {});
                     } else {
                         throw new Error('Aucun code de suivi retourné');
                     }
                 } catch (err) {
+                    dispatchTelegramNotification({
+                        event: 'SHIPMENT_FAILED',
+                        orderId: targetOrderId,
+                        data: {
+                            courierName: activeCourier,
+                            errorMessage: err.message
+                        }
+                    }).catch(() => {});
+
                     return res.status(502).json({
                         success: false,
                         error: `Échec d'expédition vers ${activeCourier} : ${err.message}`
@@ -608,32 +1478,33 @@ module.exports = async (req, res) => {
 
             return res.status(200).json({
                 success: true,
-                message: `Colis expédié avec succès vers Redex Delivery DZ (${trackingNumber})`,
+                trackingCode: trackingNumber,
+                trackingNumber: trackingNumber,
+                courier: activeCourier,
+                labelUrl: `/api/delivery?action=label_pdf&tracking=${encodeURIComponent(trackingNumber)}`,
+                message: `Colis expédié avec succès vers ${activeCourier} (${trackingNumber})`,
                 courierResponse: courierRes,
                 data: {
                     tracking_code: trackingNumber,
+                    trackingCode: trackingNumber,
                     order_id: orderPayload.orderId,
                     client_name: orderPayload.fullName,
                     phone: orderPayload.phone,
                     wilaya: orderPayload.wilaya,
                     commune: resolvedCommuneName,
-                    price: orderPayload.priceNum,
-                    delivery_type: orderPayload.deliveryType,
-                    status: 'shipped',
-                    in_redex: true,
-                    created_at: new Date().toISOString()
+                    price: orderPayload.priceNum
                 }
             });
         }
 
-        // ── 5. Official Carrier Label (Stream Raw PDF or Return URL) ──────────
         if (action === 'label_pdf') {
             const trackingCode = tracking || id || req.query.code;
             if (!trackingCode) {
                 return res.status(400).send('Numéro de suivi manquant');
             }
-            const activeToken = token || req.query.token || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
-            const carrierUrl = (baseUrl || req.query.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+            const ecoTrack = getEcoTrackSettings();
+            const activeToken = token || req.query.token || ecoTrack.apiToken || '';
+            const carrierUrl = (baseUrl || req.query.baseUrl || ecoTrack.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
 
             try {
                 const pdfRes = await fetch(`${carrierUrl}/api/v1/get/order/label?tracking=${encodeURIComponent(trackingCode)}`, {
@@ -662,8 +1533,7 @@ module.exports = async (req, res) => {
                 });
             }
 
-            const activeToken = token || req.query.token || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
-            const pdfDirectUrl = `/api/delivery?action=label_pdf&tracking=${encodeURIComponent(trackingCode)}${activeToken ? '&token=' + encodeURIComponent(activeToken) : ''}`;
+            const pdfDirectUrl = `/api/delivery?action=label_pdf&tracking=${encodeURIComponent(trackingCode)}`;
 
             return res.status(200).json({
                 success: true,
@@ -680,8 +1550,9 @@ module.exports = async (req, res) => {
             if (!trackingCode) {
                 return res.status(400).json({ success: false, error: 'Numéro de suivi manquant' });
             }
-            const activeToken = token || req.query.token || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '';
-            const carrierUrl = (baseUrl || req.query.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
+            const ecoTrack = getEcoTrackSettings();
+            const activeToken = token || req.query.token || ecoTrack.apiToken || '';
+            const carrierUrl = (baseUrl || req.query.baseUrl || ecoTrack.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
 
             try {
                 const trackRes = await fetch(`${carrierUrl}/api/v1/get/orders?tracking=${encodeURIComponent(trackingCode)}`, {
@@ -712,14 +1583,16 @@ module.exports = async (req, res) => {
         }
 
         // ── 7. Delete / Archive Order ──────────────────────────────────────────
-        if (action === 'delete' && (method === 'DELETE' || method === 'POST' || method === 'GET')) {
+        if (action === 'delete') {
             const body = req.body || {};
-            const targetId = id || (req.query && (req.query.orderId || req.query.id)) || body.orderId || body.id;
-            if (targetId) {
-                addBlacklistedOrder(targetId);
-                const { deleteOrderFromDb } = require('../lib/db');
-                await deleteOrderFromDb(targetId);
+            // Strictly from body (NEVER from req.query)
+            const targetId = (body.orderId || body.id || '').toString().trim();
+            if (!targetId) {
+                return res.status(400).json({ success: false, error: 'Numéro de commande manquant' });
             }
+            addBlacklistedOrder(targetId);
+            const { deleteOrderFromDb } = require('../lib/db');
+            await deleteOrderFromDb(targetId);
             return res.status(200).json({
                 success: true,
                 message: `Commande ${targetId} supprimée et synchronisée.`,

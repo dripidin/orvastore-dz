@@ -288,22 +288,41 @@
             }
         },
 
+        // -----------------------------------------------------------------
+        // SECURITY NOTE (Phase 5D): orva_carrier_token is the Ecotrack/Redex
+        // carrier API key entered by the operator in the Settings modal.
+        // It is NOT the admin session token.
+        //
+        // Limitation: Storing it in localStorage exposes it to any JS running
+        // on the same origin. The recommended migration path is:
+        //   1. Store the carrier token as an environment variable on Hostinger.
+        //   2. The server (delivery.php) proxies all carrier API calls.
+        //   3. Remove the token from localStorage entirely.
+        //
+        // Until that migration is done (requires server-side changes), this
+        // stores the carrier token in sessionStorage instead of localStorage
+        // so it is cleared when the browser tab closes. This reduces, but does
+        // not eliminate, the XSS risk.
+        // -----------------------------------------------------------------
+
         getStoredCarrierToken: function () {
-            return localStorage.getItem('orva_carrier_token') || '';
+            return sessionStorage.getItem('orva_carrier_token') || '';
         },
 
         getStoredCarrierBaseUrl: function () {
-            return localStorage.getItem('orva_carrier_base_url') || 'https://redex.ecotrack.dz';
+            return sessionStorage.getItem('orva_carrier_base_url') || 'https://redex.ecotrack.dz';
         },
 
         saveCarrierSettings: function () {
             const tokenInput = document.getElementById('settingsApiToken');
             const urlInput = document.getElementById('settingsBaseUrl');
             if (tokenInput) {
-                localStorage.setItem('orva_carrier_token', tokenInput.value.trim());
+                // Migrated from localStorage to sessionStorage (Phase 5D).
+                // TODO: Migrate to server-side env var + proxy endpoint.
+                sessionStorage.setItem('orva_carrier_token', tokenInput.value.trim());
             }
             if (urlInput) {
-                localStorage.setItem('orva_carrier_base_url', urlInput.value.trim() || 'https://redex.ecotrack.dz');
+                sessionStorage.setItem('orva_carrier_base_url', urlInput.value.trim() || 'https://redex.ecotrack.dz');
             }
         },
 
@@ -322,14 +341,33 @@
             }
         },
 
-        initAuthCheck: function () {
+        initAuthCheck: async function () {
             const overlay = document.getElementById('adminAuthOverlay');
             if (!overlay) return;
-            const isAuth = sessionStorage.getItem('orva_admin_logged') === 'true';
-            if (isAuth) {
-                overlay.style.display = 'none';
-            } else {
-                overlay.style.display = 'flex';
+            overlay.style.display = 'flex';
+
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'session' })
+                });
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    sessionStorage.setItem('orva_admin_logged', 'true');
+                    sessionStorage.removeItem('orva_admin_token');
+                    overlay.style.display = 'none';
+                } else {
+                    sessionStorage.removeItem('orva_admin_logged');
+                    sessionStorage.removeItem('orva_admin_token');
+                    setTimeout(() => {
+                        document.getElementById('adminAuthPassword')?.focus();
+                    }, 300);
+                }
+            } catch (authError) {
+                sessionStorage.removeItem('orva_admin_logged');
+                sessionStorage.removeItem('orva_admin_token');
                 setTimeout(() => {
                     document.getElementById('adminAuthPassword')?.focus();
                 }, 300);
@@ -371,9 +409,7 @@
 
                 if (res.ok && data.success) {
                     sessionStorage.setItem('orva_admin_logged', 'true');
-                    if (data.token) {
-                        sessionStorage.setItem('orva_admin_token', data.token);
-                    }
+                    sessionStorage.removeItem('orva_admin_token');
                     const overlay = document.getElementById('adminAuthOverlay');
                     if (overlay) overlay.style.display = 'none';
                     if (err) err.style.display = 'none';
@@ -392,17 +428,6 @@
                 }
             } catch (networkErr) {
                 console.warn('[Admin Auth Network Error]:', networkErr);
-                // Emergency development fallback when server is offline or restarting
-                if (pass === 'orva2026') {
-                    console.info('[Admin Auth]: Authenticated via offline fallback');
-                    sessionStorage.setItem('orva_admin_logged', 'true');
-                    sessionStorage.setItem('orva_admin_token', 'orva-admin-2026-secure');
-                    const overlay = document.getElementById('adminAuthOverlay');
-                    if (overlay) overlay.style.display = 'none';
-                    if (err) err.style.display = 'none';
-                    this.fetchOrders(true);
-                    return;
-                }
                 if (err) {
                     err.textContent = currentLang === 'fr' 
                         ? 'Erreur réseau lors de la vérification du mot de passe.' 
@@ -417,7 +442,23 @@
             }
         },
 
-        logout: function () {
+        logout: async function () {
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'logout' })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error('تعذر إنهاء جلسة الإدارة.');
+            } catch {
+                this.showToast(
+                    currentLang === 'fr' ? 'Impossible de fermer la session.' : 'تعذر إنهاء جلسة الإدارة؛ تحقق من الاتصال وأعد المحاولة.',
+                    'error'
+                );
+                return;
+            }
+
             sessionStorage.removeItem('orva_admin_logged');
             sessionStorage.removeItem('orva_admin_token');
             const overlay = document.getElementById('adminAuthOverlay');
@@ -1707,10 +1748,7 @@
             try {
                 const res = await fetch('/api/risk', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer orva-admin-2026-secure'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ orderId, action })
                 });
                 const json = await res.json();

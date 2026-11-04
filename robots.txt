@@ -1,0 +1,22 @@
+# ==============================================================================
+# ORVA STORE — Robots Exclusion File
+# Website: https://orva-store.com
+# ==============================================================================
+
+User-agent: *
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /data/
+Disallow: /preview/
+Disallow: /backups/
+
+# Allow Public Storefront
+Allow: /
+Allow: /pack1
+Allow: /pack2
+Allow: /yamaha
+Allow: /products/
+
+Sitemap: https://orva-store.com/sitemap.xml
+

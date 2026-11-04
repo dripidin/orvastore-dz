@@ -6,7 +6,27 @@
   "scripts": {
     "dev": "node dev-server.js",
     "start": "node dev-server.js",
-    "init-excel": "node scripts/init-local-excel.js"
+    "init-excel": "node scripts/init-local-excel.js",
+    "test:phase8b1": "node scripts/test-phase8b1-publisher.js",
+    "test:phase8c": "node scripts/test-phase8c-orders.js",
+    "test:phase8c1": "node scripts/test-phase8c1-suite.js",
+    "test:phase8c2": "node scripts/test-phase8c2-suite.js",
+    "test:phase8d": "node scripts/test-phase8d-suite.js",
+    "test:phase8d1": "node scripts/test-phase8d1-settings.js",
+    "test:phase8d1-1": "node scripts/test-phase8d1-1-security.js",
+    "test:phase8d1-2": "node scripts/test-phase8d1-2-concurrency.js",
+    "test:phase8e": "node scripts/test-phase8e-suite.js",
+    "test:phase8e1": "node scripts/test-phase8e1-acceptance.js",
+    "test:phase8e2": "node scripts/test-phase8e2-verification.js",
+    "test:phase8e3-1": "node scripts/test-phase8e3-1-schema.js",
+    "test:phase8e3-2": "node scripts/test-phase8e3-2-security.js",
+    "test:phase8e3-3": "node scripts/test-phase8e3-3-authorization.js",
+    "test:phase8e3-4": "node scripts/test-phase8e3-4-privileges.js",
+    "test:phase8e3-5": "node scripts/test-phase8e3-5-authorization.js",
+    "test:phase8e3-6": "node scripts/test-phase8e3-6-runtime.js",
+    "test:phase8e3-7": "node scripts/test-phase8e3-7-preflight.js",
+    "test:phase8e3-8": "node scripts/test-phase8e3-8-security-review.js",
+    "test:phase8e3-9": "node scripts/test-phase8e3-9-final-preflight.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

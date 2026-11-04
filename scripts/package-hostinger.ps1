@@ -38,7 +38,9 @@ $rootFiles = @(
     "algeria-communes.js",
     "admin.js",
     "Tarif_Biskra.txt",
-    ".htaccess"
+    ".htaccess",
+    "robots.txt",
+    "sitemap.xml"
 )
 
 Write-Host "Copying core frontend files..."
@@ -58,6 +60,8 @@ $apiFiles = @(
     "config.php",
     "auth.php",
     "delivery.php",
+    "publish-page.php",
+    "admin-settings.php",
     ".htaccess"
 )
 
@@ -72,8 +76,27 @@ foreach ($f in $apiFiles) {
     }
 }
 
+# 3.1. Copy Protected Data Files
+New-Item -ItemType Directory -Path (Join-Path $distDir "data") -Force | Out-Null
+$dataFiles = @(
+    ".htaccess",
+    "products-catalog.json",
+    "wilayas-tariffs.json",
+    "inventory-state.json"
+)
+
+Write-Host "Copying protected initial data files..."
+foreach ($df in $dataFiles) {
+    $src = Join-Path (Join-Path $workspaceRoot "data") $df
+    if (Test-Path $src) {
+        Copy-Item -Path $src -Destination (Join-Path $distDir "data") -Force
+        Write-Host "  OK: data/$df"
+    }
+}
 # 4. Copy Media & Asset Folders
 $assetDirs = @(
+    "admin",
+    "products",
     "pack 1 4950",
     "pack2 12950",
     "images",
@@ -103,7 +126,9 @@ Write-Host "Prepared $fileCount production files in dist-hostinger ($totalMB MB)
 
 # 6. Create Zip Archive
 Write-Host "Compressing into orva-store-hostinger.zip..."
-Compress-Archive -Path "$distDir\*" -DestinationPath $zipFile -Force
+Push-Location $distDir
+tar -a -c -f $zipFile *
+Pop-Location
 $zipBytes = (Get-Item $zipFile).Length
 $zipMB = [math]::Round(($zipBytes / 1MB), 2)
 

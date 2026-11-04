@@ -11,16 +11,49 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# ── 2. Clean URLs for Landing Pages ───────────────────────────────────────────
+# ── 2. Clean URLs & A/B Testing Routing ─────────────────────────────────────────
 RewriteRule ^pack1/?$ pack1.html [L]
 RewriteRule ^pack2/?$ pack2.html [L]
-RewriteRule ^admin/?$ admin.html [L]
 RewriteRule ^yamaha/?$ yamaha-archive.html [L]
+
+# Dynamic Published Product Pages & Isolated Preview (Protected)
+# Protect /preview/* and /data/preview/* from public discovery (Admin Session or Localhost Only)
+RewriteCond %{HTTP_COOKIE} !orva_admin_session
+RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+RewriteCond %{REMOTE_ADDR} !^::1$
+RewriteRule ^(preview|data/preview)(/.*)?$ - [F,L,NC]
+
+RewriteRule ^products/([a-zA-Z0-9_-]+)/?$ products/$1.html [L]
+RewriteRule ^preview/(.*)$ data/preview/$1 [L]
+
+# Next.js Static Asset Chunks (served from admin directory)
+RewriteRule ^_next/(.*)$ admin/_next/$1 [L]
+
+# A/B Switch: If query param ?v=classic or cookie orva_admin_theme=classic, serve classic admin.html
+RewriteCond %{QUERY_STRING} (^|&)v=classic(&|$) [OR]
+RewriteCond %{HTTP_COOKIE} orva_admin_theme=classic
+RewriteRule ^admin/?$ admin.html [L]
+
+# Default / Modern: Serve Modern Next.js Dashboard SPA
+# Prevent recursive rewrite loops on existing files
+RewriteCond %{DOCUMENT_ROOT}/admin/$1 -f
+RewriteRule ^admin/(.*)$ admin/$1 [L]
+
+# Map /dashboard/* or /admin/dashboard/* to admin/dashboard/*/index.html without loop
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !(\.(html|txt|js|css|png|jpg|svg|ico|json))$
+RewriteRule ^(?:admin/)?dashboard/([^/]+)/?$ admin/dashboard/$1/index.html [L]
+
+RewriteRule ^admin/?$ admin/index.html [L]
+RewriteRule ^dashboard/?$ admin/dashboard/default/index.html [L]
+RewriteRule ^admin/(.*)$ admin/$1 [L]
 
 # ── 3. Transparent API Routing to PHP 8.3 Backend ─────────────────────────────
 RewriteRule ^api/send-order/?$ api/send-order.php [L,QSA]
 RewriteRule ^api/auth/?$ api/auth.php [L,QSA]
 RewriteRule ^api/delivery/?$ api/delivery.php [L,QSA]
+RewriteRule ^api/publish-page/?$ api/publish-page.php [L,QSA]
+RewriteRule ^api/admin-settings/?$ api/admin-settings.php [L,QSA]
 
 # ── 4. MIME Types ─────────────────────────────────────────────────────────────
 <IfModule mod_mime.c>
@@ -77,8 +110,21 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Block access to source code and metadata files
-<FilesMatch "\.(json|env|log|md|ps1|sh|sql|yml|yaml)$">
+# Local admin integration settings and internal data/backup directories are server-side only.
+RewriteRule ^data/private(?:/|$) - [F,L,NC]
+RewriteRule ^backups(?:/|$) - [F,L,NC]
+
+# Block direct access to data directory (except internal /data/preview/ when permitted)
+RewriteCond %{REQUEST_URI} !^/data/preview/
+RewriteRule ^data(/.*)?$ - [F,L,NC]
+
+# Block access to source code, lock, and sensitive metadata files
+<FilesMatch "\.enc$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(xlsx|xls|csv|json|env|log|md|ps1|sh|sql|yml|yaml|lock|enc|bak|tmp|swp|ini|cfg)$">
     Order allow,deny
     Deny from all
 </FilesMatch>

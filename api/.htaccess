@@ -1,9 +1,17 @@
 # ==============================================================================
 # ORVA STORE — API Directory Security
+# Website: orva-store.com
 # ==============================================================================
 
-# Deny direct access to config and PHP source files not meant to be browsed
-<Files "config.php">
-    Order allow,deny
-    Deny from all
-</Files>
+# Deny direct access to config and private files
+<FilesMatch "^(config\.php|\.htaccess|\.env.*)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+Options -Indexes

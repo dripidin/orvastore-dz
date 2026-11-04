@@ -1,0 +1,11 @@
+# ==============================================================================
+# ORVA STORE — Excel Directory Direct Access Denial
+# ==============================================================================
+Deny from all
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+RewriteEngine On
+RewriteRule .* - [F,L]

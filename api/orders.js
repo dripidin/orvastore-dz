@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const {
     saveOrderToDb,
     getAllOrdersFromDb,
@@ -6,22 +7,128 @@ const {
 } = require('../lib/db');
 
 module.exports = async (req, res) => {
-    // Enable CORS headers
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    // Restricted CORS origins
+    const origin = req.headers?.origin || '';
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:8080',
+        'http://127.0.0.1:3000',
+        'https://orva-store.com',
+        'https://www.orva-store.com'
+    ];
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, token, api-token'
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Sec-Fetch-Site'
     );
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
+        if (res.writeHead) {
+            res.writeHead(204);
+            res.end();
+        } else if (res.status) {
+            res.status(204).end();
+        } else {
+            res.end();
+        }
         return;
     }
 
     const { method } = req;
+    const allowedHttpMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+    if (!allowedHttpMethods.includes(method)) {
+        res.setHeader('Allow', 'GET, POST, PUT, PATCH, DELETE');
+        return res.status(405).json({
+            success: false,
+            error: 'METHOD_NOT_ALLOWED',
+            message: `Method ${method} is not allowed.`
+        });
+    }
     const { id, orderId, search, status, limit } = req.query || {};
+
+    const adminToken = (process.env.ADMIN_API_TOKEN || '').trim();
+    const authHeader = (req.headers && (req.headers['authorization'] || req.headers['Authorization'])) || '';
+    const cookieHeader = String(req.headers?.cookie || '');
+    const sessionCookie = cookieHeader
+        .split(';')
+        .map((part) => part.trim())
+        .find((part) => part.startsWith('orva_admin_session='))
+        ?.slice('orva_admin_session='.length);
+    let sessionToken = '';
+    try {
+        sessionToken = decodeURIComponent(sessionCookie || '');
+    } catch (_) {
+        sessionToken = '';
+    }
+    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+
+    function safeTokenEqual(a, b) {
+        if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
+        const lenA = Buffer.byteLength(a, 'utf8');
+        const lenB = Buffer.byteLength(b, 'utf8');
+        const maxLen = Math.max(lenA, lenB, 1);
+        const bufA = Buffer.alloc(maxLen);
+        const bufB = Buffer.alloc(maxLen);
+        bufA.write(a, 'utf8');
+        bufB.write(b, 'utf8');
+        return crypto.timingSafeEqual(bufA, bufB) && lenA === lenB;
+    }
+
+    const isBearerAuth = Boolean(bearerToken && safeTokenEqual(bearerToken, adminToken));
+    const isCookieAuth = Boolean(sessionToken && safeTokenEqual(sessionToken, adminToken));
+
+    // Administrative operations (GET, PUT, PATCH, DELETE) require admin token
+    if (['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        if (!adminToken) {
+            return res.status(503).json({
+                success: false,
+                error: 'SERVER_MISCONFIGURED',
+                message: 'ADMIN_API_TOKEN is not configured.'
+            });
+        }
+        if (!isBearerAuth && !isCookieAuth) {
+            return res.status(401).json({
+                success: false,
+                error: 'UNAUTHORIZED_ACCESS',
+                message: 'Authorization: Bearer <ADMIN_API_TOKEN> or valid session required.'
+            });
+        }
+
+        // CSRF Gate: Applied to browser Cookie authentication
+        if (isCookieAuth && !isBearerAuth) {
+            const secFetchSite = String(req.headers?.['sec-fetch-site'] || '').toLowerCase();
+            if (secFetchSite === 'cross-site') {
+                return res.status(403).json({
+                    success: false,
+                    error: 'CSRF_REJECTED',
+                    message: 'Cross-site request blocked by Sec-Fetch-Site policy.'
+                });
+            }
+
+            if (['PUT', 'PATCH', 'DELETE'].includes(method)) {
+                if (!origin) {
+                    return res.status(403).json({
+                        success: false,
+                        error: 'CSRF_ORIGIN_REQUIRED',
+                        message: 'Origin header is required for state-changing browser sessions.'
+                    });
+                }
+                if (!allowedOrigins.includes(origin)) {
+                    return res.status(403).json({
+                        success: false,
+                        error: 'CSRF_ORIGIN_DISALLOWED',
+                        message: 'Origin header is not permitted for state-changing browser sessions.'
+                    });
+                }
+            }
+        }
+    }
 
     try {
         // ─── 1. GET Orders (List & Filter) ──────────────────────────────────

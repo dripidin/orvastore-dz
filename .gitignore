@@ -1,22 +1,99 @@
-.vercel
-node_modules
-.env
-.env.local
-.env*.local
-scratch/
-*.log
+# ==============================================================================
+# ORVA STORE — Git Ignore Configuration
+# ==============================================================================
+
+# 1. Environment & Sensitive Credentials (R2)
+.env*
+!.env.example
+*password*.txt
+hostinger stagging database passwords.txt
+*credential*.json
+secret-keys.php
+staging-secure-config*.php
+*.enc
+*.key
+*.pem
+/data/private/
+data/private/backups/
+
+# 2. Local Audit Reports & Phase Test Dumps (R2)
+PHASE_*
+*_TEST_RESULTS.json
+*results*.json
+hosted_preflight_results.json
+review-artifacts/
+
+# 3. Scratch, Audit, Verify & Reproduction Scripts
 scripts/test-*
+scripts/audit-*
+scripts/verify-*
+!scripts/verify-communes.js
+scripts/reproduce-*
+scripts/execute-*
+scripts/provision-*
+scripts/trigger-*
+scripts/capture-browser-errors.js
+scripts/check-*
+scripts/configure-*
+scripts/fix-*
+scripts/harden-*
+scripts/inspect-*
+scripts/sanitize-*
+scripts/update-*
+scripts/cleanup-*
+scripts/add-*
+scripts/generate-*
+scripts/setup-*
+scripts/workers/
 scripts/find-pooler.js
 scripts/init-supabase-db.js
 scripts/apply-schema.js
+scripts/run-dev.bat
+
+# 4. Browser Profiles, Caches & Screenshots
+scripts/temp-*
+scripts/temp-stability-profile/
+scripts/*screenshots*/
+supabase/.temp/
+supabase/preflight_inspection.sql
+
+# 5. Runtime Test State & Generated Test Products
+data/idempotency-records.json
+data/inventory-audit.json
+data/shipments-registry.json
+data/telegram-dispatch-ledger.json
+data/preview/
+products/*
+!products/.gitkeep
+
+# 6. Cloned External Reference Repositories & Unrelated Projects
+CourierDZ-main/
+easy-invoice-pdf-main/
+geoalgeria-main/
+antigravity-skills-main/
+orvastore Dashbaord v0.9/
+docs/proposals/
+
+# 7. Build Artifacts, Backups & Archives
+dist-hostinger/
+backups/
+*.backup
+*.legacy_backup
+*.enc.backup
+*.zip
+*.tar.gz
+
+# 8. Dependencies, Tooling, Logs & AI Agent Workspaces
+node_modules/
+.vercel/
+scratch/
+*.log
+node.cmd
 .agents/
 .claude/
 .devin/
 .qwen/
 .windsurf/
+.mcp.json
 skills-lock.json
 *.code-workspace
-dist-hostinger/
-*.zip
-node.cmd
-scripts/run-dev.bat
