@@ -117,6 +117,11 @@ foreach ($d in $assetDirs) {
     }
 }
 
+# 4.1. Sanitize dist directory: strip Git tracking files & dev dotfiles
+Write-Host "Sanitizing dist-hostinger (removing dotfiles and git artifacts)..."
+Get-ChildItem -Path $distDir -Filter ".git*" -Recurse -Force -File -ErrorAction SilentlyContinue | Remove-Item -Force
+New-Item -ItemType Directory -Path (Join-Path $distDir "products") -Force | Out-Null
+
 # 5. Measure files
 $allFiles = Get-ChildItem -Path $distDir -Recurse -File
 $fileCount = $allFiles.Count
