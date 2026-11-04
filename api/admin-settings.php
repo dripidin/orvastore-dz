@@ -322,6 +322,159 @@ function writeEncryptedOverrides(string $filePath, array $overrides, array $conf
     }
 }
 
+/**
+ * Test dispatch rate limiter (1 request per 3 seconds per IP/session).
+ * Returns retry duration in seconds if limited, null if allowed.
+ */
+function checkTestMessageRateLimit(): ?int {
+    $rateLimitFile = dirname(__DIR__) . '/data/locks/test-rate-limits.json';
+    $parentDir = dirname($rateLimitFile);
+    if (!is_dir($parentDir)) @mkdir($parentDir, 0755, true);
+
+    $clientKey = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1') . ($_SERVER['HTTP_AUTHORIZATION'] ?? ''));
+    $now = microtime(true);
+    $data = [];
+    if (file_exists($rateLimitFile)) {
+        $raw = @file_get_contents($rateLimitFile);
+        $data = json_decode($raw, true) ?? [];
+    }
+
+    $lastTime = $data[$clientKey] ?? 0;
+    $elapsed = $now - $lastTime;
+    if ($elapsed < 3.0) {
+        $retryAfter = (int)ceil(3.0 - $elapsed);
+        return $retryAfter > 0 ? $retryAfter : 1;
+    }
+
+    $data[$clientKey] = $now;
+    // Prune stale records (> 300s)
+    foreach ($data as $k => $ts) {
+        if ($now - $ts > 300) unset($data[$k]);
+    }
+    @file_put_contents($rateLimitFile, json_encode($data), LOCK_EX);
+    return null;
+}
+
+/**
+ * Synthetic Algerian sample data provider for PHP test dispatches.
+ */
+function getPhpSampleData(string $event): array {
+    $samples = [
+        'ORDER_CREATED' => [
+            'order_id' => 'ORVA-94821',
+            'customer_name' => 'سفيان بن علي',
+            'customer_phone' => '055***3456',
+            'product_name' => 'PACK 4EN1 4950',
+            'quantity' => '1',
+            'product_price' => '4,500',
+            'shipping_fee' => '450',
+            'grand_total' => '4,950',
+            'wilaya' => '16 — الجزائر العاصمة',
+            'commune' => 'باب الزوار',
+            'delivery_type' => 'توصيل للمنزل',
+            'delivery_time' => '24 إلى 48 ساعة',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821',
+            'risk_badge' => ''
+        ],
+        'SHIPMENT_CREATED' => [
+            'order_id' => 'ORVA-94821',
+            'courier_name' => 'Redex Delivery DZ',
+            'tracking_number' => 'RDX-94821-DZ',
+            'reference' => 'REF-ORVA-94821',
+            'wilaya' => 'الجزائر العاصمة',
+            'commune' => 'باب الزوار',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821'
+        ],
+        'SHIPMENT_FAILED' => [
+            'order_id' => 'ORVA-94821',
+            'courier_name' => 'Redex Delivery DZ',
+            'error_message' => 'رمز البلدية غير متطابق مع الولاية المختارة',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821'
+        ],
+        'STATUS_UPDATED' => [
+            'order_id' => 'ORVA-94821',
+            'tracking_number' => 'RDX-94821-DZ',
+            'new_status' => 'تم التسليم للزبون',
+            'raw_status' => 'LIVRE_CLIENT',
+            'receipt_classification' => 'Received',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821'
+        ],
+        'ORDER_CANCELLED' => [
+            'order_id' => 'ORVA-94821',
+            'cancellation_reason' => 'طلب الزبون إلغاء الطلب بعد الاتصال الهاتفي',
+            'restocked' => 'تم إرجاع الكمية للمخزون (+1)',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821'
+        ],
+        'ADMIN_ALERT' => [
+            'title' => 'تنبيه إداري: تحديث أسعار التوصيل',
+            'body' => 'تم تحديث أسعار الشحن لكافة ولايات الجنوب الكبير.',
+            'admin_name' => 'المدير العام',
+            'date' => date('Y/m/d H:i'),
+            'dashboard_url' => 'https://orva-store.com/admin.html'
+        ]
+    ];
+    return $samples[$event] ?? [
+        'order_id' => 'ORVA-94821',
+        'date' => date('Y/m/d H:i'),
+        'dashboard_url' => 'https://orva-store.com/admin.html?orderId=ORVA-94821'
+    ];
+}
+
+/**
+ * Built-in default template provider for PHP.
+ */
+function getPhpDefaultTemplate(string $event): string {
+    switch ($event) {
+        case 'ORDER_CREATED':
+            return "👑 <b>طلب جديد: {{product_name}} — {{grand_total}} د.ج</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>👤 الاسم:</b> {{customer_name}}\n<b>📱 الهاتف:</b> <code>{{customer_phone}}</code>\n<b>📍 المكان:</b> {{wilaya}}\n<b>🚚 التوصيل:</b> {{delivery_type}}\n<b>📦 الكمية:</b> {{quantity}} قطعة\n<b>💰 الإجمالي:</b> <b>{{grand_total}} د.ج</b>\n<b>📅 التاريخ:</b> {{date}}{{risk_badge}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم (Admin Dashboard)</a>";
+        case 'SHIPMENT_CREATED':
+            return "🚚 <b>تم إنشاء بوليصة الشحن بنجاح</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>📦 شركة الشحن:</b> {{courier_name}}\n<b>🏷️ رقم التتبع:</b> <code>{{tracking_number}}</code>\n<b>📋 المرجع:</b> <code>{{reference}}</code>\n<b>📍 الوجهة:</b> {{wilaya}} ({{commune}})\n<b>📅 التاريخ:</b> {{date}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">عرض تفاصيل الشحنة</a>";
+        case 'SHIPMENT_FAILED':
+            return "❌ <b>فشل إنشاء الشحنة مع شركة الشحن</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>📦 شركة الشحن:</b> {{courier_name}}\n<b>⚠️ سبب الخطأ:</b> {{error_message}}\n<b>📅 التاريخ:</b> {{date}}\n━━━━━━━━━━━━━━━━━━\n⚠️ <i>لم يتم تعديل الطلب الداخلي أو المخزون. يرجى التدقيق يدوياً.</i>\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم</a>";
+        case 'STATUS_UPDATED':
+            return "🔄 <b>تحديث حالة الشحن: {{new_status}}</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>🏷️ رقم التتبع:</b> <code>{{tracking_number}}</code>\n<b>📊 الحالة الجديدة:</b> {{new_status}} ({{receipt_classification}})\n<b>📝 الحالة الأصلية:</b> <code>{{raw_status}}</code>\n<b>📅 التاريخ:</b> {{date}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">عرض الطلب</a>";
+        case 'ORDER_CANCELLED':
+            return "🚫 <b>تم إلغاء الطلب / الشحنة</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>سبب الإلغاء:</b> {{cancellation_reason}}\n<b>المخزون المسترجع:</b> {{restocked}}\n<b>📅 التاريخ:</b> {{date}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم</a>";
+        case 'ADMIN_ALERT':
+            return "📢 <b>{{title}}</b>\n━━━━━━━━━━━━━━━━━━\n{{body}}\n━━━━━━━━━━━━━━━━━━\n<b>👤 المرسل:</b> {{admin_name}}\n<b>📅 التاريخ:</b> {{date}}\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم</a>";
+        default:
+            return "ℹ️ <b>إشعار إداري: {$event}</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>التاريخ:</b> {{date}}\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم</a>";
+    }
+}
+
+/**
+ * Universal safe template renderer for PHP.
+ */
+function renderPhpTemplate(string $event, string $templateText, array $context, bool $isTest = false): string {
+    $rendered = preg_replace_callback('/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/', function($matches) use ($context) {
+        $rawVar = $matches[1];
+        $normalized = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $rawVar));
+
+        $val = $context[$rawVar] ?? ($context[$normalized] ?? null);
+        if ($val === null || $val === false || $val === 'undefined' || $val === 'null') {
+            return '';
+        }
+        return htmlspecialchars((string)$val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }, $templateText);
+
+    if ($isTest) {
+        $rendered = "🧪 <b>[TEST] [رسالة تجريبية]</b>\n\n" . $rendered;
+    }
+
+    if (mb_strlen($rendered, 'UTF-8') > 4096) {
+        $notice = "\n\n... [تم اقتطاع الرسالة لتجاوز الحد الأقصى]";
+        $maxBody = 4096 - mb_strlen($notice, 'UTF-8');
+        $rendered = mb_substr($rendered, 0, $maxBody, 'UTF-8') . $notice;
+    }
+
+    return $rendered;
+}
+
 // If required via PHP CLI for unit testing / interop verification without HTTP request, stop here.
 if (php_sapi_name() === 'cli' && empty($_SERVER['REQUEST_METHOD'])) {
     return;
@@ -393,6 +546,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pid = $metaO['pixelId'] ?? $envPixel;
     if ($pid === $legacyPixelId) $pid = '';
 
+    $supportedEvents = ['ORDER_CREATED', 'SHIPMENT_CREATED', 'SHIPMENT_FAILED', 'STATUS_UPDATED', 'ORDER_CANCELLED', 'ADMIN_ALERT'];
+    $savedTemplates = $tgO['templates'] ?? [];
+    $projectedTemplates = [];
+    foreach ($supportedEvents as $evt) {
+        $t = $savedTemplates[$evt] ?? [];
+        $isEvtEnabled = isset($t['enabled']) ? (bool)$t['enabled'] : true;
+        $activeTpl = isset($t['activeTemplate']) ? (string)$t['activeTemplate'] : '';
+        if (empty($activeTpl)) {
+            $activeTpl = getPhpDefaultTemplate($evt);
+        }
+        $draftTpl = isset($t['draftTemplate']) ? (string)$t['draftTemplate'] : '';
+        $projectedTemplates[$evt] = [
+            'enabled' => $isEvtEnabled,
+            'activeTemplate' => $activeTpl,
+            'draftTemplate' => $draftTpl,
+            'isCustomActive' => !empty($t['activeTemplate']) && $isEvtEnabled,
+            'updatedAt' => $t['updatedAt'] ?? null
+        ];
+    }
+
     echo json_encode([
         'success' => true,
         'settings' => [
@@ -418,6 +591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'botTokenConfigured' => $hasTgBot,
                 'chatId' => $tgO['chatId'] ?? $envTgChat,
                 'chatIdConfigured' => $hasTgChat,
+                'templates' => $projectedTemplates,
                 'updatedAt' => $tgO['updatedAt'] ?? null,
                 'status' => !($tgO['enabled'] ?? true) ? 'disabled' : (($hasTgBot && $hasTgChat) ? 'configured' : 'unconfigured')
             ],
@@ -439,11 +613,414 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-// ── 4. POST / PUT State-Changing Operations ───────────────────────────────────
+// ── 4. CSRF Origin & Payload Size Guard for Mutating Requests ────────────────────
+if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'DELETE'], true)) {
+    $reqOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if (!empty($reqOrigin) && !in_array($reqOrigin, $allowedOrigins, true)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'CSRF_REJECTED',
+            'message' => 'Untrusted origin.'
+        ]);
+        exit;
+    }
+
+    if (isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 65536) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'error' => 'PAYLOAD_TOO_LARGE',
+            'message' => 'Request payload exceeds maximum allowed size.'
+        ]);
+        exit;
+    }
+}
+
+// ── 5. POST / PUT State-Changing Operations ───────────────────────────────────
 $rawBody = file_get_contents('php://input');
 $body = json_decode($rawBody, true) ?? [];
 $action = strtolower(trim($body['action'] ?? ($_GET['action'] ?? 'save')));
 
+$supportedEvents = ['ORDER_CREATED', 'SHIPMENT_CREATED', 'SHIPMENT_FAILED', 'STATUS_UPDATED', 'ORDER_CANCELLED', 'ADMIN_ALERT'];
+
+// ── Action: save_template ─────────────────────────────────────────────────────
+if ($action === 'save_template') {
+    $event = trim((string)($body['event'] ?? ''));
+    if (!in_array($event, $supportedEvents, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_EVENT', 'message' => "Unsupported event: {$event}"]);
+        exit;
+    }
+    if (!isset($body['draftTemplate']) || !is_string($body['draftTemplate'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_TEMPLATE', 'message' => 'draftTemplate must be a string.']);
+        exit;
+    }
+    $draftTemplate = trim($body['draftTemplate']);
+    if (strlen($draftTemplate) > 8192) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'PAYLOAD_TOO_LARGE', 'message' => 'Template text exceeds length limit.']);
+        exit;
+    }
+
+    if (!acquireSettingsLock()) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'SETTINGS_LOCK_TIMEOUT']);
+        exit;
+    }
+    try {
+        $overrides = readEncryptedOverrides($settingsFile, $config);
+        $now = gmdate('c');
+        if (!isset($overrides['telegram'])) $overrides['telegram'] = [];
+        if (!isset($overrides['telegram']['templates'])) $overrides['telegram']['templates'] = [];
+        if (!isset($overrides['telegram']['templates'][$event])) $overrides['telegram']['templates'][$event] = [];
+
+        $overrides['telegram']['templates'][$event]['draftTemplate'] = $draftTemplate;
+        if (isset($body['enabled'])) {
+            $overrides['telegram']['templates'][$event]['enabled'] = (bool)$body['enabled'];
+        } elseif (!isset($overrides['telegram']['templates'][$event]['enabled'])) {
+            $overrides['telegram']['templates'][$event]['enabled'] = true;
+        }
+        $overrides['telegram']['templates'][$event]['updatedAt'] = $now;
+        $overrides['telegram']['updatedAt'] = $now;
+
+        $saved = writeEncryptedOverrides($settingsFile, $overrides, $config);
+        if (!$saved) {
+            http_response_code(503);
+            echo json_encode(['success' => false, 'error' => 'SETTINGS_WRITE_FAILED']);
+            exit;
+        }
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'event' => $event,
+            'template' => $overrides['telegram']['templates'][$event]
+        ]);
+        exit;
+    } finally {
+        releaseSettingsLock();
+    }
+}
+
+// ── Action: activate_template ─────────────────────────────────────────────────
+if ($action === 'activate_template') {
+    $event = trim((string)($body['event'] ?? ''));
+    if (!in_array($event, $supportedEvents, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_EVENT', 'message' => "Unsupported event: {$event}"]);
+        exit;
+    }
+
+    if (!acquireSettingsLock()) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'SETTINGS_LOCK_TIMEOUT']);
+        exit;
+    }
+    try {
+        $overrides = readEncryptedOverrides($settingsFile, $config);
+        $now = gmdate('c');
+        if (!isset($overrides['telegram']['templates'][$event])) {
+            $overrides['telegram']['templates'][$event] = [];
+        }
+
+        $draft = $overrides['telegram']['templates'][$event]['draftTemplate'] ?? '';
+        if ($draft !== '') {
+            $overrides['telegram']['templates'][$event]['activeTemplate'] = $draft;
+        } else {
+            $overrides['telegram']['templates'][$event]['activeTemplate'] = $overrides['telegram']['templates'][$event]['activeTemplate'] ?? getPhpDefaultTemplate($event);
+        }
+        $overrides['telegram']['templates'][$event]['enabled'] = true;
+        $overrides['telegram']['templates'][$event]['updatedAt'] = $now;
+        $overrides['telegram']['updatedAt'] = $now;
+
+        $saved = writeEncryptedOverrides($settingsFile, $overrides, $config);
+        if (!$saved) {
+            http_response_code(503);
+            echo json_encode(['success' => false, 'error' => 'SETTINGS_WRITE_FAILED']);
+            exit;
+        }
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'event' => $event,
+            'activeTemplate' => $overrides['telegram']['templates'][$event]['activeTemplate'] ?? ''
+        ]);
+        exit;
+    } finally {
+        releaseSettingsLock();
+    }
+}
+
+// ── Action: restore_template ──────────────────────────────────────────────────
+if ($action === 'restore_template') {
+    $event = trim((string)($body['event'] ?? ''));
+    if (!in_array($event, $supportedEvents, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_EVENT', 'message' => "Unsupported event: {$event}"]);
+        exit;
+    }
+
+    if (!acquireSettingsLock()) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'SETTINGS_LOCK_TIMEOUT']);
+        exit;
+    }
+    try {
+        $overrides = readEncryptedOverrides($settingsFile, $config);
+        $now = gmdate('c');
+        if (isset($overrides['telegram']['templates'][$event])) {
+            unset($overrides['telegram']['templates'][$event]);
+            $overrides['telegram']['updatedAt'] = $now;
+            $saved = writeEncryptedOverrides($settingsFile, $overrides, $config);
+            if (!$saved) {
+                http_response_code(503);
+                echo json_encode(['success' => false, 'error' => 'SETTINGS_WRITE_FAILED']);
+                exit;
+            }
+        }
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'event' => $event,
+            'restored' => true
+        ]);
+        exit;
+    } finally {
+        releaseSettingsLock();
+    }
+}
+
+// ── Action: toggle_template ───────────────────────────────────────────────────
+if ($action === 'toggle_template') {
+    $event = trim((string)($body['event'] ?? ''));
+    if (!in_array($event, $supportedEvents, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_EVENT', 'message' => "Unsupported event: {$event}"]);
+        exit;
+    }
+    if (!isset($body['enabled'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_SETTINGS', 'message' => 'enabled boolean required.']);
+        exit;
+    }
+    $enabled = (bool)$body['enabled'];
+
+    if (!acquireSettingsLock()) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'SETTINGS_LOCK_TIMEOUT']);
+        exit;
+    }
+    try {
+        $overrides = readEncryptedOverrides($settingsFile, $config);
+        $now = gmdate('c');
+        if (!isset($overrides['telegram']['templates'][$event])) {
+            $overrides['telegram']['templates'][$event] = [];
+        }
+        $overrides['telegram']['templates'][$event]['enabled'] = $enabled;
+        $overrides['telegram']['templates'][$event]['updatedAt'] = $now;
+        $overrides['telegram']['updatedAt'] = $now;
+
+        $saved = writeEncryptedOverrides($settingsFile, $overrides, $config);
+        if (!$saved) {
+            http_response_code(503);
+            echo json_encode(['success' => false, 'error' => 'SETTINGS_WRITE_FAILED']);
+            exit;
+        }
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'event' => $event,
+            'enabled' => $enabled
+        ]);
+        exit;
+    } finally {
+        releaseSettingsLock();
+    }
+}
+
+// ── Action: send_test_message ─────────────────────────────────────────────────
+if ($action === 'send_test_message') {
+    $event = trim((string)($body['event'] ?? ''));
+    if (!in_array($event, $supportedEvents, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_EVENT', 'message' => "Unsupported event: {$event}"]);
+        exit;
+    }
+
+    $retryAfter = checkTestMessageRateLimit();
+    if ($retryAfter !== null) {
+        http_response_code(429);
+        header("Retry-After: {$retryAfter}");
+        echo json_encode([
+            'success' => false,
+            'error' => 'RATE_LIMITED',
+            'retryAfter' => $retryAfter,
+            'message' => "Rate limit exceeded. Please wait {$retryAfter} seconds before sending another test message."
+        ]);
+        exit;
+    }
+
+    $overrides = readEncryptedOverrides($settingsFile, $config);
+    $tgToken = $overrides['telegram']['botToken'] ?? (getenv('TELEGRAM_BOT_TOKEN') ?: ($config['telegram']['bot_token'] ?? ''));
+    $tgChatId = $overrides['telegram']['chatId'] ?? (getenv('TELEGRAM_CHAT_ID') ?: ($config['telegram']['chat_id'] ?? ''));
+
+    if (empty($tgToken) || empty($tgChatId)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'TELEGRAM_NOT_CONFIGURED', 'message' => 'Telegram Bot Token and Chat ID must be configured.']);
+        exit;
+    }
+
+    $templateText = '';
+    if (!empty($body['templateText']) && is_string($body['templateText'])) {
+        $templateText = trim($body['templateText']);
+    } elseif (!empty($overrides['telegram']['templates'][$event]['activeTemplate'])) {
+        $templateText = trim($overrides['telegram']['templates'][$event]['activeTemplate']);
+    } else {
+        $templateText = getPhpDefaultTemplate($event);
+    }
+
+    $rendered = renderPhpTemplate($event, $templateText, getPhpSampleData($event), true);
+    $isSimulated = (getenv('NODE_ENV') === 'test' || getenv('MOCK_TELEGRAM') === 'true' || !empty($_ENV['MOCK_TELEGRAM']));
+
+    if ($isSimulated) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'simulated' => true,
+            'test' => true,
+            'event' => $event,
+            'destination' => $tgChatId,
+            'textPreview' => mb_substr($rendered, 0, 150, 'UTF-8')
+        ]);
+        exit;
+    }
+
+    $ch = curl_init("https://api.telegram.org/bot{$tgToken}/sendMessage");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'chat_id' => $tgChatId,
+        'text' => $rendered,
+        'parse_mode' => 'HTML',
+        'disable_web_page_preview' => true
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    $res = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+    curl_close($ch);
+
+    $resJson = json_decode($res, true) ?? [];
+    if ($httpCode >= 200 && $httpCode < 300 && ($resJson['ok'] ?? false)) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'dispatched' => true,
+            'test' => true,
+            'event' => $event,
+            'messageId' => $resJson['result']['message_id'] ?? null
+        ]);
+        exit;
+    } else {
+        http_response_code(502);
+        $rawErr = $resJson['description'] ?? ($curlErr ?: "HTTP_{$httpCode}");
+        $safeErr = preg_replace('/\/bot[a-zA-Z0-9_:-]+/i', '/bot[REDACTED_TOKEN]', $rawErr);
+        echo json_encode([
+            'success' => false,
+            'error' => 'TELEGRAM_DISPATCH_FAILED',
+            'message' => $safeErr
+        ]);
+        exit;
+    }
+}
+
+// ── Action: send_custom_message ───────────────────────────────────────────────
+if ($action === 'send_custom_message') {
+    $title = trim((string)($body['title'] ?? ''));
+    $bodyText = trim((string)($body['body'] ?? ''));
+
+    if (empty($title) || empty($bodyText)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_PAYLOAD', 'message' => 'Both title and body are required.']);
+        exit;
+    }
+
+    if (strlen($title) > 256 || strlen($bodyText) > 4096) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'PAYLOAD_TOO_LARGE', 'message' => 'Title or body exceeds length limits.']);
+        exit;
+    }
+
+    $overrides = readEncryptedOverrides($settingsFile, $config);
+    $tgToken = $overrides['telegram']['botToken'] ?? (getenv('TELEGRAM_BOT_TOKEN') ?: ($config['telegram']['bot_token'] ?? ''));
+    $tgChatId = $overrides['telegram']['chatId'] ?? (getenv('TELEGRAM_CHAT_ID') ?: ($config['telegram']['chat_id'] ?? ''));
+
+    if (empty($tgToken) || empty($tgChatId)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'TELEGRAM_NOT_CONFIGURED', 'message' => 'Telegram Bot Token and Chat ID must be configured.']);
+        exit;
+    }
+
+    $titleEsc = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $contentEsc = htmlspecialchars($bodyText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $dateFormatted = date('Y-m-d H:i');
+    $adminUrl = "https://orva-store.com/admin.html";
+    $msg = "📢 <b>{$titleEsc}</b>\n━━━━━━━━━━━━━━━━━━\n{$contentEsc}\n━━━━━━━━━━━━━━━━━━\n<b>👤 المرسل:</b> مدير المتجر\n<b>📅 التاريخ:</b> {$dateFormatted}\n👉 <a href=\"{$adminUrl}\">لوحة التحكم</a>";
+
+    $isSimulated = (getenv('NODE_ENV') === 'test' || getenv('MOCK_TELEGRAM') === 'true' || !empty($_ENV['MOCK_TELEGRAM']));
+
+    if ($isSimulated) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'simulated' => true,
+            'destination' => $tgChatId,
+            'textPreview' => mb_substr($msg, 0, 150, 'UTF-8')
+        ]);
+        exit;
+    }
+
+    $ch = curl_init("https://api.telegram.org/bot{$tgToken}/sendMessage");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'chat_id' => $tgChatId,
+        'text' => $msg,
+        'parse_mode' => 'HTML',
+        'disable_web_page_preview' => true
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    $res = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+    curl_close($ch);
+
+    $resJson = json_decode($res, true) ?? [];
+    if ($httpCode >= 200 && $httpCode < 300 && ($resJson['ok'] ?? false)) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'dispatched' => true,
+            'messageId' => $resJson['result']['message_id'] ?? null
+        ]);
+        exit;
+    } else {
+        http_response_code(502);
+        $rawErr = $resJson['description'] ?? ($curlErr ?: "HTTP_{$httpCode}");
+        $safeErr = preg_replace('/\/bot[a-zA-Z0-9_:-]+/i', '/bot[REDACTED_TOKEN]', $rawErr);
+        echo json_encode([
+            'success' => false,
+            'error' => 'TELEGRAM_DISPATCH_FAILED',
+            'message' => $safeErr
+        ]);
+        exit;
+    }
+}
+
+// ── 6. Legacy Actions (Test Connection, Save, Clear) ──────────────────────────
 // Action: Test Connection
 if ($action === 'test') {
     $integration = trim($body['integration'] ?? '');
@@ -574,6 +1151,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PUT
             elseif (!empty($body['telegram']['botToken'])) $current['botToken'] = trim($body['telegram']['botToken']);
             if (!empty($body['telegram']['clearChatId'])) $current['chatId'] = '';
             elseif (!empty($body['telegram']['chatId'])) $current['chatId'] = trim($body['telegram']['chatId']);
+            if (isset($body['telegram']['templates']) && is_array($body['telegram']['templates'])) {
+                $current['templates'] = array_merge($current['templates'] ?? [], $body['telegram']['templates']);
+            }
             $current['updatedAt'] = $now;
             $overrides['telegram'] = $current;
         }

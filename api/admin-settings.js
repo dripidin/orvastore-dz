@@ -5,16 +5,22 @@
 // =============================================================================
 
 const crypto = require('crypto');
+const fs = require('fs');
 const https = require('https');
 const {
     DEFAULT_REDEX_URL,
     DEFAULT_ECOTRACK_URL,
     LEGACY_PIXEL_ID,
     STOREFRONT_PAGES,
+    AUDIT_FILE,
     getEffectiveSettings,
     getPublicSettings,
     getPublicStorefrontConfig,
     updateSettings,
+    saveTemplateDraft,
+    activateTemplate,
+    restoreTemplateDefault,
+    toggleTemplate
 } = require('../lib/admin-settings-store');
 
 const { testConnection, validateCourierUrl } = require('../lib/courier-client');
@@ -22,6 +28,7 @@ const { testConnection, validateCourierUrl } = require('../lib/courier-client');
 const ALLOWED_ORIGINS = new Set([
     'https://orva-store.com',
     'https://www.orva-store.com',
+    'https://staging.orva-store.com',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8080'
@@ -69,6 +76,11 @@ function isAuthorized(req) {
 }
 
 function isTrustedOrigin(req) {
+    const secFetchSite = req.headers?.['sec-fetch-site'];
+    if (secFetchSite === 'cross-site') {
+        return false;
+    }
+
     const origin = req.headers?.origin;
     const referer = req.headers?.referer;
     const host = req.headers?.host;
@@ -492,9 +504,118 @@ async function runConnectionTest(integration, credentials = {}) {
     }
 }
 
+const SUPPORTED_TELEGRAM_EVENTS = new Set([
+    'ORDER_CREATED',
+    'SHIPMENT_CREATED',
+    'SHIPMENT_FAILED',
+    'STATUS_UPDATED',
+    'ORDER_CANCELLED',
+    'ADMIN_ALERT'
+]);
+
+const adminTestRateLimits = new Map();
+
+function resetAdminTestRateLimits() {
+    adminTestRateLimits.clear();
+}
+
+function checkAdminTestRateLimit(req, now = Date.now()) {
+    const ip = req.headers?.['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
+    const auth = req.headers?.authorization || req.headers?.cookie || 'admin';
+    const key = `${ip}:${auth}`;
+    let entry = adminTestRateLimits.get(key);
+    if (!entry) {
+        entry = { lastDispatched: 0, timestamps: [] };
+    }
+    // Clean timestamps older than 60s
+    entry.timestamps = entry.timestamps.filter(ts => now - ts < 60000);
+
+    // Rule 1: 3-second cooldown
+    const elapsed = now - entry.lastDispatched;
+    if (elapsed < 3000) {
+        const retryAfter = Math.max(1, Math.ceil((3000 - elapsed) / 1000));
+        return {
+            allowed: false,
+            retryAfter,
+            message: `يرجى الانتظار ${retryAfter} ثوانٍ قبل إرسال رسالة تجريبية أخرى لتجنب حظر تيليجرام.`
+        };
+    }
+
+    // Rule 2: Max 10 per minute
+    if (entry.timestamps.length >= 10) {
+        const oldest = entry.timestamps[0];
+        const retryAfter = Math.max(1, Math.ceil((60000 - (now - oldest)) / 1000));
+        return {
+            allowed: false,
+            retryAfter,
+            message: `تم تجاوز الحد الأقصى لإرسال الرسائل (10 رسائل في الدقيقة). يرجى الانتظار ${retryAfter} ثانية.`
+        };
+    }
+
+    entry.lastDispatched = now;
+    entry.timestamps.push(now);
+    adminTestRateLimits.set(key, entry);
+
+    if (adminTestRateLimits.size > 200) {
+        for (const [k, v] of adminTestRateLimits.entries()) {
+            if (now - v.lastDispatched > 300000) adminTestRateLimits.delete(k);
+        }
+    }
+
+    return { allowed: true };
+}
+
+function sendTelegramHttpRequest(botToken, chatId, text) {
+    return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+        });
+
+        const req = https.request({
+            hostname: 'api.telegram.org',
+            port: 443,
+            path: `/bot${botToken}/sendMessage`,
+            method: 'POST',
+            timeout: 5000,
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload)
+            }
+        }, (res) => {
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                let parsed = null;
+                try { parsed = JSON.parse(body); } catch (_) {}
+                if (res.statusCode >= 200 && res.statusCode < 300 && parsed && parsed.ok) {
+                    resolve({ ok: true, result: parsed.result });
+                } else {
+                    const errMsg = (parsed && parsed.description) ? parsed.description : `HTTP_${res.statusCode}`;
+                    reject(new Error(`TELEGRAM_API_ERROR: ${errMsg}`));
+                }
+            });
+        });
+
+        req.on('timeout', () => {
+            req.destroy(new Error('TELEGRAM_TIMEOUT'));
+        });
+
+        req.on('error', (err) => {
+            const msg = (err && err.message) || String(err);
+            reject(new Error(msg.replace(/\/bot[a-zA-Z0-9_:-]+/g, '/bot[REDACTED_TOKEN]')));
+        });
+
+        req.write(payload);
+        req.end();
+    });
+}
+
 // ── Main Request Handler ─────────────────────────────────────────────────────
 
-module.exports = async (req, res) => {
+const adminSettingsHandler = async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
@@ -556,12 +677,204 @@ module.exports = async (req, res) => {
         return res.status(403).json({ success: false, error: 'CSRF_REJECTED', message: 'Untrusted origin.' });
     }
 
+    const contentLength = parseInt(req.headers?.['content-length'] || '0', 10);
+    if (contentLength > 65536) {
+        return res.status(400).json({ success: false, error: 'PAYLOAD_TOO_LARGE', message: 'Request payload exceeds 64KB limit.' });
+    }
+
     let body = req.body || {};
     if (typeof body === 'string') {
+        if (Buffer.byteLength(body) > 65536) {
+            return res.status(400).json({ success: false, error: 'PAYLOAD_TOO_LARGE', message: 'Request payload exceeds 64KB limit.' });
+        }
         try { body = JSON.parse(body); } catch (_) {}
     }
 
     const action = String(body.action || query.action || 'save').toLowerCase();
+
+    // ── Telegram Template & Custom Message Actions (Phase 8F Milestone 2) ─────
+    if (action === 'save_template') {
+        const event = String(body.event || '').trim();
+        if (!SUPPORTED_TELEGRAM_EVENTS.has(event)) {
+            return res.status(400).json({ success: false, error: 'INVALID_EVENT', message: `Event '${event}' is unsupported.` });
+        }
+        const draftTemplate = typeof body.draftTemplate === 'string' ? body.draftTemplate : '';
+        if (draftTemplate.length > 8192) {
+            return res.status(400).json({ success: false, error: 'PAYLOAD_TOO_LARGE', message: 'Template text exceeds maximum allowed size.' });
+        }
+        try {
+            const updated = saveTemplateDraft(event, draftTemplate, body.enabled, 'admin');
+            return res.status(200).json({ success: true, settings: updated, event });
+        } catch (_) {
+            return res.status(503).json({ success: false, error: 'SETTINGS_UNAVAILABLE' });
+        }
+    }
+
+    if (action === 'activate_template') {
+        const event = String(body.event || '').trim();
+        if (!SUPPORTED_TELEGRAM_EVENTS.has(event)) {
+            return res.status(400).json({ success: false, error: 'INVALID_EVENT', message: `Event '${event}' is unsupported.` });
+        }
+        try {
+            const updated = activateTemplate(event, 'admin');
+            return res.status(200).json({ success: true, settings: updated, event });
+        } catch (_) {
+            return res.status(503).json({ success: false, error: 'SETTINGS_UNAVAILABLE' });
+        }
+    }
+
+    if (action === 'restore_template') {
+        const event = String(body.event || '').trim();
+        if (!SUPPORTED_TELEGRAM_EVENTS.has(event)) {
+            return res.status(400).json({ success: false, error: 'INVALID_EVENT', message: `Event '${event}' is unsupported.` });
+        }
+        try {
+            const updated = restoreTemplateDefault(event, 'admin');
+            return res.status(200).json({ success: true, settings: updated, event });
+        } catch (_) {
+            return res.status(503).json({ success: false, error: 'SETTINGS_UNAVAILABLE' });
+        }
+    }
+
+    if (action === 'toggle_template') {
+        const event = String(body.event || '').trim();
+        if (!SUPPORTED_TELEGRAM_EVENTS.has(event)) {
+            return res.status(400).json({ success: false, error: 'INVALID_EVENT', message: `Event '${event}' is unsupported.` });
+        }
+        if (typeof body.enabled !== 'boolean') {
+            return res.status(400).json({ success: false, error: 'INVALID_SETTINGS', message: 'Field enabled must be a boolean.' });
+        }
+        try {
+            const updated = toggleTemplate(event, body.enabled, 'admin');
+            return res.status(200).json({ success: true, settings: updated, event });
+        } catch (_) {
+            return res.status(503).json({ success: false, error: 'SETTINGS_UNAVAILABLE' });
+        }
+    }
+
+    if (action === 'send_test_message') {
+        const event = String(body.event || '').trim();
+        if (!SUPPORTED_TELEGRAM_EVENTS.has(event)) {
+            return res.status(400).json({ success: false, error: 'INVALID_EVENT', message: `Event '${event}' is unsupported.` });
+        }
+
+        const rateCheck = checkAdminTestRateLimit(req);
+        if (!rateCheck.allowed) {
+            res.setHeader('Retry-After', String(rateCheck.retryAfter));
+            return res.status(429).json({
+                success: false,
+                error: 'RATE_LIMITED',
+                message: rateCheck.message,
+                retryAfter: rateCheck.retryAfter
+            });
+        }
+
+        const effective = getEffectiveSettings().telegram;
+        if (!effective.botToken || !effective.chatId) {
+            return res.status(400).json({
+                success: false,
+                error: 'TELEGRAM_NOT_CONFIGURED',
+                message: 'Telegram bot token and chat ID must be configured in settings.'
+            });
+        }
+
+        let engine = null;
+        try { engine = require('../lib/telegram-template-engine'); } catch (_) {}
+        if (!engine) {
+            return res.status(500).json({ success: false, error: 'ENGINE_UNAVAILABLE' });
+        }
+
+        let templateText = typeof body.templateText === 'string' && body.templateText.trim() ? body.templateText.trim() : null;
+        if (templateText && templateText.length > 8192) {
+            return res.status(400).json({ success: false, error: 'PAYLOAD_TOO_LARGE' });
+        }
+
+        if (!templateText) {
+            const tpls = effective.templates || {};
+            const stored = tpls[event];
+            templateText = (stored && (stored.draftTemplate || stored.activeTemplate)) || (engine.getEventRegistry()[event]?.defaultTemplate) || '';
+        }
+
+        const sampleData = engine.getSampleData(event);
+        const rendered = engine.renderTemplate(templateText, sampleData, { isTest: true, event });
+
+        try {
+            const dispatchRes = await sendTelegramHttpRequest(effective.botToken, effective.chatId, rendered.text);
+            return res.status(200).json({
+                success: true,
+                message: 'Test message dispatched successfully.',
+                event,
+                chatId: effective.chatId,
+                messageId: dispatchRes?.result?.message_id,
+                test: true,
+                charCount: rendered.charCount
+            });
+        } catch (err) {
+            const sanitized = String(err.message || err).replace(/\/bot[a-zA-Z0-9_:-]+/g, '/bot[REDACTED_TOKEN]');
+            return res.status(500).json({
+                success: false,
+                error: 'TELEGRAM_DISPATCH_FAILED',
+                message: sanitized
+            });
+        }
+    }
+
+    if (action === 'send_custom_message') {
+        const title = typeof body.title === 'string' ? body.title.trim() : '';
+        const bodyText = typeof body.body === 'string' ? body.body.trim() : '';
+        if (!title || !bodyText) {
+            return res.status(400).json({ success: false, error: 'INVALID_PAYLOAD', message: 'Both title and body are required.' });
+        }
+        if (title.length > 256 || bodyText.length > 4096) {
+            return res.status(400).json({ success: false, error: 'PAYLOAD_TOO_LARGE', message: 'Title or body exceeds length limits.' });
+        }
+
+        const effective = getEffectiveSettings().telegram;
+        if (!effective.botToken || !effective.chatId) {
+            return res.status(400).json({ success: false, error: 'TELEGRAM_NOT_CONFIGURED', message: 'Telegram bot token and chat ID must be configured.' });
+        }
+
+        let engine = null;
+        try { engine = require('../lib/telegram-template-engine'); } catch (_) {}
+        const messageText = engine && typeof engine.buildDefaultMessage === 'function'
+            ? engine.buildDefaultMessage('ADMIN_ALERT', 'ADMIN-BROADCAST', { title, body: bodyText, admin_name: 'مدير المتجر' })
+            : `📢 <b>${title}</b>\n━━━━━━━━━━━━━━━━━━\n${bodyText}\n━━━━━━━━━━━━━━━━━━\n<b>👤 المرسل:</b> مدير المتجر\n<b>📅 التاريخ:</b> ${new Date().toLocaleString('ar-DZ', { timeZone: 'Africa/Algiers' })}`;
+
+        try {
+            const dispatchRes = await sendTelegramHttpRequest(effective.botToken, effective.chatId, messageText);
+            try {
+                let audit = [];
+                if (fs.existsSync(AUDIT_FILE)) {
+                    try { audit = JSON.parse(fs.readFileSync(AUDIT_FILE, 'utf8')); } catch (_) { audit = []; }
+                }
+                audit.push({
+                    timestamp: new Date().toISOString(),
+                    action: 'SETTINGS_UPDATE',
+                    integration: 'telegram',
+                    subAction: 'CUSTOM_MESSAGE',
+                    admin: 'admin'
+                });
+                if (audit.length > 1000) audit = audit.slice(-1000);
+                const tmp = `${AUDIT_FILE}.${process.pid}.tmp`;
+                fs.writeFileSync(tmp, JSON.stringify(audit, null, 2), 'utf8');
+                fs.renameSync(tmp, AUDIT_FILE);
+            } catch (_) {}
+
+            return res.status(200).json({
+                success: true,
+                message: 'Custom administrative message dispatched successfully.',
+                chatId: effective.chatId,
+                messageId: dispatchRes?.result?.message_id
+            });
+        } catch (err) {
+            const sanitized = String(err.message || err).replace(/\/bot[a-zA-Z0-9_:-]+/g, '/bot[REDACTED_TOKEN]');
+            return res.status(500).json({
+                success: false,
+                error: 'TELEGRAM_DISPATCH_FAILED',
+                message: sanitized
+            });
+        }
+    }
 
     // ── 5. Action: Connection Test ────────────────────────────────────────────
     if (action === 'test') {
@@ -644,3 +957,7 @@ module.exports = async (req, res) => {
 
     return res.status(405).json({ success: false, error: 'METHOD_NOT_ALLOWED' });
 };
+
+adminSettingsHandler.resetAdminTestRateLimits = resetAdminTestRateLimits;
+
+module.exports = adminSettingsHandler;

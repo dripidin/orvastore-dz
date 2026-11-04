@@ -154,6 +154,12 @@ if (file_exists($encFile)) {
                                 if (!empty($overrides['telegram']['chatId'])) {
                                     $config['telegram']['chat_id'] = $overrides['telegram']['chatId'];
                                 }
+                                if (isset($overrides['telegram']['enabled'])) {
+                                    $config['telegram']['enabled'] = (bool)$overrides['telegram']['enabled'];
+                                }
+                                if (isset($overrides['telegram']['templates']) && is_array($overrides['telegram']['templates'])) {
+                                    $config['telegram']['templates'] = $overrides['telegram']['templates'];
+                                }
                                 if (!empty($overrides['metaPixel']['pixelId'])) {
                                     $config['meta']['pixel_id'] = $overrides['metaPixel']['pixelId'];
                                 }

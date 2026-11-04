@@ -42,11 +42,11 @@ RewriteRule ^admin/(.*)$ admin/$1 [L]
 # Map /dashboard/* or /admin/dashboard/* to admin/dashboard/*/index.html without loop
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !(\.(html|txt|js|css|png|jpg|svg|ico|json))$
-RewriteRule ^(?:admin/)?dashboard/([^/]+)/?$ admin/dashboard/$1/index.html [L]
+RewriteRule ^(?:admin/)?dashboard/(.+?)/?$ admin/dashboard/$1/index.html [L,QSA]
 
 RewriteRule ^admin/?$ admin/index.html [L]
 RewriteRule ^dashboard/?$ admin/dashboard/default/index.html [L]
-RewriteRule ^admin/(.*)$ admin/$1 [L]
+ErrorDocument 404 /admin/404.html
 
 # ── 3. Transparent API Routing to PHP 8.3 Backend ─────────────────────────────
 RewriteRule ^api/send-order/?$ api/send-order.php [L,QSA]

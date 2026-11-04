@@ -358,10 +358,12 @@ if ($supabaseHttp !== 200 && $supabaseHttp !== 201) {
     exit;
 }
 
-// ── 9. Decoupled Notifications with Deduplication Ledger (Phase 8D) ───
-$tgToken  = $config['telegram']['bot_token'] ?? '';
-$tgChatId = $config['telegram']['chat_id'] ?? '';
-if ($tgToken && $tgChatId) {
+// ── 9. Decoupled Notifications with Deduplication Ledger & Templates (Phase 8D/8F) ──
+$tgToken   = $config['telegram']['bot_token'] ?? '';
+$tgChatId  = $config['telegram']['chat_id'] ?? '';
+$tgEnabled = $config['telegram']['enabled'] ?? true;
+
+if ($tgToken && $tgChatId && $tgEnabled) {
     $ledgerFile = __DIR__ . '/../data/telegram-dispatch-ledger.json';
     $ledgerKey = "ORDER_CREATED_{$orderId}_none";
     $ledger = [];
@@ -370,7 +372,7 @@ if ($tgToken && $tgChatId) {
     }
 
     if (!isset($ledger[$ledgerKey])) {
-        // Mask customer phone for privacy
+        // 1. Mask customer phone for administrative privacy
         $maskedPhone = $phone;
         if (strlen($phone) >= 8) {
             $maskedPhone = substr($phone, 0, 3) . '***' . substr($phone, -4);
@@ -378,39 +380,127 @@ if ($tgToken && $tgChatId) {
 
         $dateFormatted = date('Y-m-d H:i');
         $adminUrl = "https://orva-store.com/admin.html?orderId=" . urlencode($orderId);
-        $tgMsg = "👑 <b>طلب جديد: {$product['shortTitle']} — " . number_format($calculatedGrandTotal) . " د.ج</b>\n" .
-                 "━━━━━━━━━━━━━━━━━━\n" .
-                 "<b>🆔 رقم الطلب:</b> <code>{$orderId}</code>\n" .
-                 "<b>👤 الاسم:</b> {$fullName}\n" .
-                 "<b>📱 الهاتف:</b> <code>{$maskedPhone}</code>\n" .
-                 "<b>📍 المكان:</b> {$cleanLocation}\n" .
-                 "<b>🚚 التوصيل:</b> {$actualDeliveryType}\n" .
-                 "<b>⚡ المدة:</b> {$deliveryTime}\n" .
-                 "<b>📦 العرض والكمية:</b> {$quantity} قطعة — <b>{$product['shortTitle']}</b>\n" .
-                 "<b>💵 سعر العرض:</b> {$productTotalStr}\n" .
-                 "<b>🚚 مصاريف التوصيل:</b> {$shippingFeeStr}\n" .
-                 "━━━━━━━━━━━━━━━━━━\n" .
-                 "<b>💰 المجموع الكلي (COD):</b> <b>{$grandTotalStr}</b>\n" .
-                 "<b>📅 التاريخ:</b> {$dateFormatted}\n" .
-                 "━━━━━━━━━━━━━━━━━━\n" .
-                 "📌 <b>الطلبية محفوظة في قاعدة البيانات وجاهزة للتأكيد.</b>\n" .
-                 "👉 <a href=\"{$adminUrl}\">لوحة التحكم (Admin Dashboard)</a>";
 
+        // 2. Resolve Custom Active Template for ORDER_CREATED
+        $customTemplate = null;
+        $templates = $config['telegram']['templates'] ?? [];
+        if (isset($templates['ORDER_CREATED']) && is_array($templates['ORDER_CREATED'])) {
+            $tplConf = $templates['ORDER_CREATED'];
+            if (($tplConf['enabled'] ?? true) && !empty($tplConf['activeTemplate']) && trim($tplConf['activeTemplate']) !== '') {
+                $customTemplate = trim($tplConf['activeTemplate']);
+            }
+        }
+
+        $tgMsg = '';
+        if ($customTemplate !== null) {
+            // Context variables map with canonical keys & common aliases
+            $context = [
+                'order_id' => $orderId,
+                'orderId' => $orderId,
+                'id' => $orderId,
+                'customer_name' => $fullName,
+                'customerName' => $fullName,
+                'fullName' => $fullName,
+                'name' => $fullName,
+                'customer_phone' => $maskedPhone,
+                'customerPhone' => $maskedPhone,
+                'phone' => $maskedPhone,
+                'maskedPhone' => $maskedPhone,
+                'product_name' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
+                'productName' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
+                'productTitle' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
+                'quantity' => (string)$quantity,
+                'qty' => (string)$quantity,
+                'product_price' => $productTotalStr,
+                'productPrice' => $productTotalStr,
+                'shipping_fee' => $shippingFeeStr,
+                'shippingFee' => $shippingFeeStr,
+                'grand_total' => $grandTotalStr,
+                'grandTotal' => $grandTotalStr,
+                'total' => $grandTotalStr,
+                'wilaya' => $cleanLocation,
+                'location' => $cleanLocation,
+                'commune' => $commune ?: '',
+                'city' => $commune ?: '',
+                'delivery_type' => $actualDeliveryType,
+                'deliveryType' => $actualDeliveryType,
+                'delivery_time' => $deliveryTime,
+                'deliveryTime' => $deliveryTime,
+                'date' => $dateFormatted,
+                'dateTime' => $dateFormatted,
+                'dashboard_url' => $adminUrl,
+                'dashboardUrl' => $adminUrl,
+                'risk_score' => (string)($riskScore ?? 0),
+                'risk_decision' => (string)($riskDecision ?? 'ALLOW'),
+                'risk_badge' => ''
+            ];
+
+            // Render template and escape dynamic variable values
+            $rendered = preg_replace_callback('/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/', function($matches) use ($context) {
+                $rawVar = $matches[1];
+                $normVar = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $rawVar));
+                $val = $context[$rawVar] ?? ($context[$normVar] ?? null);
+                if ($val === null || $val === false || $val === 'undefined' || $val === 'null') {
+                    return '';
+                }
+                return htmlspecialchars((string)$val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            }, $customTemplate);
+
+            // Length cap at 4,096 chars
+            if (mb_strlen($rendered, 'UTF-8') > 4096) {
+                $notice = "\n\n... [تم اقتطاع الرسالة لتجاوز الحد الأقصى]";
+                $maxBody = 4096 - mb_strlen($notice, 'UTF-8');
+                $rendered = mb_substr($rendered, 0, $maxBody, 'UTF-8') . $notice;
+            }
+
+            if (trim($rendered) !== '') {
+                $tgMsg = $rendered;
+            }
+        }
+
+        // 3. Transparent Fallback to Default Message if template disabled/missing/empty
+        if (empty($tgMsg)) {
+            $tgMsg = "👑 <b>طلب جديد: {$product['shortTitle']} — " . number_format($calculatedGrandTotal) . " د.ج</b>\n" .
+                     "━━━━━━━━━━━━━━━━━━\n" .
+                     "<b>🆔 رقم الطلب:</b> <code>{$orderId}</code>\n" .
+                     "<b>👤 الاسم:</b> {$fullName}\n" .
+                     "<b>📱 الهاتف:</b> <code>{$maskedPhone}</code>\n" .
+                     "<b>📍 المكان:</b> {$cleanLocation}\n" .
+                     "<b>🚚 التوصيل:</b> {$actualDeliveryType}\n" .
+                     "<b>⚡ المدة:</b> {$deliveryTime}\n" .
+                     "<b>📦 العرض والكمية:</b> {$quantity} قطعة — <b>{$product['shortTitle']}</b>\n" .
+                     "<b>💵 سعر العرض:</b> {$productTotalStr}\n" .
+                     "<b>🚚 مصاريف التوصيل:</b> {$shippingFeeStr}\n" .
+                     "━━━━━━━━━━━━━━━━━━\n" .
+                     "<b>💰 المجموع الكلي (COD):</b> <b>{$grandTotalStr}</b>\n" .
+                     "<b>📅 التاريخ:</b> {$dateFormatted}\n" .
+                     "━━━━━━━━━━━━━━━━━━\n" .
+                     "📌 <b>الطلبية محفوظة في قاعدة البيانات وجاهزة للتأكيد.</b>\n" .
+                     "👉 <a href=\"{$adminUrl}\">لوحة التحكم (Admin Dashboard)</a>";
+        }
+
+        // 4. Safe Non-blocking HTTP Dispatch via cURL
         $tgCh = curl_init("https://api.telegram.org/bot{$tgToken}/sendMessage");
         curl_setopt($tgCh, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($tgCh, CURLOPT_POST, true);
-        curl_setopt($tgCh, CURLOPT_POSTFIELDS, json_encode(['chat_id' => $tgChatId, 'text' => $tgMsg, 'parse_mode' => 'HTML']));
+        curl_setopt($tgCh, CURLOPT_POSTFIELDS, json_encode([
+            'chat_id' => $tgChatId,
+            'text' => $tgMsg,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true
+        ]));
         curl_setopt($tgCh, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($tgCh, CURLOPT_TIMEOUT, 4);
         @curl_exec($tgCh);
         @curl_close($tgCh);
 
-        // Record in ledger
+        // 5. Deduplication Ledger Recording
         $ledger[$ledgerKey] = [
             'event' => 'ORDER_CREATED',
             'orderId' => $orderId,
             'trackingCode' => '',
             'status' => 'DISPATCHED',
+            'isCustom' => ($customTemplate !== null),
             'timestamp' => gmdate('c')
         ];
         @file_put_contents($ledgerFile, json_encode($ledger, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);

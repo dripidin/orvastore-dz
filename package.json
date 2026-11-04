@@ -26,7 +26,10 @@
     "test:phase8e3-6": "node scripts/test-phase8e3-6-runtime.js",
     "test:phase8e3-7": "node scripts/test-phase8e3-7-preflight.js",
     "test:phase8e3-8": "node scripts/test-phase8e3-8-security-review.js",
-    "test:phase8e3-9": "node scripts/test-phase8e3-9-final-preflight.js"
+    "test:phase8e3-9": "node scripts/test-phase8e3-9-final-preflight.js",
+    "test:phase8f": "node scripts/test-phase8f-telegram-customization.js",
+    "sync:admin": "node scripts/sync-admin.js",
+    "build:dashboard": "cd \"orvastore Dashbaord v0.9/next-shadcn-admin-dashboard-baseui-main\" && npm run build && cd ../.. && node scripts/sync-admin.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
