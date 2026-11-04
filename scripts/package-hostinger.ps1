@@ -99,7 +99,8 @@ $assetDirs = @(
     "pack2 12950",
     "images",
     "images products",
-    "product images"
+    "product images",
+    "assets"
 )
 
 Write-Host "Copying product image directories..."

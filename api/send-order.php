@@ -387,13 +387,17 @@ if ($tgToken && $tgChatId && $tgEnabled) {
         if (isset($templates['ORDER_CREATED']) && is_array($templates['ORDER_CREATED'])) {
             $tplConf = $templates['ORDER_CREATED'];
             if (($tplConf['enabled'] ?? true) && !empty($tplConf['activeTemplate']) && trim($tplConf['activeTemplate']) !== '') {
-                $customTemplate = trim($tplConf['activeTemplate']);
+                $candidateTpl = trim($tplConf['activeTemplate']);
+                // Guard: Discard legacy hardcoded masked templates to protect full admin phone visibility
+                if (strpos($candidateTpl, '***') === false && strpos($candidateTpl, 'إخفاء جزئي') === false) {
+                    $customTemplate = $candidateTpl;
+                }
             }
         }
 
         $tgMsg = '';
         if ($customTemplate !== null) {
-            // Context variables map with canonical keys & common aliases
+            // Context variables map with canonical keys & common aliases (Admin channel is authorized private recipient)
             $context = [
                 'order_id' => $orderId,
                 'orderId' => $orderId,
@@ -406,8 +410,8 @@ if ($tgToken && $tgChatId && $tgEnabled) {
                 'customerPhone' => $phone,
                 'phone' => $phone,
                 'raw_phone' => $phone,
-                'masked_phone' => $maskedPhone,
-                'maskedPhone' => $maskedPhone,
+                'masked_phone' => $phone,
+                'maskedPhone' => $phone,
                 'product_name' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
                 'productName' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
                 'productTitle' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),

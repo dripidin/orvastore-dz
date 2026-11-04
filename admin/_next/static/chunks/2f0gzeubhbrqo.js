@@ -188,10 +188,10 @@ Read more: https://nextjs.org/docs/messages/next-image-missing-loader`),"__NEXT_
                 <span style="color:#d4a373;">ORVA</span> STORE
             </a>
             ${r?`
-            <span style="font-size:11px; padding:3px 8px; border-radius:4px; background:#1c2d20; color:#5eead4; border:1px solid #134e48; display:flex; align-items:center; gap:4px;">
-                <i class="fa-solid fa-shield-halved"></i>
-                متجر موثوق 100%
-            </span>`:`
+            <div class="header-phone-badge" style="font-size:12px; color:#d4a373; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-phone"></i>
+                <span style="color:#eae6e1;">خدمة الزبائن: 0798282495</span>
+            </div>`:`
             <span style="font-size:11px; padding:3px 8px; border-radius:4px; background:#292522; color:#b8b0a8;">
                 معاينة خاصة بالمنتج (Preview)
             </span>`}

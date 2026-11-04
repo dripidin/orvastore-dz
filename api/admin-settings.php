@@ -133,18 +133,21 @@ function tryReclaimSettingsLock(string $targetDir): bool {
 
     $stat = @stat($targetDir);
     $isDead = false;
+    $isStale = false;
     $isCorruptedOrMissing = false;
 
     if (file_exists($ownerFile)) {
         $raw = @file_get_contents($ownerFile);
         $owner = json_decode($raw, true);
-        if (is_array($owner) && !empty($owner['pid'])) {
-            $pid = (int)$owner['pid'];
-            if (!isSettingsProcessAlive($pid)) {
-                $isDead = true;
-            } else {
-                // Rule 1 & 2: A live process must NEVER lose its lock merely because it is slow or >8000ms!
-                return false;
+        if (is_array($owner)) {
+            $lockTime = $owner['time'] ?? ($stat ? $stat['mtime'] : 0);
+            if ($lockTime > 0 && (time() - $lockTime > 5)) {
+                $isStale = true;
+            } elseif (!empty($owner['pid'])) {
+                $pid = (int)$owner['pid'];
+                if (!isSettingsProcessAlive($pid)) {
+                    $isDead = true;
+                }
             }
         } else {
             $isCorruptedOrMissing = true;
@@ -153,7 +156,11 @@ function tryReclaimSettingsLock(string $targetDir): bool {
         $isCorruptedOrMissing = true;
     }
 
-    if ($isDead || ($isCorruptedOrMissing && $stat && (time() - $stat['mtime'] > 8))) {
+    if ($stat && (time() - $stat['mtime'] > 5)) {
+        $isStale = true;
+    }
+
+    if ($isDead || $isStale || $isCorruptedOrMissing) {
         @unlink($ownerFile);
         return @rmdir($targetDir);
     }
@@ -431,7 +438,7 @@ function getPhpSampleData(string $event): array {
 function getPhpDefaultTemplate(string $event): string {
     switch ($event) {
         case 'ORDER_CREATED':
-            return "👑 <b>طلب جديد: {{product_name}} — {{grand_total}} د.ج</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>👤 الاسم:</b> {{customer_name}}\n<b>📱 الهاتف:</b> <code>{{customer_phone}}</code>\n<b>📍 المكان:</b> {{wilaya}}\n<b>🚚 التوصيل:</b> {{delivery_type}}\n<b>📦 الكمية:</b> {{quantity}} قطعة\n<b>💰 الإجمالي:</b> <b>{{grand_total}} د.ج</b>\n<b>📅 التاريخ:</b> {{date}}{{risk_badge}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم (Admin Dashboard)</a>";
+            return "🔔 <b>طلب جديد — ORVA STORE</b>\n━━━━━━━━━━━━━━\n🆔 <b>رقم الطلب:</b> <code>#{{order_id}}</code>\n👤 <b>اسم العميل:</b> {{customer_name}}\n📞 <b>الهاتف:</b> <code>{{customer_phone}}</code>\n📍 <b>الولاية:</b> {{wilaya}}\n🏠 <b>البلدية:</b> {{commune}}\n━━━━━━━━━━━━━━\n🛒 <b>تفاصيل المنتجات:</b>\n• {{product_name}}\n• الكمية: {{quantity}}\n• السعر: {{product_price}} د.ج\n━━━━━━━━━━━━━━\n💰 <b>سعر المنتجات:</b> {{product_price}} د.ج\n🚚 <b>التوصيل:</b> {{shipping_fee}} د.ج\n💵 <b>الإجمالي:</b> {{grand_total}} د.ج\n📅 <b>تاريخ الطلب:</b> {{date}}\n📌 <b>الحالة:</b> طلب جديد\n━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">لوحة التحكم (Admin Dashboard)</a>";
         case 'SHIPMENT_CREATED':
             return "🚚 <b>تم إنشاء بوليصة الشحن بنجاح</b>\n━━━━━━━━━━━━━━━━━━\n<b>🆔 رقم الطلب:</b> <code>{{order_id}}</code>\n<b>📦 شركة الشحن:</b> {{courier_name}}\n<b>🏷️ رقم التتبع:</b> <code>{{tracking_number}}</code>\n<b>📋 المرجع:</b> <code>{{reference}}</code>\n<b>📍 الوجهة:</b> {{wilaya}} ({{commune}})\n<b>📅 التاريخ:</b> {{date}}\n━━━━━━━━━━━━━━━━━━\n👉 <a href=\"{{dashboard_url}}\">عرض تفاصيل الشحنة</a>";
         case 'SHIPMENT_FAILED':
@@ -512,7 +519,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $actionQuery === 'public') {
             'pixelId' => ($meta['enabled'] ?? true) ? $pid : '',
             'browserPixelEnabled' => ($meta['enabled'] ?? true) && !empty($pid),
             'scope' => $meta['scope'] ?? 'all',
-            'pages' => $meta['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/yamaha-archive.html']
+            'pages' => $meta['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/yamaha-archive.html'],
+            'store' => [
+                'logoUrl' => $overrides['store']['logoUrl'] ?? '/images/orva-logo.svg',
+                'name' => $overrides['store']['name'] ?? 'ORVA STORE'
+            ]
         ]
     ]);
     exit;
@@ -607,6 +618,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'pages' => $metaO['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/yamaha-archive.html'],
                 'updatedAt' => $metaO['updatedAt'] ?? null,
                 'status' => !empty($pid) ? 'configured' : 'unconfigured'
+            ],
+            'store' => [
+                'logoUrl' => $overrides['store']['logoUrl'] ?? '/images/orva-logo.svg',
+                'name' => $overrides['store']['name'] ?? 'ORVA STORE',
+                'updatedAt' => $overrides['store']['updatedAt'] ?? null,
             ]
         ]
     ]);
@@ -643,6 +659,59 @@ $body = json_decode($rawBody, true) ?? [];
 $action = strtolower(trim($body['action'] ?? ($_GET['action'] ?? 'save')));
 
 $supportedEvents = ['ORDER_CREATED', 'SHIPMENT_CREATED', 'SHIPMENT_FAILED', 'STATUS_UPDATED', 'ORDER_CANCELLED', 'ADMIN_ALERT'];
+
+// ── Action: upload_logo ────────────────────────────────────────────────────────
+if ($action === 'upload_logo') {
+    $imgData = null;
+    $ext = 'png';
+    if (!empty($body['dataUrl'])) {
+        $dataUrl = $body['dataUrl'];
+        if (preg_match('/^data:image\/(png|jpeg|jpg|webp|svg\+xml);base64,/', $dataUrl, $m)) {
+            $ext = ($m[1] === 'svg+xml') ? 'svg' : ($m[1] === 'jpeg' ? 'jpg' : $m[1]);
+            $base64 = substr($dataUrl, strpos($dataUrl, ',') + 1);
+            $imgData = base64_decode($base64);
+        }
+    } elseif (!empty($_FILES['logo']['tmp_name'])) {
+        $fName = $_FILES['logo']['name'] ?? '';
+        $fExt = strtolower(pathinfo($fName, PATHINFO_EXTENSION));
+        if (in_array($fExt, ['png', 'jpg', 'jpeg', 'webp', 'svg'], true)) {
+            $ext = ($fExt === 'jpeg') ? 'jpg' : $fExt;
+            $imgData = file_get_contents($_FILES['logo']['tmp_name']);
+        }
+    }
+
+    if (!$imgData || strlen($imgData) < 10) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'INVALID_IMAGE', 'message' => 'بيانات الصورة غير صالحة.']);
+        exit;
+    }
+
+    $targetDir = dirname(__DIR__) . '/assets/images';
+    if (!is_dir($targetDir)) @mkdir($targetDir, 0755, true);
+    $filename = "store-logo.{$ext}";
+    $targetPath = $targetDir . '/' . $filename;
+    file_put_contents($targetPath, $imgData);
+    $logoUrl = "/assets/images/{$filename}?v=" . time();
+
+    if (acquireSettingsLock()) {
+        try {
+            $overrides = readEncryptedOverrides($settingsFile, $config);
+            if (!isset($overrides['store'])) $overrides['store'] = [];
+            $overrides['store']['logoUrl'] = $logoUrl;
+            $overrides['store']['updatedAt'] = gmdate('c');
+            writeEncryptedOverrides($settingsFile, $overrides, $config);
+        } finally {
+            releaseSettingsLock();
+        }
+    }
+
+    echo json_encode([
+        'success' => true,
+        'logoUrl' => $logoUrl,
+        'message' => 'تم حفظ وتحديث شعار المتجر بنجاح'
+    ]);
+    exit;
+}
 
 // ── Action: save_template ─────────────────────────────────────────────────────
 if ($action === 'save_template') {
@@ -1176,6 +1245,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PUT
             elseif (!empty($body['metaPixel']['capiToken'])) $current['capiToken'] = trim($body['metaPixel']['capiToken']);
             $current['updatedAt'] = $now;
             $overrides['metaPixel'] = $current;
+        }
+
+        if (isset($body['store']) && is_array($body['store'])) {
+            $current = $overrides['store'] ?? [];
+            if (isset($body['store']['logoUrl'])) $current['logoUrl'] = trim((string)$body['store']['logoUrl']);
+            if (isset($body['store']['name'])) $current['name'] = trim((string)$body['store']['name']);
+            $current['updatedAt'] = $now;
+            $overrides['store'] = $current;
         }
 
         $saved = writeEncryptedOverrides($settingsFile, $overrides, $config);

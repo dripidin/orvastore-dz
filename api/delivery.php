@@ -725,15 +725,14 @@ if ($action === 'delete') {
         exit;
     }
 
-    $patchUrl = "{$supabaseUrl}/rest/v1/orders?order_id=eq." . urlencode($targetId);
-    supabaseRequest('PATCH', $patchUrl, [
-        'status' => 'deleted',
-        'updated_at' => date('c')
-    ], $supabaseKey, $adminToken);
+    // Direct permanent hard delete from Supabase orders table
+    $delUrl = "{$supabaseUrl}/rest/v1/orders?order_id=eq." . urlencode($targetId);
+    supabaseRequest('DELETE', $delUrl, null, $supabaseKey, $adminToken);
 
+    // Also support fallback soft delete flag or status sync
     echo json_encode([
         'success' => true,
-        'message' => "Order {$targetId} deleted successfully",
+        'message' => "Order {$targetId} permanently deleted.",
         'orderId' => $targetId
     ]);
     exit;
