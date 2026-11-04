@@ -372,14 +372,14 @@ if ($tgToken && $tgChatId && $tgEnabled) {
     }
 
     if (!isset($ledger[$ledgerKey])) {
-        // 1. Mask customer phone for administrative privacy
+        // 1. Phone number handling: preserve full phone for admin notification, compute masked phone as secondary
         $maskedPhone = $phone;
         if (strlen($phone) >= 8) {
             $maskedPhone = substr($phone, 0, 3) . '***' . substr($phone, -4);
         }
 
         $dateFormatted = date('Y-m-d H:i');
-        $adminUrl = "https://orva-store.com/admin.html?orderId=" . urlencode($orderId);
+        $adminUrl = "https://orva-store.com/dashboard/ecommerce?orderId=" . urlencode($orderId);
 
         // 2. Resolve Custom Active Template for ORDER_CREATED
         $customTemplate = null;
@@ -402,9 +402,11 @@ if ($tgToken && $tgChatId && $tgEnabled) {
                 'customerName' => $fullName,
                 'fullName' => $fullName,
                 'name' => $fullName,
-                'customer_phone' => $maskedPhone,
-                'customerPhone' => $maskedPhone,
-                'phone' => $maskedPhone,
+                'customer_phone' => $phone,
+                'customerPhone' => $phone,
+                'phone' => $phone,
+                'raw_phone' => $phone,
+                'masked_phone' => $maskedPhone,
                 'maskedPhone' => $maskedPhone,
                 'product_name' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
                 'productName' => $product['shortTitle'] ?? ($product['title'] ?? ($product['name'] ?? 'منتج ORVA')),
@@ -460,22 +462,26 @@ if ($tgToken && $tgChatId && $tgEnabled) {
 
         // 3. Transparent Fallback to Default Message if template disabled/missing/empty
         if (empty($tgMsg)) {
-            $tgMsg = "👑 <b>طلب جديد: {$product['shortTitle']} — " . number_format($calculatedGrandTotal) . " د.ج</b>\n" .
-                     "━━━━━━━━━━━━━━━━━━\n" .
-                     "<b>🆔 رقم الطلب:</b> <code>{$orderId}</code>\n" .
-                     "<b>👤 الاسم:</b> {$fullName}\n" .
-                     "<b>📱 الهاتف:</b> <code>{$maskedPhone}</code>\n" .
-                     "<b>📍 المكان:</b> {$cleanLocation}\n" .
-                     "<b>🚚 التوصيل:</b> {$actualDeliveryType}\n" .
-                     "<b>⚡ المدة:</b> {$deliveryTime}\n" .
-                     "<b>📦 العرض والكمية:</b> {$quantity} قطعة — <b>{$product['shortTitle']}</b>\n" .
-                     "<b>💵 سعر العرض:</b> {$productTotalStr}\n" .
-                     "<b>🚚 مصاريف التوصيل:</b> {$shippingFeeStr}\n" .
-                     "━━━━━━━━━━━━━━━━━━\n" .
-                     "<b>💰 المجموع الكلي (COD):</b> <b>{$grandTotalStr}</b>\n" .
-                     "<b>📅 التاريخ:</b> {$dateFormatted}\n" .
-                     "━━━━━━━━━━━━━━━━━━\n" .
-                     "📌 <b>الطلبية محفوظة في قاعدة البيانات وجاهزة للتأكيد.</b>\n" .
+            $communeDisplay = !empty($commune) ? $commune : 'الجزائر';
+            $tgMsg = "🔔 <b>طلب جديد — ORVA STORE</b>\n" .
+                     "━━━━━━━━━━━━━━\n" .
+                     "🆔 <b>رقم الطلب:</b> <code>#{$orderId}</code>\n" .
+                     "👤 <b>اسم العميل:</b> {$fullName}\n" .
+                     "📞 <b>الهاتف:</b> <code>{$phone}</code>\n" .
+                     "📍 <b>الولاية:</b> {$cleanLocation}\n" .
+                     "🏠 <b>البلدية:</b> {$communeDisplay}\n" .
+                     "━━━━━━━━━━━━━━\n" .
+                     "🛒 <b>تفاصيل المنتجات:</b>\n" .
+                     "• {$product['shortTitle']}\n" .
+                     "• الكمية: {$quantity}\n" .
+                     "• السعر: {$productTotalStr}\n" .
+                     "━━━━━━━━━━━━━━\n" .
+                     "💰 <b>سعر المنتجات:</b> {$productTotalStr}\n" .
+                     "🚚 <b>التوصيل:</b> {$shippingFeeStr}\n" .
+                     "💵 <b>الإجمالي:</b> <b>{$grandTotalStr}</b>\n" .
+                     "📅 <b>تاريخ الطلب:</b> {$dateFormatted}\n" .
+                     "📌 <b>الحالة:</b> طلب جديد\n" .
+                     "━━━━━━━━━━━━━━\n" .
                      "👉 <a href=\"{$adminUrl}\">لوحة التحكم (Admin Dashboard)</a>";
         }
 

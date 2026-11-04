@@ -156,7 +156,7 @@ async function main() {
     runTest('TC12', 'Direct Dashboard URL: {{dashboard_url}} generates valid admin order link', () => {
         const tpl = 'Link: {{dashboard_url}}';
         const rendered = engine.renderTemplate(tpl, { order_id: 'ORVA-83599' });
-        assert.ok(rendered.text.includes('https://orva-store.com/admin.html?orderId=ORVA-83599'));
+        assert.ok(rendered.text.includes('https://orva-store.com/dashboard/ecommerce?orderId=ORVA-83599'));
     });
 
     // =============================================================================
@@ -256,10 +256,14 @@ async function main() {
         assert.ok(!rendered.text.includes('javascript:'));
     });
 
-    runTest('TC25', 'Customer PII Phone Masking: dynamic phone variable is masked automatically', () => {
+    runTest('TC25', 'Customer Full Phone: dynamic phone variable renders unmasked original number', () => {
         const tpl = 'Phone: {{customer_phone}}';
         const rendered = engine.renderTemplate(tpl, { phone: '0555123456' });
-        assert.strictEqual(rendered.text, 'Phone: 055***3456');
+        assert.strictEqual(rendered.text, 'Phone: 0555123456');
+
+        const maskedTpl = 'Masked: {{masked_phone}}';
+        const maskedRendered = engine.renderTemplate(maskedTpl, { phone: '0555123456' });
+        assert.strictEqual(maskedRendered.text, 'Masked: 055***3456');
     });
 
     // =============================================================================
