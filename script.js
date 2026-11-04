@@ -697,3 +697,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeContactBtn) closeContactBtn.addEventListener('click', () => toggleContactModal(false));
     if (closeContactModalBtn) closeContactModalBtn.addEventListener('click', () => toggleContactModal(false));
 });
+
+
+// Lightweight Visitor Analytics Tracking Beacon
+(function() {
+    try {
+        if (typeof window === 'undefined') return;
+        const payload = JSON.stringify({
+            event: 'page_view',
+            page: window.location.pathname,
+            referrer: document.referrer || '',
+            sessionId: sessionStorage.getItem('orva_sid') || (function() {
+                const sid = 's_' + Math.random().toString(36).substring(2, 10);
+                sessionStorage.setItem('orva_sid', sid);
+                return sid;
+            })()
+        });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/analytics', new Blob([payload], { type: 'application/json' }));
+        } else {
+            fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function(){});
+        }
+    } catch (_) {}
+})();

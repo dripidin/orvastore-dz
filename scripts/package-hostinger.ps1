@@ -27,16 +27,13 @@ $rootFiles = @(
     "index.html",
     "pack1.html",
     "pack2.html",
-    "admin.html",
     "yamaha-archive.html",
     "styles.css",
     "packs-styles.css",
-    "admin.css",
     "script.js",
     "packs-client.js",
     "packs-config.js",
     "algeria-communes.js",
-    "admin.js",
     "Tarif_Biskra.txt",
     ".htaccess",
     "robots.txt",
@@ -62,6 +59,7 @@ $apiFiles = @(
     "delivery.php",
     "publish-page.php",
     "admin-settings.php",
+    "analytics.php",
     ".htaccess"
 )
 

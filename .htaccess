@@ -29,10 +29,8 @@ RewriteRule ^preview/(.*)$ data/preview/$1 [L]
 # Next.js Static Asset Chunks (served from admin directory)
 RewriteRule ^_next/(.*)$ admin/_next/$1 [L]
 
-# A/B Switch: If query param ?v=classic or cookie orva_admin_theme=classic, serve classic admin.html
-RewriteCond %{QUERY_STRING} (^|&)v=classic(&|$) [OR]
-RewriteCond %{HTTP_COOKIE} orva_admin_theme=classic
-RewriteRule ^admin/?$ admin.html [L]
+# Legacy Dashboard Redirect: Route /admin and /admin.html directly to Modern Dashboard
+RewriteRule ^admin(?:\.html)?/?$ /dashboard/ecommerce [R=301,L]
 
 # Default / Modern: Serve Modern Next.js Dashboard SPA
 # Prevent recursive rewrite loops on existing files
@@ -54,6 +52,7 @@ RewriteRule ^api/auth/?$ api/auth.php [L,QSA]
 RewriteRule ^api/delivery/?$ api/delivery.php [L,QSA]
 RewriteRule ^api/publish-page/?$ api/publish-page.php [L,QSA]
 RewriteRule ^api/admin-settings/?$ api/admin-settings.php [L,QSA]
+RewriteRule ^api/analytics/?$ api/analytics.php [L,QSA]
 
 # ── 4. MIME Types ─────────────────────────────────────────────────────────────
 <IfModule mod_mime.c>

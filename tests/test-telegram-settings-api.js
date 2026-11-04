@@ -601,6 +601,17 @@ async function main() {
             });
             assert.strictEqual(orderRes1.statusCode, 200);
             assert.strictEqual(orderRes2.statusCode, 200);
+
+            // Clean up transient test orders from database immediately to prevent DB pollution
+            if (process.env.DATABASE_URL) {
+                try {
+                    const { Client } = require('pg');
+                    const pgClient = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+                    await pgClient.connect();
+                    await pgClient.query("DELETE FROM public.orders WHERE full_name IN ('Customer While Throttled', 'Rapid Customer 1', 'Rapid Customer 2');");
+                    await pgClient.end();
+                } catch (_) {}
+            }
         });
 
         await runTest('TC27', 'Exhaustion of test quota does not impede checkout order creation', async () => {
