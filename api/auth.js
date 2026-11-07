@@ -8,8 +8,11 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const SESSIONS_FILE = path.join(__dirname, '..', 'data', 'private', 'admin-sessions.json');
-const LOCKOUTS_FILE = path.join(__dirname, '..', 'data', 'locks', 'auth-lockouts.json');
+// Vercel serverless FS is read-only except /tmp — signed cookies don't need a session file.
+const ON_VERCEL = Boolean(process.env.VERCEL);
+const DATA_ROOT = ON_VERCEL ? path.join('/tmp', 'orva-auth') : path.join(__dirname, '..', 'data');
+const SESSIONS_FILE = path.join(DATA_ROOT, 'private', 'admin-sessions.json');
+const LOCKOUTS_FILE = path.join(DATA_ROOT, 'locks', 'auth-lockouts.json');
 
 function safeEqual(a, b) {
     if (typeof a !== 'string' || typeof b !== 'string') return false;
@@ -51,10 +54,15 @@ function readJson(file) {
 }
 
 function writeJson(file, data) {
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
-    fs.renameSync(tmp, file);
+    try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
+        fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
+        fs.renameSync(tmp, file);
+    } catch (err) {
+        // shortcut: lockout/session file writes may fail on read-only hosts; signed cookies still auth
+        console.warn('[Auth] writeJson skipped:', err?.code || err?.message);
+    }
 }
 
 function clientIp(req) {
@@ -102,7 +110,29 @@ function clearLockout(req) {
     }
 }
 
-function createSession(ttlSeconds = 28800) {
+function createSignedSession(ttlSeconds, secret) {
+    const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
+    const nonce = crypto.randomBytes(16).toString('hex');
+    const payload = `orva1.${exp}.${nonce}`;
+    const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    return `${payload}.${sig}`;
+}
+
+function signedSessionValid(sessionId, secret) {
+    if (!sessionId || !secret) return false;
+    const parts = String(sessionId).split('.');
+    if (parts.length !== 4 || parts[0] !== 'orva1') return false;
+    const payload = parts.slice(0, 3).join('.');
+    const sig = parts[3];
+    const expect = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    if (!safeEqual(sig, expect)) return false;
+    return Number(parts[1]) > Math.floor(Date.now() / 1000);
+}
+
+function createSession(ttlSeconds = 28800, secret = '') {
+    if (ON_VERCEL || secret) {
+        return createSignedSession(ttlSeconds, secret || requireEnv('ADMIN_API_TOKEN') || 'local');
+    }
     const all = readJson(SESSIONS_FILE);
     const now = Math.floor(Date.now() / 1000);
     for (const [sid, meta] of Object.entries(all)) {
@@ -118,7 +148,7 @@ function createSession(ttlSeconds = 28800) {
 }
 
 function destroySession(sessionId) {
-    if (!sessionId) return;
+    if (!sessionId || ON_VERCEL) return;
     const all = readJson(SESSIONS_FILE);
     if (all[sessionId]) {
         delete all[sessionId];
@@ -128,9 +158,12 @@ function destroySession(sessionId) {
 
 function sessionIsValid(sessionId, adminToken) {
     if (!sessionId) return false;
-    const all = readJson(SESSIONS_FILE);
-    const meta = all[sessionId];
-    if (meta && Number(meta.expiresAt || 0) > Math.floor(Date.now() / 1000)) return true;
+    if (signedSessionValid(sessionId, adminToken)) return true;
+    if (!ON_VERCEL) {
+        const all = readJson(SESSIONS_FILE);
+        const meta = all[sessionId];
+        if (meta && Number(meta.expiresAt || 0) > Math.floor(Date.now() / 1000)) return true;
+    }
     // Legacy compatibility: cookie previously stored ADMIN_API_TOKEN
     if (adminToken && safeEqual(sessionId, adminToken)) return true;
     return false;
@@ -237,7 +270,7 @@ module.exports = async (req, res) => {
 
         if (safeEqual(inputPassword, expectedPassword)) {
             clearLockout(req);
-            const sessionId = createSession(28800);
+            const sessionId = createSession(28800, adminToken);
             setSessionCookie(sessionId, 28800);
             return res.status(200).json({ success: true, message: 'AUTHENTICATED' });
         }
