@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-11-07T04:55:00.000Z",
+  "mode": "DRY_RUN_ONLY",
+  "hostedImport": false,
+  "note": "No reservations were released, settled, deleted, or imported to hosted Supabase.",
+  "source": {
+    "inventoryState": "data/inventory-state.json",
+    "sha256": "e4c5be3d94dbe458353396a4a7517d4894675b34d0f9e5bad4bc15f6f906c1b7",
+    "priorDryRun": "data/local-fixtures/inventory-seed-dry-run.json"
+  },
+  "preserve": {
+    "historicalReservedLedgerRows": 51,
+    "checkoutPendingAmongReserved": 0,
+    "bySku": {
+      "ORVA-P1-PRO": { "ledgerReservedRows": 50, "itemAvailable": 50, "itemReserved": 50, "itemTotalPhysical": 100 },
+      "ORVA-P2-ELITE": { "ledgerReservedRows": 1, "itemAvailable": 21, "itemReserved": 1, "itemTotalPhysical": 22 }
+    },
+    "policy": [
+      "Preserve all 51 RESERVED ledger rows with lifecycle NULL (historical).",
+      "Preserve available, reserved, and totalPhysical item counters exactly as in source JSON.",
+      "Do not invent ledger rows for counter-only mismatches.",
+      "Do not auto-release or settle any historical hold."
+    ]
+  },
+  "orvaDrillProInvestigation": {
+    "sku": "ORVA-DRILL-PRO",
+    "itemCounters": { "available": 17, "reserved": 3, "totalPhysical": 20 },
+    "ledgerReservedRows": 0,
+    "issue": "LEDGER_VS_ITEM_RESERVED",
+    "likelyCause": "Item.reserved counter was incremented without a durable reservation ledger entry (or ledger entries were released while the counter was not decremented). No matching RESERVED order_ids exist for this SKU in inventory-state.json.",
+    "seedRecommendation": "Import item counters as-is (available=17, reserved=3, total=20). Do NOT create synthetic RESERVED ledger rows. Do NOT auto-correct by releasing stock. Flag for manual ops review after Staging schema is live.",
+    "riskIfAutoFixed": "Blindly zeroing reserved would inflate available to 20 and could oversell if physical stock is actually held."
+  },
+  "proposedSeedStepsWhenApproved": [
+    "1. Apply supabase/proposals/2026-11-07-public-inventory-idempotency.sql to Staging schema only (explicit approval).",
+    "2. INSERT inventory_items from JSON counters (94 SKUs) with ON CONFLICT DO UPDATE of counters only if empty Staging.",
+    "3. INSERT inventory_reservations for the 51 RESERVED rows with lifecycle NULL, status RESERVED.",
+    "4. Skip RELEASED/SETTLED historical noise unless ops requests audit import.",
+    "5. Verify: SELECT count(*) WHERE status='RESERVED' = 51; Pack1 available+reserved=totalPhysical."
+  ]
+}

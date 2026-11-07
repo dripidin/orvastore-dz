@@ -186,6 +186,18 @@ function serveStatic(req, res, pathname, query = {}) {
 
     // ── 3. Next.js Dashboard Routes (/dashboard/* or /admin/dashboard/*) ─
     if (decodedPath.startsWith('/admin/dashboard') || decodedPath.startsWith('/dashboard')) {
+        // Canonical order management is ecommerce#orders (no /orders/ static export).
+        if (
+            decodedPath === '/admin/dashboard/orders' ||
+            decodedPath === '/admin/dashboard/orders/' ||
+            decodedPath === '/dashboard/orders' ||
+            decodedPath === '/dashboard/orders/'
+        ) {
+            res.writeHead(302, { Location: '/admin/dashboard/ecommerce/#orders' });
+            res.end();
+            return;
+        }
+
         const cleanSub = decodedPath.replace(/^\/admin/, '');
 
         // Direct static files under admin (RSC .txt payloads, manifest json, etc.)

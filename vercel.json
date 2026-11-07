@@ -8,7 +8,11 @@
     { "source": "/dashboard/", "destination": "/admin/dashboard/default/", "permanent": false },
     { "source": "/dashboard/:path+/", "destination": "/admin/dashboard/:path+/", "permanent": false },
     { "source": "/dashboard/:path+", "destination": "/admin/dashboard/:path+/", "permanent": false },
-    { "source": "/classic-admin", "destination": "/classic-admin.html", "permanent": false }
+    { "source": "/classic-admin", "destination": "/classic-admin.html", "permanent": false },
+    { "source": "/admin/dashboard/orders", "destination": "/admin/dashboard/ecommerce#orders", "permanent": false },
+    { "source": "/admin/dashboard/orders/", "destination": "/admin/dashboard/ecommerce#orders", "permanent": false },
+    { "source": "/dashboard/orders", "destination": "/admin/dashboard/ecommerce#orders", "permanent": false },
+    { "source": "/dashboard/orders/", "destination": "/admin/dashboard/ecommerce#orders", "permanent": false }
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },

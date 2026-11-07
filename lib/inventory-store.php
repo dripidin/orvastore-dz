@@ -3,6 +3,10 @@
 // ORVA STORE — PHP Inventory Store (Hostinger LiteSpeed)
 // Atomic reserve / release / settle with orderId idempotency.
 // Fail-closed: missing SKU never invents stock.
+//
+// Hostinger Production (first launch): ORVA_INVENTORY_BACKEND=json (default).
+// PostgreSQL is opt-in only via ORVA_INVENTORY_BACKEND=postgres (local/dev path).
+// No silent fallback between JSON and Postgres.
 // ==============================================================================
 
 if (!defined('ORVA_API') && php_sapi_name() !== 'cli') {
@@ -10,16 +14,92 @@ if (!defined('ORVA_API') && php_sapi_name() !== 'cli') {
     exit('Direct access not permitted.');
 }
 
+require_once __DIR__ . '/orva-pg.php';
+require_once __DIR__ . '/inventory-pg.php';
+
 if (!function_exists('orva_inventory_paths')) {
+    /**
+     * Explicit inventory backend: "json" | "postgres".
+     * Default for Hostinger Production first launch: json.
+     * postgres only when ORVA_INVENTORY_BACKEND=postgres|pg|postgresql
+     * or legacy ORVA_INVENTORY_REQUIRE_PG=true.
+     */
+    function orva_inventory_backend(): string
+    {
+        global $config;
+        $raw = getenv('ORVA_INVENTORY_BACKEND');
+        if ($raw === false || $raw === '') {
+            $raw = $_ENV['ORVA_INVENTORY_BACKEND'] ?? ($config['inventory']['backend'] ?? '');
+        }
+        $raw = strtolower(trim((string)$raw));
+        if ($raw === '') {
+            $require = strtolower(trim((string)(getenv('ORVA_INVENTORY_REQUIRE_PG')
+                ?: ($_ENV['ORVA_INVENTORY_REQUIRE_PG'] ?? ''))));
+            if ($require === 'true' || $require === '1') {
+                $raw = 'postgres';
+            } else {
+                $raw = 'json';
+            }
+        }
+        if (in_array($raw, ['postgres', 'postgresql', 'pg'], true)) {
+            return 'postgres';
+        }
+        if (in_array($raw, ['json', 'file'], true)) {
+            return 'json';
+        }
+        // Unknown value → refuse both backends (fail closed at call sites).
+        return 'invalid';
+    }
+
+    function orva_inventory_use_pg(): bool
+    {
+        return orva_inventory_backend() === 'postgres';
+    }
+
+    function orva_inventory_json_allowed(): bool
+    {
+        return orva_inventory_backend() === 'json';
+    }
+
     function orva_inventory_paths(): array
     {
+        global $config;
         $root = dirname(__DIR__);
+        $file = getenv('ORVA_INVENTORY_STATE_PATH');
+        if ($file === false || $file === '') {
+            $file = $_ENV['ORVA_INVENTORY_STATE_PATH'] ?? ($config['inventory']['state_path'] ?? '');
+        }
+        $file = trim((string)$file);
+        if ($file === '') {
+            $file = $root . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'inventory-state.json';
+        }
+        $locksDir = getenv('ORVA_INVENTORY_LOCKS_DIR');
+        if ($locksDir === false || $locksDir === '') {
+            $locksDir = $_ENV['ORVA_INVENTORY_LOCKS_DIR'] ?? ($config['inventory']['locks_dir'] ?? '');
+        }
+        $locksDir = trim((string)$locksDir);
+        if ($locksDir === '') {
+            $locksDir = dirname($file) . DIRECTORY_SEPARATOR . 'locks';
+            // Keep classic layout when state file is under data/
+            if (basename(dirname($file)) === 'data') {
+                $locksDir = dirname($file) . DIRECTORY_SEPARATOR . 'locks';
+            }
+        }
+        $audit = getenv('ORVA_INVENTORY_AUDIT_PATH');
+        if ($audit === false || $audit === '') {
+            $audit = $_ENV['ORVA_INVENTORY_AUDIT_PATH'] ?? ($config['inventory']['audit_path'] ?? '');
+        }
+        $audit = trim((string)$audit);
+        if ($audit === '') {
+            $audit = dirname($file) . DIRECTORY_SEPARATOR . 'inventory-audit.json';
+        }
         return [
             'root' => $root,
-            'file' => $root . '/data/inventory-state.json',
-            'lock' => $root . '/data/locks/inventory.lock',
-            'locksDir' => $root . '/data/locks',
-            'audit' => $root . '/data/inventory-audit.json',
+            'file' => $file,
+            'lock' => $locksDir . DIRECTORY_SEPARATOR . 'inventory.lock',
+            'locksDir' => $locksDir,
+            'audit' => $audit,
+            'backend' => orva_inventory_backend(),
         ];
     }
 
@@ -56,10 +136,19 @@ if (!function_exists('orva_inventory_paths')) {
         }
     }
 
-    function orva_inventory_load_state(): array
+    /**
+     * @param bool $forMutation When true, missing/unreadable/corrupt file fails closed
+     *                          (no empty invented inventory that could be written).
+     * @return array|null Null means unavailable (caller must fail closed).
+     */
+    function orva_inventory_load_state(bool $forMutation = false): ?array
     {
         $paths = orva_inventory_paths();
-        if (!file_exists($paths['file'])) {
+        if (!is_file($paths['file'])) {
+            if ($forMutation) {
+                error_log('[orva_inventory] state file missing for mutation');
+                return null;
+            }
             return [
                 'version' => 2,
                 'lastUpdated' => gmdate('c'),
@@ -68,12 +157,28 @@ if (!function_exists('orva_inventory_paths')) {
             ];
         }
         $raw = @file_get_contents($paths['file']);
+        if ($raw === false) {
+            if ($forMutation) {
+                error_log('[orva_inventory] state file unreadable');
+                return null;
+            }
+            return [
+                'version' => 2,
+                'lastUpdated' => gmdate('c'),
+                'inventory' => [],
+                'reservations' => [],
+            ];
+        }
         // Strip UTF-8 BOM (common from Windows editors / PowerShell) so json_decode succeeds.
-        if (is_string($raw) && strncmp($raw, "\xEF\xBB\xBF", 3) === 0) {
+        if (strncmp($raw, "\xEF\xBB\xBF", 3) === 0) {
             $raw = substr($raw, 3);
         }
-        $data = json_decode($raw ?: '[]', true);
+        $data = json_decode($raw, true);
         if (!is_array($data)) {
+            if ($forMutation) {
+                error_log('[orva_inventory] state file corrupt JSON');
+                return null;
+            }
             $data = [];
         }
         if (!isset($data['inventory']) || !is_array($data['inventory'])) {
@@ -87,6 +192,10 @@ if (!function_exists('orva_inventory_paths')) {
 
     function orva_inventory_save_state(array $state): bool
     {
+        if (!orva_inventory_json_allowed()) {
+            error_log('[orva_inventory] JSON write refused — backend is not json');
+            return false;
+        }
         $paths = orva_inventory_paths();
         $state['lastUpdated'] = gmdate('c');
         $dir = dirname($paths['file']);
@@ -148,9 +257,37 @@ if (!function_exists('orva_inventory_paths')) {
             return ['ok' => false, 'code' => 'INVALID_RESERVATION', 'message' => 'Invalid reservation request.'];
         }
 
+        if (orva_inventory_use_pg()) {
+            return orva_inventory_pg_reserve($sku, $quantity, $orderId);
+        }
+        if (!orva_inventory_json_allowed()) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
+
         $fp = orva_inventory_acquire_lock();
+        if (!$fp) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
         try {
-            $state = orva_inventory_load_state();
+            $state = orva_inventory_load_state(true);
+            if ($state === null) {
+                return [
+                    'ok' => false,
+                    'code' => 'INVENTORY_UNAVAILABLE',
+                    'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                    'httpStatus' => 503,
+                ];
+            }
 
             if (isset($state['reservations'][$orderId])) {
                 $existing = $state['reservations'][$orderId];
@@ -202,7 +339,9 @@ if (!function_exists('orva_inventory_paths')) {
                 'sku' => $sku,
                 'quantity' => $quantity,
                 'status' => 'RESERVED',
+                'lifecycle' => 'CHECKOUT_PENDING',
                 'timestamp' => gmdate('c'),
+                'updatedAt' => gmdate('c'),
             ];
 
             if (!orva_inventory_save_state($state)) {
@@ -249,9 +388,37 @@ if (!function_exists('orva_inventory_paths')) {
             return ['ok' => false, 'code' => 'MISSING_ORDER_ID'];
         }
 
+        if (orva_inventory_use_pg()) {
+            return orva_inventory_pg_release($orderId, $reason, $expectedQty);
+        }
+        if (!orva_inventory_json_allowed()) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
+
         $fp = orva_inventory_acquire_lock();
+        if (!$fp) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
         try {
-            $state = orva_inventory_load_state();
+            $state = orva_inventory_load_state(true);
+            if ($state === null) {
+                return [
+                    'ok' => false,
+                    'code' => 'INVENTORY_UNAVAILABLE',
+                    'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                    'httpStatus' => 503,
+                ];
+            }
             if (!isset($state['reservations'][$orderId])) {
                 return ['ok' => true, 'code' => 'NO_RESERVATION', 'alreadyReleased' => true];
             }
@@ -326,9 +493,37 @@ if (!function_exists('orva_inventory_paths')) {
             return ['ok' => false, 'code' => 'MISSING_ORDER_ID'];
         }
 
+        if (orva_inventory_use_pg()) {
+            return orva_inventory_pg_settle($orderId);
+        }
+        if (!orva_inventory_json_allowed()) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
+
         $fp = orva_inventory_acquire_lock();
+        if (!$fp) {
+            return [
+                'ok' => false,
+                'code' => 'INVENTORY_UNAVAILABLE',
+                'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                'httpStatus' => 503,
+            ];
+        }
         try {
-            $state = orva_inventory_load_state();
+            $state = orva_inventory_load_state(true);
+            if ($state === null) {
+                return [
+                    'ok' => false,
+                    'code' => 'INVENTORY_UNAVAILABLE',
+                    'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.',
+                    'httpStatus' => 503,
+                ];
+            }
             if (!isset($state['reservations'][$orderId])) {
                 return ['ok' => true, 'code' => 'NO_RESERVATION', 'alreadySettled' => true];
             }
@@ -387,11 +582,75 @@ if (!function_exists('orva_inventory_paths')) {
         if ($orderId === '') {
             return false;
         }
-        $state = orva_inventory_load_state();
-        if (!isset($state['reservations'][$orderId])) {
+        if (orva_inventory_use_pg()) {
+            return orva_inventory_pg_has_active($orderId);
+        }
+        if (!orva_inventory_json_allowed()) {
+            throw new RuntimeException('INVENTORY_UNAVAILABLE');
+        }
+        $state = orva_inventory_load_state(false);
+        if ($state === null || !isset($state['reservations'][$orderId])) {
             return false;
         }
         $status = strtoupper((string)($state['reservations'][$orderId]['status'] ?? ''));
         return $status === 'RESERVED' || $status === 'SETTLED';
+    }
+
+    /**
+     * After order persistence succeeds, bind reservation so crash recovery will not release it.
+     */
+    function orva_inventory_bind_order(string $orderId): array
+    {
+        $orderId = trim($orderId);
+        if ($orderId === '') {
+            return ['ok' => false, 'code' => 'MISSING_ORDER_ID'];
+        }
+        if (orva_inventory_use_pg()) {
+            try {
+                $pdo = orva_pg_pdo();
+                $ledger = orva_pg_table('inventory_reservations');
+                $stmt = $pdo->prepare(
+                    "UPDATE {$ledger}
+                     SET lifecycle = 'ORDER_BOUND', updated_at = NOW()
+                     WHERE order_id = :oid AND status = 'RESERVED'
+                     RETURNING order_id"
+                );
+                $stmt->execute(['oid' => $orderId]);
+                $row = $stmt->fetch();
+                return $row ? ['ok' => true, 'bound' => true] : ['ok' => true, 'code' => 'NO_RESERVATION'];
+            } catch (Throwable $e) {
+                error_log('[orva_inventory_bind] ' . $e->getMessage());
+                return ['ok' => false, 'code' => 'INVENTORY_UNAVAILABLE', 'httpStatus' => 503];
+            }
+        }
+        if (!orva_inventory_json_allowed()) {
+            return ['ok' => false, 'code' => 'INVENTORY_UNAVAILABLE', 'httpStatus' => 503];
+        }
+        $fp = orva_inventory_acquire_lock();
+        if (!$fp) {
+            return ['ok' => false, 'code' => 'INVENTORY_UNAVAILABLE', 'httpStatus' => 503];
+        }
+        try {
+            $state = orva_inventory_load_state(true);
+            if ($state === null) {
+                return ['ok' => false, 'code' => 'INVENTORY_UNAVAILABLE', 'httpStatus' => 503];
+            }
+            if (!isset($state['reservations'][$orderId])) {
+                return ['ok' => true, 'code' => 'NO_RESERVATION'];
+            }
+            $res = &$state['reservations'][$orderId];
+            if (strtoupper((string)($res['status'] ?? '')) !== 'RESERVED') {
+                return ['ok' => true, 'code' => 'NOT_RESERVED', 'status' => $res['status'] ?? null];
+            }
+            $res['lifecycle'] = 'ORDER_BOUND';
+            $res['boundAt'] = gmdate('c');
+            $res['updatedAt'] = $res['boundAt'];
+            if (!orva_inventory_save_state($state)) {
+                return ['ok' => false, 'code' => 'INVENTORY_WRITE_FAILED', 'httpStatus' => 503];
+            }
+            return ['ok' => true, 'bound' => true];
+        } finally {
+            orva_inventory_release_lock($fp);
+        }
     }
 }

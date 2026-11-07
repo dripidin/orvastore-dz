@@ -17,6 +17,8 @@ const {
     extractIdempotencyKey,
     withIdempotencyLock
 } = require('../lib/order-validator');
+// bindReservationToOrder lives in inventory-manager (dispatches to PG or JSON), not order-validator.
+const { bindReservationToOrder } = require('../lib/inventory-manager');
 
 function getCookieValue(cookieHeader, name) {
     if (!cookieHeader) return null;
@@ -49,7 +51,7 @@ module.exports = async (req, res) => {
 
         const body = req.body || {};
         const {
-            fullName, phone, wilaya, commune,
+            fullName, phone, wilaya, wilayaId, commune,
             deliveryType,
             quantity,
             orderId, deviceId,
@@ -64,7 +66,7 @@ module.exports = async (req, res) => {
         const validation = verifyAndCalculateOrder({
             packId, productId, sku, productName,
             quantity,
-            wilaya, commune,
+            wilaya, wilayaId, commune,
             deliveryType,
             fullName, phone
         });
@@ -135,7 +137,19 @@ module.exports = async (req, res) => {
                 });
             }
         } catch (e) {
-            console.warn('[send-order] Rate limit check skipped:', e.message);
+            if (e && (e.code === 'RATE_LIMIT_STORAGE_UNAVAILABLE' || e.statusCode === 503)) {
+                return res.status(503).json({
+                    success: false,
+                    error: 'RATE_LIMIT_STORAGE_UNAVAILABLE',
+                    message: 'تعذر التحقق من حد الطلبات. يرجى المحاولة لاحقاً.'
+                });
+            }
+            console.warn('[send-order] Rate limit check error:', e.message);
+            return res.status(503).json({
+                success: false,
+                error: 'RATE_LIMIT_STORAGE_UNAVAILABLE',
+                message: 'تعذر التحقق من حد الطلبات. يرجى المحاولة لاحقاً.'
+            });
         }
 
         // ── 5. Concurrent-Safe Idempotency Wrapper & Inventory Execution ───────
@@ -204,6 +218,17 @@ module.exports = async (req, res) => {
                     riskDecision: riskResult.decision,
                     riskReasons:  riskResult.reasons
                 });
+                // Bind reservation so abandoned-checkout recovery will not release a real order.
+                try {
+                    const { shouldUsePgInventory, bindReservationToOrderPg } = require('../lib/inventory-pg');
+                    if (shouldUsePgInventory()) {
+                        await bindReservationToOrderPg(cleanOrderId);
+                    } else {
+                        await bindReservationToOrder(cleanOrderId);
+                    }
+                } catch (bindErr) {
+                    console.warn('[send-order] reservation bind warning:', bindErr.message);
+                }
             } catch (dbErr) {
                 console.error('[send-order] DB Persistence Failed:', dbErr.message);
                 // Roll back ONLY a reservation created by this request

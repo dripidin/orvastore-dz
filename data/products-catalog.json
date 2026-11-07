@@ -91,7 +91,7 @@
       "sellingPrice": 8900,
       "status": "active",
       "stockQuantity": 25,
-      "allowOrders": true
+      "allowOrders": false
     },
     "orva-last-item-test": {
       "id": "prod_orva-last-item-test",

@@ -1,0 +1,678 @@
+{
+  "generatedAt": "2026-11-07T02:51:57.103Z",
+  "sourceFile": "data/inventory-state.json",
+  "sourceSha256": "e4c5be3d94dbe458353396a4a7517d4894675b34d0f9e5bad4bc15f6f906c1b7",
+  "historicalReservedOrders": 51,
+  "pack1Note": "ORVA-P1-PRO reserved quantity preserved; no automatic release.",
+  "warnings": [
+    {
+      "sku": "ORVA-DRILL-PRO",
+      "issue": "LEDGER_VS_ITEM_RESERVED",
+      "itemReserved": 3,
+      "ledgerReserved": 0,
+      "note": "Seed will preserve item.reserved totals; will NOT auto-release Pack1 historical holds."
+    }
+  ],
+  "proposedRows": [
+    {
+      "sku": "ORVA-P1-PRO",
+      "available": 50,
+      "reserved": 50,
+      "total_physical": 100,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-P2-ELITE",
+      "available": 21,
+      "reserved": 1,
+      "total_physical": 22,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-P3-ULTRA",
+      "available": 14,
+      "reserved": 0,
+      "total_physical": 14,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-SAC-YAM",
+      "available": 30,
+      "reserved": 0,
+      "total_physical": 30,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-SAC-BUNDLE",
+      "available": 18,
+      "reserved": 0,
+      "total_physical": 18,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-DRILL-PRO",
+      "available": 17,
+      "reserved": 3,
+      "total_physical": 20,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-LAST-ITEM-TEST",
+      "available": 1,
+      "reserved": 0,
+      "total_physical": 1,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-TEST-SKU",
+      "available": 1,
+      "reserved": 0,
+      "total_physical": 1,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793657742307",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793657742585",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793657742585",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793657742774",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793657742838",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793657742849",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793657742866",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-DRILL-DYNAMO",
+      "available": 20,
+      "reserved": 0,
+      "total_physical": 20,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793657772568",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793657772837",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793657772837",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793657773002",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793657773066",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793657773078",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793657773094",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793657841617",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793657841904",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793657841904",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793657842093",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793657842169",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793657842180",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793657842195",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793657929431",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793657929707",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793657929707",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793657929911",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793657929979",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793657929990",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793657930008",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793662223625",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793662223919",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793662223919",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793662224140",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793662224261",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793662224273",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793662224293",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793662622268",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793662622518",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793662622518",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793662622694",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793662622787",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793662622801",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793662622821",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793664009644",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793664009938",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793664009938",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793664010117",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793664010218",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793664010232",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793664010250",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793665438132",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793665438421",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793665438421",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793665438605",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793665438712",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793665438725",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793665438744",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793667259620",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793667259966",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793667259966",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793667260174",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793667260273",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793667260285",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793667260305",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793668936558",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793668936918",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793668936918",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793668937125",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793668937238",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793668937251",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793668937272",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793670374944",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793670375266",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793670375266",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793670375461",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793670375579",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793670375592",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793670375613",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-RACE-SKU-1793745381408",
+      "available": 4,
+      "reserved": 0,
+      "total_physical": 4,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-A-1793745381779",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-MULTI-B-1793745381779",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-ORPHAN-1793745382003",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-RES-1793745382128",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-REL-1793745382143",
+      "available": 10,
+      "reserved": 0,
+      "total_physical": 10,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-IDEMP-SETTLE-1793745382162",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    },
+    {
+      "sku": "ORVA-STAB-TEST",
+      "available": 7,
+      "reserved": 0,
+      "total_physical": 7,
+      "preserve_historical_reservations": true
+    }
+  ],
+  "applied": false,
+  "message": "DRY RUN ONLY — no database writes."
+}

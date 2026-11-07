@@ -383,6 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
         orderForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isSubmitting) return;
+            // Archive / commercially blocked landing pages must not submit checkout.
+            if (orderForm.getAttribute('data-orders-disabled') === 'true' || orderForm.hasAttribute('hidden')) {
+                return;
+            }
 
             let isValid = true;
 

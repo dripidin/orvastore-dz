@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-11-07T02:59:54.191Z",
+  "mode": "READ_ONLY_SANITIZED",
+  "note": "No reservations were imported, released, settled, or deleted.",
+  "previousReport": {
+    "path": "data/reservation-reconciliation-report.json",
+    "generatedAt": "2026-11-06T21:52:52.374Z",
+    "reservedCount": 49,
+    "pack1Only": true
+  },
+  "current": {
+    "inventoryStateSha256": "e4c5be3d94dbe458353396a4a7517d4894675b34d0f9e5bad4bc15f6f906c1b7",
+    "totalReservedLedgerRows": 51,
+    "bySku": {
+      "ORVA-P1-PRO": {
+        "count": 50,
+        "quantity": 50
+      },
+      "ORVA-P2-ELITE": {
+        "count": 1,
+        "quantity": 1,
+        "orderIds": [
+          "PACK2-40288"
+        ]
+      }
+    },
+    "itemCounters": {
+      "ORVA-P1-PRO": {
+        "sku": "ORVA-P1-PRO",
+        "available": 50,
+        "reserved": 50,
+        "totalPhysical": 100,
+        "lowStockThreshold": 5
+      },
+      "ORVA-P2-ELITE": {
+        "sku": "ORVA-P2-ELITE",
+        "available": 21,
+        "reserved": 1,
+        "totalPhysical": 22,
+        "lowStockThreshold": 5
+      },
+      "ORVA-DRILL-PRO": {
+        "sku": "ORVA-DRILL-PRO",
+        "available": 17,
+        "reserved": 3,
+        "totalPhysical": 20,
+        "lowStockThreshold": 5
+      }
+    }
+  },
+  "deltaExplanation": [
+    "Previous snapshot (2026-11-06): 49 RESERVED rows, all ORVA-P1-PRO.",
+    "Current inventory-state.json: 51 RESERVED rows = 50 ORVA-P1-PRO + 1 ORVA-P2-ELITE (PACK2-40288).",
+    "All 49 previous Pack1 order IDs are still present and RESERVED (none removed).",
+    "Pack1 +1: LOCAL-PREV-5203300d reserved 2026-11-07T00:24:21Z (local preview / test after prior report).",
+    "Pack2 +1: PACK2-40288 reserved 2026-11-06T23:28:25.790Z (after prior Pack1-only report).",
+    "Arithmetic: 49 (preserved) + 1 (new Pack1) + 1 (Pack2) = 51.",
+    "ORVA-DRILL-PRO item.reserved=3 with 0 RESERVED ledger rows remains an item/ledger mismatch; seed dry-run preserves item counters and does not invent ledger rows."
+  ],
+  "addedSincePreviousReport": [
+    {
+      "orderId": "LOCAL-PREV-5203300d",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-07T00:24:21+00:00",
+      "note": "Appeared after 2026-11-06 reconciliation snapshot"
+    },
+    {
+      "orderId": "PACK2-40288",
+      "sku": "ORVA-P2-ELITE",
+      "quantity": 1,
+      "timestamp": "2026-11-06T23:28:25.790Z",
+      "note": "Non-Pack1 reservation absent from prior Pack1-only report"
+    }
+  ],
+  "preservedFromPreviousReport": 49,
+  "removedSincePreviousReport": []
+}

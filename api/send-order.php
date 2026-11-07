@@ -7,6 +7,7 @@
 define('ORVA_API', true);
 $config = require __DIR__ . '/config.php';
 require_once dirname(__DIR__) . '/lib/inventory-store.php';
+require_once dirname(__DIR__) . '/lib/rate-limit-pg.php';
 require_once dirname(__DIR__) . '/lib/risk-engine.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -341,7 +342,19 @@ if ($clientOrderId !== '') {
         ]);
         exit;
     }
-    if (orva_inventory_has_active_reservation($clientOrderId)) {
+    try {
+        $alreadyReserved = orva_inventory_has_active_reservation($clientOrderId);
+    } catch (Throwable $e) {
+        if ($idempLockFp) { flock($idempLockFp, LOCK_UN); fclose($idempLockFp); }
+        http_response_code(503);
+        echo json_encode([
+            'success' => false,
+            'error' => 'INVENTORY_UNAVAILABLE',
+            'message' => 'خدمة المخزون غير متاحة حالياً. يرجى المحاولة لاحقاً.'
+        ]);
+        exit;
+    }
+    if ($alreadyReserved) {
         if ($idempLockFp) { flock($idempLockFp, LOCK_UN); fclose($idempLockFp); }
         http_response_code(409);
         echo json_encode([
@@ -359,19 +372,28 @@ if ($eventId === '') {
     $eventId = 'order_' . $orderId . '_' . time();
 }
 
-// ── 7b. Risk Engine (Services plan ecom scoring) ──────────────────────────────
+// ── 7b. Risk Engine (Services plan ecom scoring) ──────────────────────────
 $clientIp = preg_replace('/[^0-9a-fA-F:.]/', '', (string)($_SERVER['REMOTE_ADDR'] ?? '')) ?: '';
+$countryCode = strtoupper(trim((string)(
+    $_SERVER['HTTP_CF_IPCOUNTRY'] ?? 
+    $_SERVER['GEOIP_COUNTRY_CODE'] ?? 
+    $_SERVER['HTTP_X_COUNTRY_CODE'] ?? ''
+)));
 $deviceId = trim((string)($data['deviceId'] ?? $data['device_id'] ?? ''));
 $formDurationMs = $data['formDurationMs'] ?? $data['form_duration_ms'] ?? null;
 $honeypotValue = trim((string)($data['honeypot'] ?? $data['website'] ?? ''));
+
 $riskCtx = [
     'storeId' => 'orvastore',
     'orderId' => $orderId,
     'actorPhone' => $cleanPhone,
+    'actorIp' => $clientIp,
     'actorIpHash' => orva_risk_hash_ip($clientIp),
+    'countryCode' => $countryCode,
     'deviceId' => $deviceId,
     'honeypotValue' => $honeypotValue,
     'formDurationMs' => is_numeric($formDurationMs) ? (int)$formDurationMs : null,
+    'quantity' => $quantity,
 ];
 $riskResult = orva_risk_evaluate($riskCtx);
 
@@ -382,8 +404,8 @@ if (($riskResult['decision'] ?? '') === 'BLOCK') {
     echo json_encode([
         'success' => false,
         'error' => 'REQUEST_BLOCKED',
-        'message' => 'عذراً، لا يمكن معالجة طلبك في الوقت الحالي. يرجى التحقق من معلوماتك والمحاولة مرة أخرى.'
-    ]);
+        'message' => $riskResult['userMessage'] ?? 'عذراً، لا يمكن معالجة طلبك في الوقت الحالي. يرجى التحقق من معلوماتك والمحاولة مرة أخرى.'
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -397,6 +419,22 @@ $riskBadge = $riskDecision === 'REVIEW'
     ? "\n⚠️ فحص يدوي (REVIEW) — نقاط الخطر: {$riskScore}/100"
     : ($riskScore > 0 ? "\n🟡 مؤشر خطر: {$riskScore}/100" : '');
 
+// ── 7c. Atomic rate limit (fail closed only if pg configured; otherwise risk engine handles it) ─
+if (function_exists('orva_pg_is_configured') && orva_pg_is_configured()) {
+    $rlResult = orva_rate_limit_check_and_record($clientIp, $deviceId, $cleanPhone);
+    if (empty($rlResult['allowed']) && empty($rlResult['localBypass'])) {
+        if ($idempLockFp) { flock($idempLockFp, LOCK_UN); fclose($idempLockFp); }
+        $rlStatus = (int)($rlResult['httpStatus'] ?? 429);
+        http_response_code($rlStatus);
+        echo json_encode([
+            'success' => false,
+            'error' => $rlResult['code'] ?? 'RATE_LIMIT_EXCEEDED',
+            'message' => $rlResult['message'] ?? 'عذراً، لقد تم تسجيل طلبك مسبقاً. سيتصل بك فريقنا لتأكيد طلبك.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
+
 // ── 8. Atomic Inventory Reservation ───────────────────────────────────────────
 $sku = strtoupper(trim((string)$product['sku']));
 $createdReservation = false;
@@ -408,6 +446,9 @@ if (!$reserveResult['ok']) {
     $statusCode = ($code === 'INVENTORY_SKU_MISSING') ? 409 : 400;
     if ($code === 'ORDER_ID_ALREADY_RESERVED') {
         $statusCode = 409;
+    }
+    if ($code === 'INVENTORY_UNAVAILABLE' || !empty($reserveResult['httpStatus'])) {
+        $statusCode = (int)($reserveResult['httpStatus'] ?? 503);
     }
     http_response_code($statusCode);
     echo json_encode([
@@ -502,6 +543,13 @@ if ($supabaseHttp !== 200 && $supabaseHttp !== 201) {
             : 'تعذر حفظ الطلب في قاعدة البيانات. يرجى المحاولة لاحقاً.'
     ]);
     exit;
+}
+
+// Bind reservation after successful persistence (crash recovery must not release real orders).
+try {
+    orva_inventory_bind_order($orderId);
+} catch (Throwable $e) {
+    error_log('[send-order.php] reservation bind warning: ' . $e->getMessage());
 }
 
 // ── 10. Decoupled Notifications (Telegram failure must not invalidate order) ──

@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-11-07T04:05:30.113Z",
+  "baseBranch": "release/v1.0",
+  "proposedStagingBranch": "staging",
+  "fileCount": 653,
+  "manifestListSha256": "8c3d52751d64fe0d0a428c70bec3a1592ae5058a6c4abb3cccec4103173e0c78",
+  "warnings": [
+    "data/inventory-state.json is Git-tracked; Staging deploy must NOT overwrite live Hostinger inventory with a developer workstation copy. Prefer server-side preserve / exclude from rsync deploy.",
+    "reservation reconciliation reports are tracked; exclude from website docroot if packaging a ZIP."
+  ],
+  "excludedLocalOnly": [
+    "tools/pgsql-portable/",
+    "tools/orva-pgdata/",
+    "data/private/orva-local-pg.env",
+    ".env.local",
+    "local PG test result JSON",
+    "orvastore Dashbaord v0.9/ (source; deploy uses admin/ export)"
+  ],
+  "includesAdminExport": true,
+  "adminFileCount": 426,
+  "proposedNewFiles": [
+    "lib/db-authority.js",
+    "lib/idempotency-pg.js",
+    "lib/inventory-pg.js",
+    "lib/inventory-pg.php",
+    "lib/inventory-recovery.js",
+    "lib/orva-pg.php",
+    "lib/rate-limit-pg.php",
+    "scripts/recover-abandoned-reservations.js",
+    "scripts/recover-abandoned-reservations.php",
+    "scripts/inventory-seed-dry-run.js",
+    "supabase/proposals/2026-11-07-public-inventory-idempotency.sql",
+    "supabase/proposals/2026-11-07-public-inventory-idempotency-rate-limit.md",
+    "docs/HOSTINGER_INVENTORY_RECOVERY_CRON_PROPOSAL.md",
+    "ORVA_STORE_BACKEND_STABILIZATION_LOCAL_REPORT.md",
+    "ORVA_STORE_STAGING_RELEASE_PREPARATION.md"
+  ]
+}

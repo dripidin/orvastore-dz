@@ -1,0 +1,10 @@
+{
+  "reservedLedgerRows": 51,
+  "checkoutPending": 0,
+  "drillPro": {
+    "available": 17,
+    "reserved": 3,
+    "totalPhysical": 20
+  },
+  "note": "READ_ONLY — no mutations performed"
+}

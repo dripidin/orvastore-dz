@@ -110,6 +110,7 @@ foreach ($df in $dataFiles) {
 # 4. Copy Media & Asset Folders
 $assetDirs = @(
     "admin",
+    "lib",
     "products",
     "pack 1 4950",
     "pack2 12950",

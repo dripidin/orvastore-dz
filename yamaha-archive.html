@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -34,12 +34,12 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('set', 'autoConfig', false, '9988776655443322');
-    fbq('init', '9988776655443322');
+    fbq('set', 'autoConfig', false, '1773144400655201');
+    fbq('init', '1773144400655201');
     fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=9988776655443322&ev=PageView&noscript=1"
+    src="https://www.facebook.com/tr?id=1773144400655201&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
 
@@ -271,11 +271,17 @@
                     <div class="order-form-card">
 
                         <div class="form-header">
-                            <h3 class="form-title">إستمارة الطلب السريع</h3>
-                            <p class="form-subtitle">أدخل معلوماتك وسنتصل بك لتأكيد التوصيل</p>
+                            <h3 class="form-title">عرض غير متاح للطلب</h3>
+                            <p class="form-subtitle">هذه صفحة أرشيف. المنتج المرتبط مؤرشف وغير قابل للشراء حتى يُعتمد عرض وسعر نهائيان.</p>
                         </div>
 
-                        <form id="orvaOrderForm" class="order-form" novalidate>
+                        <div id="orvaArchiveUnavailable" style="padding:1rem;border:1px solid #ccc;background:#f7f7f7;margin-bottom:1rem;text-align:center;">
+                            <strong>الطلب متوقف حالياً على هذه الصفحة.</strong>
+                            <p style="margin:0.5rem 0 0;">راجع العروض النشطة من الصفحة الرئيسية.</p>
+                            <a href="index.html" style="display:inline-block;margin-top:0.75rem;">العودة للمتجر</a>
+                        </div>
+
+                        <form id="orvaOrderForm" class="order-form" novalidate hidden aria-hidden="true" data-orders-disabled="true">
 
                             <!-- Quantity Selector (Max 3) -->
                             <div class="form-group quantity-group">

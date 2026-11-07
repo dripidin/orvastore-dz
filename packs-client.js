@@ -369,7 +369,7 @@
                     orderId,
                     eventId,
                     packId: packKey,
-                    sku: packKey,
+                    sku: packSku,
                     fullName: nameVal,
                     phone: phoneVal,
                     wilayaId: selectedWilayaObj.id,

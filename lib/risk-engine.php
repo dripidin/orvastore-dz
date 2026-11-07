@@ -1,8 +1,14 @@
-<?php
+﻿<?php
 /**
- * ORVA STORE — PHP Risk Engine (Hostinger path)
- * Port of Services plan ecom riskEngine.js for LiteSpeed/PHP orders.
- * Stores events in data/risk-events.json (no Redis / no extra deps).
+ * ORVA STORE — PHP Risk Engine (Hostinger / LiteSpeed)
+ * Port of Services plan ecom trust&risk skill.
+ * Implements strict anti-fraud & anti-competitor protections:
+ * - Foreign / Non-Algerian check
+ * - Max 3 orders per phone
+ * - Max 3 orders per device
+ * - Max 2 orders per IP
+ * - Max 3 quantity per order
+ * - Honeypot & rapid submission checks
  */
 
 if (!defined('ORVA_API') && php_sapi_name() !== 'cli') {
@@ -33,8 +39,10 @@ function orva_risk_hash_ip(?string $ip): string
 function orva_risk_normalize_phone(string $phone): string
 {
     $digits = preg_replace('/\D+/', '', $phone) ?? '';
-    if (str_starts_with($digits, '213') && strlen($digits) >= 12) {
+    if (str_starts_with($digits, '213') && strlen($digits) >= 11) {
         $digits = '0' . substr($digits, 3);
+    } elseif (str_starts_with($digits, '00213') && strlen($digits) >= 13) {
+        $digits = '0' . substr($digits, 5);
     }
     return $digits;
 }
@@ -92,8 +100,19 @@ function orva_risk_level_to_decision(string $level, int $score): string
 }
 
 /**
- * @param array{storeId?:string,orderId?:string,actorPhone?:string,actorIpHash?:string,deviceId?:string,honeypotValue?:string,formDurationMs?:int|null} $ctx
- * @return array{score:int,level:string,decision:string,reasons:array<int,string>}
+ * @param array{
+ *   storeId?:string,
+ *   orderId?:string,
+ *   actorPhone?:string,
+ *   actorIp?:string,
+ *   actorIpHash?:string,
+ *   countryCode?:string,
+ *   deviceId?:string,
+ *   honeypotValue?:string,
+ *   formDurationMs?:int|null,
+ *   quantity?:int
+ * } $ctx
+ * @return array{score:int,level:string,decision:string,reasons:array<int,string>,userMessage:string|null}
  */
 function orva_risk_evaluate(array $ctx): array
 {
@@ -101,17 +120,38 @@ function orva_risk_evaluate(array $ctx): array
     $weights = $cfg['SCORE_WEIGHTS'];
     $eventsFile = $cfg['EVENTS_FILE'];
     $events = orva_risk_prune(orva_risk_read_events($eventsFile), (int)$cfg['RETENTION_DAYS']);
-    $since = time() - ((int)$cfg['RATE_LIMIT']['windowMinutes'] * 60);
+    $since = time() - ((int)$cfg['WINDOW_MINUTES'] * 60);
     $triggered = [];
     $total = 0;
+    $userMessage = null;
 
-    // Honeypot
+    // 1. Quantity Check: max 3 items per order
+    $quantity = (int)($ctx['quantity'] ?? 1);
+    if ($quantity > (int)$cfg['MAX_QUANTITY_PER_ORDER']) {
+        $total += (int)$weights['QUANTITY_EXCEEDED'];
+        $triggered[] = "Quantity ({$quantity}) exceeds limit of {$cfg['MAX_QUANTITY_PER_ORDER']}";
+        $userMessage = 'عذراً، أقصى كمية مسموح بطلبها هي 3 قطع لكل طلبية.';
+    }
+
+    // 2. Geographic / Algeria Only Check
+    $country = strtoupper(trim((string)($ctx['countryCode'] ?? '')));
+    $rawIp = trim((string)($ctx['actorIp'] ?? ''));
+    $isLocal = ($rawIp === '127.0.0.1' || $rawIp === '::1' || str_starts_with($rawIp, '192.168.') || str_starts_with($rawIp, '10.'));
+    
+    if (!$isLocal && $country !== '' && $country !== 'DZ') {
+        $total += (int)$weights['NON_ALGERIAN_GEO'];
+        $triggered[] = "Non-Algerian IP country detected: {$country}";
+        $userMessage = 'نعتذر، خدمة التوصيل متوفرة فقط داخل دولة الجزائر (Algeria).';
+    }
+
+    // 3. Honeypot check (Automated bot trap)
     if (trim((string)($ctx['honeypotValue'] ?? '')) !== '') {
         $total += (int)$weights['HONEYPOT_TRIGGERED'];
         $triggered[] = 'Honeypot field triggered (automated submission detected)';
+        $userMessage = $userMessage ?? 'عذراً، تعذر إرسال الطلب (كشف نظام الحماية نشاطاً آلياً).';
     }
 
-    // Rapid submission
+    // 4. Rapid submission check
     $ms = $ctx['formDurationMs'] ?? null;
     if ($ms !== null && is_numeric($ms)) {
         $secs = ((float)$ms) / 1000.0;
@@ -121,11 +161,12 @@ function orva_risk_evaluate(array $ctx): array
         }
     }
 
-    // Invalid Algerian phone
+    // 5. Algerian Phone Format check
     $phone = orva_risk_normalize_phone((string)($ctx['actorPhone'] ?? ''));
-    if ($phone !== '' && !preg_match($cfg['PHONE_REGEX'], $phone)) {
+    if ($phone === '' || !preg_match($cfg['PHONE_REGEX'], $phone)) {
         $total += (int)$weights['INVALID_PHONE_PATTERN'];
-        $triggered[] = 'Phone number does not match Algerian format';
+        $triggered[] = 'Phone number does not match valid Algerian format (05, 06, 07)';
+        $userMessage = $userMessage ?? 'يرجى إدخال رقم هاتف جزائري صحيح يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام.';
     }
 
     $createdInWindow = array_filter($events, static function ($e) use ($since) {
@@ -133,22 +174,39 @@ function orva_risk_evaluate(array $ctx): array
         return $ts >= $since && (($e['event_type'] ?? '') === 'REQUEST_CREATED' || ($e['event_type'] ?? '') === 'REQUEST_BLOCKED');
     });
 
-    // Rate limit by IP hash / device
+    // 6. Rate Limit by IP (Max 2 per IP in 24h)
     $ipHash = (string)($ctx['actorIpHash'] ?? '');
-    $deviceId = (string)($ctx['deviceId'] ?? '');
-    $rateHits = 0;
-    foreach ($createdInWindow as $e) {
-        if (($ipHash !== '' && ($e['ip_hash'] ?? '') === $ipHash)
-            || ($deviceId !== '' && ($e['device_id'] ?? '') === $deviceId)) {
-            $rateHits++;
+    if ($ipHash !== '') {
+        $ipHits = 0;
+        foreach ($createdInWindow as $e) {
+            if (($e['ip_hash'] ?? '') === $ipHash) {
+                $ipHits++;
+            }
+        }
+        if ($ipHits >= (int)$cfg['MAX_IP_ORDERS']) {
+            $total += (int)$weights['IP_LIMIT_EXCEEDED'];
+            $triggered[] = "IP rate limit exceeded ({$ipHits} orders from this IP in window)";
+            $userMessage = $userMessage ?? 'تم الوصول إلى الحد الأقصى للطلبات من شبكة الإنترنت الحالية (طلبان خلال 24 ساعة).';
         }
     }
-    if ($rateHits >= (int)$cfg['RATE_LIMIT']['maxRequests']) {
-        $total += (int)$weights['RATE_LIMIT_HIT'];
-        $triggered[] = "Rate limit exceeded ({$rateHits} orders in window)";
+
+    // 7. Rate Limit by Device ID (Max 3 per device in 24h)
+    $deviceId = (string)($ctx['deviceId'] ?? '');
+    if ($deviceId !== '') {
+        $deviceHits = 0;
+        foreach ($createdInWindow as $e) {
+            if (($e['device_id'] ?? '') === $deviceId) {
+                $deviceHits++;
+            }
+        }
+        if ($deviceHits >= (int)$cfg['MAX_DEVICE_ORDERS']) {
+            $total += (int)$weights['DEVICE_LIMIT_EXCEEDED'];
+            $triggered[] = "Device rate limit exceeded ({$deviceHits} orders from this device in window)";
+            $userMessage = $userMessage ?? 'تم الوصول إلى الحد الأقصى للطلبات من هذا الجهاز (3 طلبات خلال 24 ساعة).';
+        }
     }
 
-    // Repeated phone
+    // 8. Rate Limit by Phone Number (Max 3 per phone in 24h)
     if ($phone !== '') {
         $phoneHits = 0;
         foreach ($createdInWindow as $e) {
@@ -157,36 +215,17 @@ function orva_risk_evaluate(array $ctx): array
                 $phoneHits++;
             }
         }
-        if ($phoneHits >= (int)$cfg['RATE_LIMIT']['maxRequests']) {
-            $total += (int)$weights['REPEATED_PHONE'];
+        if ($phoneHits >= (int)$cfg['MAX_PHONE_ORDERS']) {
+            $total += (int)$weights['PHONE_LIMIT_EXCEEDED'];
             $triggered[] = "Phone {$phone} reached max attempts ({$phoneHits} prior)";
-        } elseif ($phoneHits === 1) {
-            $total += 15;
-            $triggered[] = "Second attempt for phone {$phone}";
+            $userMessage = $userMessage ?? 'عذراً، تم تسجيل 3 طلبات بهذا الرقم مسبقاً خلال 24 ساعة. سيتصل بك فريقنا لتأكيد طلبك.';
+        } elseif ($phoneHits === 1 || $phoneHits === 2) {
+            $total += 10;
+            $triggered[] = "Subsequent attempt #{$phoneHits} for phone {$phone}";
         }
     }
 
-    // Previous rejection / block
-    foreach ($events as $e) {
-        $type = (string)($e['event_type'] ?? '');
-        if ($type !== 'REQUEST_REJECTED' && $type !== 'ACTOR_BLOCKED' && $type !== 'REQUEST_BLOCKED') {
-            continue;
-        }
-        $match = false;
-        if ($phone !== '' && orva_risk_normalize_phone((string)($e['actor_phone'] ?? '')) === $phone) {
-            $match = true;
-        }
-        if ($deviceId !== '' && ($e['device_id'] ?? '') === $deviceId) {
-            $match = true;
-        }
-        if ($match) {
-            $total += (int)$weights['PREVIOUS_REJECTION'];
-            $triggered[] = 'Actor has prior rejected/blocked requests';
-            break;
-        }
-    }
-
-    // Multi-device identity (same device, many phones)
+    // 9. Multi-device identity (same device, multiple phone numbers)
     if ($deviceId !== '') {
         $phones = [];
         foreach ($events as $e) {
@@ -213,6 +252,7 @@ function orva_risk_evaluate(array $ctx): array
         'level' => $level,
         'decision' => $decision,
         'reasons' => $triggered,
+        'userMessage' => ($decision === 'BLOCK') ? $userMessage : null
     ];
 }
 

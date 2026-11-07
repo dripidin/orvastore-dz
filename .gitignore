@@ -15,6 +15,14 @@ staging-secure-config*.php
 *.pem
 /data/private/
 data/private/backups/
+# Disposable local PostgreSQL binaries / data (never commit)
+/tools/pgsql-portable/
+/tools/orva-pgdata/
+/tools/pgsql-extract-tmp/
+/tools/*.jar
+/tools/*.txz
+/tools/*.tar
+/tools/pgsql/
 
 # 2. Local Audit Reports & Phase Test Dumps (R2)
 PHASE_*
@@ -71,6 +79,10 @@ data/local-fixtures/*.runtime.json
 data/locks/
 # Mutable inventory remains on disk; future commits should prefer seeds under data/seeds/
 # (tracked copies are preserved for now — do not delete local inventory files)
+# Deploy protection: after approval, stop tracking runtime inventory so Git sync
+# cannot overwrite Hostinger Production stock (git rm --cached data/inventory-state.json).
+# data/inventory-state.json
+# data/inventory-audit.json
 products/*
 !products/.gitkeep
 
@@ -122,4 +134,5 @@ scripts/run-staging-jwt-provision.ps1
 
 
 admin/dev/
+services/
 

@@ -37,8 +37,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $rawInput = file_get_contents('php://input');
 $body = json_decode($rawInput, true) ?? [];
 $action = $_GET['action'] ?? ($body['action'] ?? '');
-$supabaseUrl = rtrim($config['supabase']['url'], '/');
-$supabaseKey = $config['supabase']['anon_key'];
+$supabaseUrl = rtrim((string)($config['supabase']['url'] ?? ''), '/');
+$appEnvDelivery = strtolower(trim((string)($config['app_env'] ?? 'production')));
+$schemaDelivery = trim((string)($config['supabase']['schema'] ?? 'public'));
+if ($supabaseUrl === '') {
+    http_response_code(503);
+    error_log('[ORVA Delivery] CRITICAL: SUPABASE_URL is not configured.');
+    echo json_encode(['success' => false, 'error' => 'SERVER_MISCONFIGURED']);
+    exit;
+}
+if ($appEnvDelivery === 'staging' || $schemaDelivery === 'staging') {
+    if (trim((string)($config['supabase']['service_role_key'] ?? '')) !== '') {
+        http_response_code(503);
+        error_log('[ORVA Delivery] CRITICAL: SUPABASE_SERVICE_ROLE_KEY must not be set for staging.');
+        echo json_encode(['success' => false, 'error' => 'SERVER_MISCONFIGURED', 'message' => 'STAGING_SERVICE_ROLE_FORBIDDEN']);
+        exit;
+    }
+} elseif (trim((string)($config['supabase']['service_role_key'] ?? '')) === '') {
+    http_response_code(503);
+    error_log('[ORVA Delivery] CRITICAL: SUPABASE_SERVICE_ROLE_KEY required for production-shaped delivery.');
+    echo json_encode(['success' => false, 'error' => 'SERVER_MISCONFIGURED']);
+    exit;
+}
+// Server credential selected inside orva_orders_storage_request (service_role for public).
+$supabaseKey = trim((string)($config['supabase']['service_role_key'] ?? ''));
 
 // Load admin token from environment — NO hardcoded fallback
 $adminToken = '';
@@ -96,7 +118,7 @@ if ($action === 'login' || $action === 'auth') {
 }
 
 // ── State-Changing Actions Definition & Method Enforcement ──────────────────
-$stateChangingActions = ['update_status', 'status', 'change_status', 'modify_order', 'switch_order', 'delete', 'create', 'push_order'];
+$stateChangingActions = ['update_status', 'status', 'change_status', 'modify_order', 'switch_order', 'delete', 'create', 'push_order', 'create_order', 'manual_order'];
 $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if (in_array($action, $stateChangingActions, true)) {
@@ -114,7 +136,7 @@ if (in_array($action, $stateChangingActions, true)) {
 }
 
 // ── Enforce Authentication & CSRF on All Administrative Endpoints ───────────
-$adminActions = ['get_all_orders', 'orders', 'update_status', 'status', 'change_status', 'modify_order', 'switch_order', 'delete', 'analytics', 'create', 'push_order'];
+$adminActions = ['get_all_orders', 'orders', 'update_status', 'status', 'change_status', 'modify_order', 'switch_order', 'delete', 'analytics', 'create', 'push_order', 'create_order', 'manual_order', 'track', 'track_order'];
 if (in_array($action, $adminActions, true)) {
     $authType = getAdminAuthType($adminToken);
     if ($authType === '') {
@@ -664,9 +686,9 @@ if ($action === 'create' || $action === 'push_order') {
         exit;
     }
 
-    // 2. Check credentials
-    $ecoUrl = rtrim($config['ecotrack']['base_url'] ?? 'https://redex.ecotrack.dz', '/');
-    $ecoToken = $config['ecotrack']['api_token'] ?? '';
+    // 2. Check credentials (from dashboard pre-template or config)
+    $ecoUrl = rtrim($body['baseUrl'] ?? ($config['ecotrack']['base_url'] ?? 'https://redex.ecotrack.dz'), '/');
+    $ecoToken = trim((string)($body['token'] ?? ($config['ecotrack']['api_token'] ?? '')));
 
     if (empty($ecoToken)) {
         http_response_code(422);
@@ -678,24 +700,32 @@ if ($action === 'create' || $action === 'push_order') {
         exit;
     }
 
-    // 3. Prepare real payload for provider
-    $fullName = $body['fullName'] ?? ($existingOrder['customer_name'] ?? 'Client');
-    $phone = $body['phone'] ?? ($existingOrder['customer_phone'] ?? '0555000000');
-    $wilayaCode = intval($body['wilayaCode'] ?? 16);
-    $commune = $body['commune'] ?? 'Alger Centre';
-    $price = intval($body['price'] ?? ($existingOrder['grand_total'] ?? 4950));
+    // 3. Prepare real payload for provider from existingOrder or request body
+    $rawWilaya = $body['wilaya'] ?? ($existingOrder['wilaya'] ?? '');
+    $extractedCode = null;
+    if (preg_match('/\b(\d{1,2})\b/', (string)$rawWilaya, $m)) {
+        $extractedCode = intval($m[1]);
+    }
+    $wilayaCode = intval($body['wilayaCode'] ?? ($extractedCode ?? 16));
+
+    $fullName = trim((string)($body['fullName'] ?? ($existingOrder['full_name'] ?? ($existingOrder['customer_name'] ?? 'Client'))));
+    $phone = trim((string)($body['phone'] ?? ($existingOrder['phone'] ?? ($existingOrder['customer_phone'] ?? '0555000000'))));
+    $commune = trim((string)($body['commune'] ?? ($existingOrder['commune'] ?? 'Alger Centre')));
     $isStopdesk = ($deliveryType === 'desk' || str_contains(strtolower($deliveryType), 'stop'));
+    $address = trim((string)($body['address'] ?? ($existingOrder['address'] ?? ($commune ?: ($isStopdesk ? 'Bureau Stop Desk' : 'Centre Ville')))));
+    $productName = trim((string)($body['productName'] ?? ($existingOrder['product_name'] ?? 'ORVA Store Order')));
+    $price = intval($body['price'] ?? ($body['codAmountDzd'] ?? ($existingOrder['price_num'] ?? ($existingOrder['grand_total'] ?? 4950))));
 
     $ecotrackPayload = [
         'nom_client' => $fullName,
         'telephone' => $phone,
-        'telephone_2' => $body['phone2'] ?? null,
-        'adresse' => $body['address'] ?? ($isStopdesk ? 'Bureau Stop Desk' : 'Centre Ville'),
+        'telephone_2' => $body['phone2'] ?? ($existingOrder['phone2'] ?? null),
+        'adresse' => $address,
         'code_wilaya' => (string)$wilayaCode,
         'commune' => $commune,
         'montant' => $price,
         'remarque' => $body['remarks'] ?? ($isStopdesk ? 'Stop Desk' : 'Domicile'),
-        'produit' => $body['productName'] ?? 'ORVA Store Order',
+        'produit' => $productName,
         'type' => 1,
         'stop_desk' => $isStopdesk ? 1 : 0,
         'reference' => $orderId
@@ -792,6 +822,103 @@ if ($action === 'delete') {
         'message' => "Order {$targetId} permanently deleted.",
         'orderId' => $targetId
     ]);
+    exit;
+}
+
+// ── 5b. Courier Tracking Endpoint ──────────────────────────────────────────
+if ($action === 'track' || $action === 'track_order') {
+    $trackingParam = trim((string)($_GET['tracking'] ?? $_GET['code'] ?? ''));
+    $orderIdParam = trim((string)($_GET['orderId'] ?? $_GET['id'] ?? ''));
+
+    if (empty($trackingParam) && empty($orderIdParam)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Missing tracking code or orderId']);
+        exit;
+    }
+
+    $existingOrder = null;
+    if (!empty($orderIdParam)) {
+        $qUrl = "{$supabaseUrl}/rest/v1/orders?order_id=eq." . urlencode($orderIdParam) . "&limit=1";
+        $qRes = supabaseRequest('GET', $qUrl, null, $supabaseKey, $adminToken);
+        if (is_array($qRes['data']) && !empty($qRes['data'])) {
+            $existingOrder = $qRes['data'][0];
+            if (empty($trackingParam)) {
+                $trackingParam = $existingOrder['redex_tracking_code'] ?? '';
+            }
+        }
+    }
+
+    $trackingCode = $trackingParam ?: ($existingOrder['redex_tracking_code'] ?? $orderIdParam);
+    $trackingUrl = "https://redex.ecotrack.dz/tracking?tracking=" . urlencode($trackingCode);
+
+    echo json_encode([
+        'success' => true,
+        'orderId' => $orderIdParam ?: ($existingOrder['order_id'] ?? ''),
+        'trackingCode' => $trackingCode,
+        'status' => $existingOrder['status'] ?? 'pending',
+        'in_redex' => !empty($existingOrder['in_redex']),
+        'courier' => 'Redex Delivery DZ',
+        'trackingUrl' => $trackingUrl,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+// ── 5c. Manual Order Creation (Admin) ──────────────────────────────────────
+if ($action === 'create_order' || $action === 'manual_order') {
+    $rawInput = file_get_contents('php://input');
+    $body = json_decode($rawInput, true) ?? [];
+
+    $fullName = trim((string)($body['fullName'] ?? ''));
+    $phone = trim((string)($body['phone'] ?? ''));
+    $wilaya = trim((string)($body['wilaya'] ?? ''));
+    $commune = trim((string)($body['commune'] ?? ''));
+    $productName = trim((string)($body['productName'] ?? 'Manual Order'));
+    $priceNum = isset($body['priceNum']) ? (int)$body['priceNum'] : 4950;
+    $shippingFee = trim((string)($body['shippingFee'] ?? '0 د.ج'));
+    $grandTotal = trim((string)($body['grandTotal'] ?? ($priceNum . ' د.ج')));
+    $deliveryType = trim((string)($body['deliveryType'] ?? 'home'));
+    $quantity = isset($body['quantity']) ? max(1, (int)$body['quantity']) : 1;
+
+    if (empty($fullName) || empty($phone) || empty($wilaya)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Missing required fields (fullName, phone, wilaya)']);
+        exit;
+    }
+
+    $manualOrderId = 'ORD-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+
+    $newOrderRecord = [
+        'order_id'      => $manualOrderId,
+        'store_id'      => 'orvastore',
+        'full_name'     => $fullName,
+        'phone'         => $phone,
+        'wilaya'        => $wilaya,
+        'commune'       => $commune,
+        'delivery_type' => $deliveryType,
+        'quantity'      => $quantity,
+        'product_name'  => $productName,
+        'product_total' => $priceNum . ' د.ج',
+        'shipping_fee'  => $shippingFee,
+        'grand_total'   => $grandTotal,
+        'price_num'     => $priceNum,
+        'status'        => 'pending',
+        'created_at'    => gmdate('c'),
+    ];
+
+    $insertRes = supabaseRequest('POST', "{$supabaseUrl}/rest/v1/orders", $newOrderRecord, $supabaseKey, $adminToken);
+
+    if (($insertRes['code'] ?? 500) < 200 || ($insertRes['code'] ?? 500) >= 300) {
+        http_response_code(502);
+        echo json_encode(['success' => false, 'error' => 'DATABASE_INSERT_FAILED', 'details' => $insertRes]);
+        exit;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'orderId' => $manualOrderId,
+        'message' => "Order {$manualOrderId} created successfully.",
+        'order'   => $newOrderRecord
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 

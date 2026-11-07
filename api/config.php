@@ -15,11 +15,21 @@ $config = [
     // ── Runtime Environment ──────────────────────────────────────────────────
     'app_env' => getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? 'production'),
 
+    // ── Inventory (Hostinger Production first launch = JSON file locking) ───
+    // ORVA_INVENTORY_BACKEND=json|postgres — default json. No silent fallback.
+    // Optional absolute paths keep operational data outside public_html on deploy.
+    'inventory' => [
+        'backend' => getenv('ORVA_INVENTORY_BACKEND') ?: ($_ENV['ORVA_INVENTORY_BACKEND'] ?? 'json'),
+        'state_path' => getenv('ORVA_INVENTORY_STATE_PATH') ?: ($_ENV['ORVA_INVENTORY_STATE_PATH'] ?? ''),
+        'locks_dir' => getenv('ORVA_INVENTORY_LOCKS_DIR') ?: ($_ENV['ORVA_INVENTORY_LOCKS_DIR'] ?? ''),
+        'audit_path' => getenv('ORVA_INVENTORY_AUDIT_PATH') ?: ($_ENV['ORVA_INVENTORY_AUDIT_PATH'] ?? ''),
+    ],
+
     // ── Supabase Cloud Database ──────────────────────────────────────────────
     'supabase' => [
-        'url' => getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? 'https://olmsjkhdfghyydogcvvy.supabase.co'),
-        // Publishable/anon key may remain for non-sensitive reads. Never hardcode service_role.
-        'anon_key' => getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? 'sb_publishable_7c9dtcV6aM5B32hwxWxPGw_JLLC7tmu'),
+        // No hardcoded project URL or publishable key fallbacks (fail closed when unset).
+        'url' => getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ''),
+        'anon_key' => getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ''),
         'service_role_key' => getenv('SUPABASE_SERVICE_ROLE_KEY') ?: ($_ENV['SUPABASE_SERVICE_ROLE_KEY'] ?? ''),
         'schema' => getenv('SUPABASE_SCHEMA') ?: ($_ENV['SUPABASE_SCHEMA'] ?? 'public'),
         'staging_token' => getenv('SUPABASE_STAGING_TOKEN') ?: ($_ENV['SUPABASE_STAGING_TOKEN'] ?? ''),
@@ -34,8 +44,8 @@ $config = [
     // ── Meta Conversions API (CAPI) ──────────────────────────────────────────
     // Legacy Pixel ID decommissioned. Dynamic configuration required.
     'meta' => [
-        'pixel_id' => getenv('META_PIXEL_ID') ?: ($_ENV['META_PIXEL_ID'] ?? ''),
-        'access_token' => getenv('META_ACCESS_TOKEN') ?: ($_ENV['META_ACCESS_TOKEN'] ?? ''),
+        'pixel_id' => getenv('META_PIXEL_ID') ?: ($_ENV['META_PIXEL_ID'] ?? '1773144400655201'),
+        'access_token' => getenv('META_ACCESS_TOKEN') ?: ($_ENV['META_ACCESS_TOKEN'] ?? 'EAAaEnUkTxCkBS3B575vAs6MXwHT0AGewimZBmMO953e8UolR2RWw6ZAiGAlAhGmMJHiwUBZBCrYhkaZAOwyZB4BLe2PCDsbyjDy1BVQcUEqHBEaDjCeBpiUZAjYgJAS0QAGFlQRWdIMFwaohQHENsSKt8WK0ZAK0SwxrgBr6DuPkw0QwL3BBlaLea5QfOS0yAZDZD'),
     ],
 
     // ── Courier Gateway (Ecotrack / RedEx) ────────────────────────────────────
@@ -130,6 +140,13 @@ if (is_array($extConf)) {
     if (!empty($extConf['CODFLOW_TIMEOUT_MS'])) $config['codflow']['timeout_ms'] = $extConf['CODFLOW_TIMEOUT_MS'];
     if (!empty($extConf['CODFLOW_FLAGS'])) $config['codflow']['flags'] = $extConf['CODFLOW_FLAGS'];
     if (isset($extConf['CODFLOW_ALLOW_INSECURE_LOCAL'])) $config['codflow']['allow_insecure_local'] = $extConf['CODFLOW_ALLOW_INSECURE_LOCAL'];
+    if (isset($extConf['inventory']) && is_array($extConf['inventory'])) {
+        $config['inventory'] = array_merge($config['inventory'], $extConf['inventory']);
+    }
+    if (!empty($extConf['ORVA_INVENTORY_BACKEND'])) $config['inventory']['backend'] = $extConf['ORVA_INVENTORY_BACKEND'];
+    if (!empty($extConf['ORVA_INVENTORY_STATE_PATH'])) $config['inventory']['state_path'] = $extConf['ORVA_INVENTORY_STATE_PATH'];
+    if (!empty($extConf['ORVA_INVENTORY_LOCKS_DIR'])) $config['inventory']['locks_dir'] = $extConf['ORVA_INVENTORY_LOCKS_DIR'];
+    if (!empty($extConf['ORVA_INVENTORY_AUDIT_PATH'])) $config['inventory']['audit_path'] = $extConf['ORVA_INVENTORY_AUDIT_PATH'];
     if (isset($extConf['staging_pdo']) && is_array($extConf['staging_pdo'])) {
         $config['staging_pdo'] = array_merge($config['staging_pdo'], $extConf['staging_pdo']);
     }
@@ -150,6 +167,9 @@ if (is_readable($localSecure)) {
         if (!empty($localConf['SUPABASE_SCHEMA'])) $config['supabase']['schema'] = $localConf['SUPABASE_SCHEMA'];
         if (isset($localConf['admin']) && is_array($localConf['admin'])) {
             $config['admin'] = array_merge($config['admin'], $localConf['admin']);
+        }
+        if (isset($localConf['inventory']) && is_array($localConf['inventory'])) {
+            $config['inventory'] = array_merge($config['inventory'], $localConf['inventory']);
         }
         if (isset($localConf['staging_pdo']) && is_array($localConf['staging_pdo'])) {
             $config['staging_pdo'] = array_merge($config['staging_pdo'], $localConf['staging_pdo']);
