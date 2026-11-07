@@ -1,22 +1,44 @@
-# Vercel uses Node api/*.js only. Hostinger uses api/*.php.
-# Same basename without extension (admin-settings.js + admin-settings.php)
-# breaks Vercel preview: "Two or more files have conflicting paths".
+# ==============================================================================
+# ORVA STORE — Vercel Deployment Ignore Configuration
+# ==============================================================================
+
+# 1. Dependencies & Source Dashboard
+node_modules/
+orvastore Dashbaord v0.9/
+.next/
+
+# 2. Local reference repos, packages & tools
+geoalgeria-main/
+CourierDZ-main/
+codflow-main/
+easy-invoice-pdf-main/
+antigravity-skills-main/
+awesome-design-md-main/
+tools/
+services/
+.agents/
+.claude/
+.devin/
+.qwen/
+.windsurf/
+
+# 3. Archives & packaging output (Hostinger & Staging)
+*.zip
+dist-*/
+tmp-*/
+backups/
+
+# 4. Hostinger PHP backend (Vercel uses api/*.js serverless functions only)
 api/*.php
 lib/*.php
 **/*.php
 
-# Hostinger / local-only bulk (keep deploys small)
-dist-staging-*/
-dist-hostinger/
-tmp-staging-*/
-tmp-staging-tests/
-backups/
-codflow-main/
+# 5. Documentation, test suites, and internal scripts
 docs/
 *.md
-pack3 15950/products in one image.jpg
+tests/
+scripts/
+supabase/
 data/private/
 data/local-fixtures/
 data/locks/
-supabase/
-scripts/
