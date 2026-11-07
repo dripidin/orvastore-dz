@@ -1,0 +1,30 @@
+{
+  "orders": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "order_id": "LOCAL-SYNTH-001",
+      "store_id": "orvastore",
+      "full_name": "Synthetic Test Customer",
+      "phone": "0555000001",
+      "wilaya": "16",
+      "commune": "الجزائر الوسطى",
+      "delivery_type": "توصيل للمنزل",
+      "delivery_time": "24 - 48 H",
+      "quantity": 1,
+      "product_name": "Pack 1 Pro",
+      "product_total": "4950 د.ج",
+      "shipping_fee": "500 د.ج",
+      "price_num": 5450,
+      "grand_total": "5450 د.ج",
+      "status": "pending",
+      "in_redex": false,
+      "redex_tracking_code": null,
+      "remarks": [],
+      "risk_score": 0,
+      "risk_level": "LOW",
+      "created_at": "2026-11-07T00:00:00+00:00",
+      "updated_at": "2026-11-07T00:00:00+00:00"
+    }
+  ],
+  "audit_logs": []
+}

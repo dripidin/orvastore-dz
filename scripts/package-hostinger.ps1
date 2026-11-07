@@ -48,6 +48,7 @@ $rootFiles = @(
     "script.js",
     "packs-client.js",
     "packs-config.js",
+    "meta-pixel-loader.js",
     "algeria-communes.js",
     "Tarif_Biskra.txt",
     ".htaccess",

@@ -29,7 +29,12 @@
     "test:phase8e3-9": "node scripts/test-phase8e3-9-final-preflight.js",
     "test:phase8f": "node scripts/test-phase8f-telegram-customization.js",
     "sync:admin": "node scripts/sync-admin.js",
-    "build:dashboard": "cd \"orvastore Dashbaord v0.9/next-shadcn-admin-dashboard-baseui-main\" && npm run build && cd ../.. && node scripts/sync-admin.js"
+    "build:dashboard": "cd \"orvastore Dashbaord v0.9/next-shadcn-admin-dashboard-baseui-main\" && npm run build && cd ../.. && node scripts/sync-admin.js",
+    "test:staging-pdo": "php scripts/test-staging-pdo-local.php",
+    "verify:admin-export": "php scripts/verify-admin-export-routes.php",
+    "preview:php": "php -S 127.0.0.1:8000 scripts/php-local-router.php",
+    "preview:local": "powershell -ExecutionPolicy Bypass -File scripts/start-local-preview.ps1",
+    "check:vercel-paths": "node scripts/vercel-path-conflicts.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -37,7 +42,6 @@
     "dzship": "^1.0.0",
     "googleapis": "^176.0.0",
     "pg": "^8.23.1",
-    "resend": "^3.2.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

@@ -1173,6 +1173,20 @@ module.exports = async (req, res) => {
                 : targetCourier.defaultToken || process.env.ECOTRACK_API_TOKEN || process.env.REDEX_API_TOKEN || '');
             const carrierUrl = (baseUrl || req.query.baseUrl || req.body?.baseUrl || ecoTrack?.baseUrl || targetCourier.baseUrl || 'https://redex.ecotrack.dz').replace(/\/+$/, '');
 
+            if (process.env.MOCK_COURIER === 'true' || req.body?.mock === true || req.query?.mock === 'true') {
+                return res.status(200).json({
+                    success: true,
+                    configured: true,
+                    reachable: true,
+                    authenticated: true,
+                    operational: true,
+                    mocked: true,
+                    courier: targetCourier.name,
+                    baseUrl: carrierUrl,
+                    message: 'MOCK_COURIER: connection test simulated locally (no remote call).'
+                });
+            }
+
             if (!activeToken) {
                 return res.status(400).json({
                     success: false,
@@ -1315,6 +1329,27 @@ module.exports = async (req, res) => {
         // ── 4. Create & Dispatch Parcel to Carrier API ─────────────────────────
         if ((action === 'create' || action === 'push_order') && method === 'POST') {
             const body = req.body || {};
+            const mockCourier = process.env.MOCK_COURIER === 'true' || body.mock === true;
+            if (mockCourier) {
+                const targetOrderId = body.orderId || ('ORVA-' + Math.floor(10000 + Math.random() * 90000));
+                const activeCourier = body.courierId || courierId || 'redex';
+                const trackingNumber = 'MOCK-' + crypto.createHash('sha256')
+                    .update(String(targetOrderId) + Date.now())
+                    .digest('hex')
+                    .slice(0, 10)
+                    .toUpperCase();
+                return res.status(200).json({
+                    success: true,
+                    mocked: true,
+                    orderId: targetOrderId,
+                    trackingCode: trackingNumber,
+                    trackingNumber,
+                    courierId: activeCourier,
+                    courierName: activeCourier === 'ecotrack' ? 'Ecotrack DZ (mocked)' : 'Redex Delivery DZ (mocked)',
+                    labelUrl: `/api/delivery?action=label_pdf&tracking=${encodeURIComponent(trackingNumber)}`,
+                    message: 'MOCK_COURIER: shipment created locally without dispatching to a real carrier.'
+                });
+            }
             const activeCourier = body.courierId || courierId || 'redex';
             const ecoTrack = activeCourier === 'redex' ? getEcoTrackSettings() : null;
             const providedToken = body.token || req.query.token || token || '';

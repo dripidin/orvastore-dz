@@ -153,15 +153,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $ledger['totalPageViews']++;
+
+        // Cap / prune session map: keep at most 2,000 and drop entries older than 24h
+        if (!isset($ledger['sessions']) || !is_array($ledger['sessions'])) {
+            $ledger['sessions'] = [];
+        }
+        $nowTs = time();
+        foreach ($ledger['sessions'] as $sid => $seenAt) {
+            $seenTs = is_numeric($seenAt) ? (int)$seenAt : (strtotime((string)$seenAt) ?: 0);
+            if ($seenTs < $nowTs - 86400) {
+                unset($ledger['sessions'][$sid]);
+            }
+        }
         $ledger['sessions'][$sessionId] = date('c');
+        if (count($ledger['sessions']) > 2000) {
+            asort($ledger['sessions']);
+            $ledger['sessions'] = array_slice($ledger['sessions'], -2000, null, true);
+        }
 
         // Page breakdown
         $cleanPage = $page ?: '/';
         $ledger['pages'][$cleanPage] = ($ledger['pages'][$cleanPage] ?? 0) + 1;
 
-        if ($event === 'purchase' || $event === 'order_created') {
-            $ledger['conversions']++;
-        }
+        // Ignore client-claimed purchase conversions on the public endpoint.
+        // Trusted purchase counting remains on the order persistence path.
 
         // Recent events queue (cap at 100)
         $ledger['recentEvents'][] = [

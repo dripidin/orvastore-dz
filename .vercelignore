@@ -1,0 +1,22 @@
+# Vercel uses Node api/*.js only. Hostinger uses api/*.php.
+# Same basename without extension (admin-settings.js + admin-settings.php)
+# breaks Vercel preview: "Two or more files have conflicting paths".
+api/*.php
+lib/*.php
+**/*.php
+
+# Hostinger / local-only bulk (keep deploys small)
+dist-staging-*/
+dist-hostinger/
+tmp-staging-*/
+tmp-staging-tests/
+backups/
+codflow-main/
+docs/
+*.md
+pack3 15950/products in one image.jpg
+data/private/
+data/local-fixtures/
+data/locks/
+supabase/
+scripts/

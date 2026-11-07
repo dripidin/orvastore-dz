@@ -417,8 +417,8 @@
                 } else {
                     if (err) {
                         err.textContent = currentLang === 'fr' 
-                            ? 'Mot de passe incorrect. Veuillez vérifier la variable ADMIN_PASSWORD sur Vercel.' 
-                            : 'كلمة المرور غير صحيحة. يرجى التأكد من مفتاح ADMIN_PASSWORD في Vercel.';
+                            ? 'Mot de passe incorrect. Vérifiez ADMIN_PASSWORD (Vercel Environment Variables ou config serveur).' 
+                            : 'كلمة المرور غير صحيحة. تحقق من ADMIN_PASSWORD في إعدادات الاستضافة.';
                         err.style.display = 'block';
                     }
                     if (input) {
@@ -843,8 +843,16 @@
                     </div>
                 `;
 
-                // Risk & Trust Badge (Risk Shield Paused by Admin)
-                const riskPill = `<div style="margin-top:4px;"><span class="status-badge badge-delivered" onclick="storeAdmin.viewRisk('${o.orderId}')" style="cursor:pointer; font-size:10px;" title="درع الأمان معطل مؤقتاً">🟢 ${currentLang === 'fr' ? 'Approuvé (Bouclier en pause)' : 'معتمد (الدرع معطل)'}</span></div>`;
+                // Risk & Trust Badge
+                const riskScore = o.riskScore || 0;
+                let riskPill = '';
+                if (riskScore >= 40 || o.riskLevel === 'HIGH' || o.riskDecision === 'BLOCK') {
+                    riskPill = `<div style="margin-top:4px;"><span class="status-badge badge-returned" onclick="storeAdmin.viewRisk('${o.orderId}')" style="cursor:pointer; font-size:10px;" title="Cliquer pour voir l'analyse de risque">🔴 ${currentLang === 'fr' ? 'Risque' : 'خطر'} ${riskScore}/100</span></div>`;
+                } else if (riskScore > 15 || o.riskLevel === 'MEDIUM' || o.riskDecision === 'REVIEW') {
+                    riskPill = `<div style="margin-top:4px;"><span class="status-badge badge-pending" onclick="storeAdmin.viewRisk('${o.orderId}')" style="cursor:pointer; font-size:10px;" title="Cliquer pour voir l'analyse de risque">⚠️ ${currentLang === 'fr' ? 'À vérifier' : 'مراجعة'} ${riskScore}/100</span></div>`;
+                } else {
+                    riskPill = `<div style="margin-top:4px;"><span class="status-badge badge-delivered" onclick="storeAdmin.viewRisk('${o.orderId}')" style="cursor:pointer; font-size:10px;" title="Client vérifié et fiable">🟢 ${currentLang === 'fr' ? 'Fiable' : 'موثوق'}</span></div>`;
+                }
 
                 tr.innerHTML = `
                     <td>
@@ -1698,12 +1706,6 @@
             const modalBody = document.getElementById('riskModalBody');
             if (modalBody) {
                 modalBody.innerHTML = `
-                    <div style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; padding:12px; border-radius:var(--radius-sm); margin-bottom:14px; font-size:13px; font-weight:600;">
-                        ${currentLang === 'fr'
-                            ? '⚠️ Le système d\'évaluation du risque est actuellement mis en pause par l\'administration. Toutes les commandes sont approuvées sans restriction.'
-                            : '⚠️ نظام تقييم الخطورة معطل مؤقتاً بأمر الإدارة — جميع الطلبيات معتمدة ومقبولة تلقائياً بنسبة خطر 0%.'
-                        }
-                    </div>
                     <div class="tracking-summary-card mb-3">
                         <div>
                             <span>${currentLang === 'fr' ? 'Commande :' : 'الطلب :'}</span>

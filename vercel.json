@@ -1,9 +1,18 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/pack1", "destination": "/pack1.html" },
-    { "source": "/pack2", "destination": "/pack2.html" }
+    { "source": "/pack2", "destination": "/pack2.html" },
+    { "source": "/pack3", "destination": "/pack3.html" }
   ],
-  "cleanUrls": true
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
 }

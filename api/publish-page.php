@@ -97,30 +97,10 @@ function updateSitemapXml(string $rootDir): void {
     @file_put_contents($rootDir . '/sitemap.xml', $xml, LOCK_EX);
 }
 
+require_once dirname(__DIR__) . '/lib/admin-session.php';
 $adminToken = readSecret('ADMIN_API_TOKEN', $config['admin']['token'] ?? '');
-$isAuthed = false;
-
-// Check Authorization header (Bearer token)
-$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-if (empty($authHeader) && function_exists('apache_request_headers')) {
-    $reqHeaders = apache_request_headers();
-    $authHeader = $reqHeaders['Authorization'] ?? $reqHeaders['authorization'] ?? '';
-}
-
-if (str_starts_with($authHeader, 'Bearer ')) {
-    $token = trim(substr($authHeader, 7));
-    if ($adminToken !== '' && hash_equals($adminToken, $token)) {
-        $isAuthed = true;
-    }
-}
-
-// Check session cookie (HttpOnly)
-if (!$isAuthed && isset($_COOKIE['orva_admin_session'])) {
-    $cookieToken = trim((string)$_COOKIE['orva_admin_session']);
-    if ($adminToken !== '' && hash_equals($adminToken, $cookieToken)) {
-        $isAuthed = true;
-    }
-}
+$authResult = orva_admin_authorize(trim((string)$adminToken));
+$isAuthed = !empty($authResult['ok']);
 
 // Check local development environment by REMOTE_ADDR (never trust spoofed HTTP_HOST)
 $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';

@@ -7,6 +7,8 @@
 
 define('ORVA_API', true);
 $config = require __DIR__ . '/config.php';
+require_once dirname(__DIR__) . '/lib/inventory-store.php';
+require_once dirname(__DIR__) . '/lib/admin-session.php';
 
 // CORS: restricted to known origins, no wildcard for credentialed endpoints
 $allowedOrigins = [
@@ -53,31 +55,31 @@ if ($adminToken === '') {
 
 // ── Auth Verification Helper (Returns auth type: 'bearer', 'cookie', or '') ──
 function getAdminAuthType(string $expectedToken): string {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-    if (empty($authHeader) && function_exists('apache_request_headers')) {
-        $headers = apache_request_headers();
-        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
-    }
-
-    if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
-        if (hash_equals($expectedToken, $matches[1])) {
-            return 'bearer';
-        }
-    }
-
-    // Session cookie (HttpOnly, set by /api/auth)
-    $cookieVal = (string) ($_COOKIE['orva_admin_session'] ?? '');
-    if ($cookieVal !== '' && hash_equals($expectedToken, $cookieVal)) {
-        return 'cookie';
-    }
-
-    return '';
+    $auth = orva_admin_authorize($expectedToken);
+    return $auth['ok'] ? ($auth['type'] === 'bearer' ? 'bearer' : 'cookie') : '';
 }
 
-// ── Helper: Supabase REST Request ────────────────────────────────────────────
+/**
+ * Apply inventory transition for an order status change.
+ * Cancel/delete → release reserved back to available.
+ * Shipped/delivered/courier handoff → settle reserved + physical once.
+ */
+function orva_delivery_apply_inventory(string $orderId, string $newStatus): void
+{
+    $status = strtolower(trim($newStatus));
+    if (in_array($status, ['cancelled', 'canceled', 'deleted', 'rejected'], true)) {
+        orva_inventory_release($orderId, 'ORDER_' . strtoupper($status));
+        return;
+    }
+    if (in_array($status, ['shipped', 'delivered', 'in_transit', 'dispatched'], true)) {
+        orva_inventory_settle($orderId);
+    }
+}
+
+// ── Helper: Orders storage (PostgREST, or Staging PDO/mock when flagged) ─────
 function supabaseRequest(string $method, string $url, $data = null, string $supabaseKey = '', string $adminToken = '') {
     global $config;
-    return orva_supabase_rest_request($method, $url, $data, $config, $adminToken, ['Prefer: return=representation']);
+    return orva_orders_storage_request($method, $url, $data, $config, $adminToken, ['Prefer: return=representation']);
 }
 
 // ── 1. Login / Auth Actions — Delegated to /api/auth ─────────────────────────
@@ -205,7 +207,18 @@ if ($action === 'get_all_orders' || $action === 'orders') {
             'remarks'            => $remarks,
             'created_at'         => $r['created_at'] ?? null,
             'riskScore'          => (int)($r['risk_score'] ?? 0),
-            'riskLevel'          => $r['risk_level'] ?? 'LOW'
+            'riskLevel'          => $r['risk_level'] ?? 'LOW',
+            'riskDecision'       => $r['risk_decision'] ?? 'ALLOW',
+            'riskReasons'        => (static function ($raw) {
+                if (is_array($raw)) {
+                    return $raw;
+                }
+                $s = trim((string)$raw);
+                if ($s === '') {
+                    return [];
+                }
+                return array_values(array_filter(array_map('trim', explode('|', $s))));
+            })($r['risk_reasons'] ?? '')
         ];
     }
 
@@ -236,6 +249,10 @@ if ($action === 'update_status' || $action === 'status' || $action === 'change_s
         'status' => $newStatus,
         'updated_at' => date('c')
     ], $supabaseKey, $adminToken);
+
+    if (($res['code'] ?? 500) >= 200 && ($res['code'] ?? 500) < 300) {
+        orva_delivery_apply_inventory($targetId, $newStatus);
+    }
 
     echo json_encode([
         'success' => true,
@@ -529,6 +546,21 @@ if ($action === 'modify_order' || $action === 'switch_order') {
 if ($action === 'test_courier' || $action === 'test_ecotrack') {
     $ecoUrl = rtrim($config['ecotrack']['base_url'] ?? 'https://redex.ecotrack.dz', '/');
     $ecoToken = $config['ecotrack']['api_token'] ?? '';
+    $mockCourier = (getenv('MOCK_COURIER') === 'true' || !empty($_ENV['MOCK_COURIER']));
+
+    if ($mockCourier) {
+        echo json_encode([
+            'success' => true,
+            'configured' => true,
+            'reachable' => true,
+            'authenticated' => true,
+            'operational' => true,
+            'mocked' => true,
+            'baseUrl' => $ecoUrl,
+            'message' => 'MOCK_COURIER: connection test simulated locally (no remote call).'
+        ]);
+        exit;
+    }
 
     if (empty($ecoToken)) {
         http_response_code(400);
@@ -592,6 +624,23 @@ if ($action === 'create' || $action === 'push_order') {
     if (empty($orderId)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Missing orderId parameter']);
+        exit;
+    }
+
+    $mockCourier = (getenv('MOCK_COURIER') === 'true' || !empty($_ENV['MOCK_COURIER']) || !empty($body['mock']));
+    if ($mockCourier) {
+        $tracking = 'MOCK-' . strtoupper(substr(hash('sha256', $orderId . microtime(true)), 0, 10));
+        $courierName = $courierId === 'ecotrack' ? 'Ecotrack DZ (mocked)' : 'Redex Delivery DZ (mocked)';
+        echo json_encode([
+            'success' => true,
+            'mocked' => true,
+            'orderId' => $orderId,
+            'trackingCode' => $tracking,
+            'courierId' => $courierId,
+            'courierName' => $courierName,
+            'labelUrl' => '/api/delivery?action=label_pdf&tracking=' . rawurlencode($tracking),
+            'message' => 'MOCK_COURIER: shipment created locally without dispatching to a real carrier.',
+        ]);
         exit;
     }
 
@@ -692,13 +741,18 @@ if ($action === 'create' || $action === 'push_order') {
 
     // 4. Update Supabase with REAL tracking number (never synthetic)
     $patchUrl = "{$supabaseUrl}/rest/v1/orders?order_id=eq." . urlencode($orderId);
-    supabaseRequest('PATCH', $patchUrl, [
+    $shipPatch = supabaseRequest('PATCH', $patchUrl, [
         'status' => 'shipped',
         'in_redex' => true,
         'redex_tracking_code' => $realTracking,
         'delivery_type' => ($isStopdesk ? 'استلام من المكتب (Stop Desk)' : 'توصيل للمنزل'),
         'updated_at' => date('c')
     ], $supabaseKey, $adminToken);
+
+    if (($shipPatch['code'] ?? 500) >= 200 && ($shipPatch['code'] ?? 500) < 300) {
+        // Courier handoff: reserved ↓ and totalPhysical ↓ exactly once
+        orva_inventory_settle($orderId);
+    }
 
     echo json_encode([
         'success' => true,
@@ -727,9 +781,12 @@ if ($action === 'delete') {
 
     // Direct permanent hard delete from Supabase orders table
     $delUrl = "{$supabaseUrl}/rest/v1/orders?order_id=eq." . urlencode($targetId);
-    supabaseRequest('DELETE', $delUrl, null, $supabaseKey, $adminToken);
+    $delRes = supabaseRequest('DELETE', $delUrl, null, $supabaseKey, $adminToken);
 
-    // Also support fallback soft delete flag or status sync
+    if (($delRes['code'] ?? 500) >= 200 && ($delRes['code'] ?? 500) < 300) {
+        orva_inventory_release($targetId, 'ORDER_DELETED');
+    }
+
     echo json_encode([
         'success' => true,
         'message' => "Order {$targetId} permanently deleted.",

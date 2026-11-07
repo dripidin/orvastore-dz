@@ -53,23 +53,42 @@ function getSessionToken(cookieHeader) {
     try { return decodeURIComponent(entry.slice('orva_admin_session='.length)); } catch (_) { return ''; }
 }
 
+function loadAdminSessions() {
+    try {
+        const path = require('path');
+        const file = path.join(__dirname, '..', 'data', 'private', 'admin-sessions.json');
+        if (!fs.existsSync(file)) return {};
+        const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+        return raw && typeof raw === 'object' ? raw : {};
+    } catch (_) {
+        return {};
+    }
+}
+
+function isValidRandomSession(cookieToken) {
+    if (!cookieToken || cookieToken.length < 32) return false;
+    const sessions = loadAdminSessions();
+    const meta = sessions[cookieToken];
+    if (!meta || typeof meta !== 'object') return false;
+    return Number(meta.expiresAt || 0) > Math.floor(Date.now() / 1000);
+}
+
 function isAuthorized(req) {
     const adminToken = process.env.ADMIN_API_TOKEN || '';
-    const adminPassword = process.env.ADMIN_PASSWORD || '';
 
-    // 1. Authorization header (Bearer token)
+    // 1. Authorization header — ADMIN_API_TOKEN only (never ADMIN_PASSWORD)
     const authHeader = req.headers?.authorization || req.headers?.Authorization || '';
     if (authHeader.startsWith('Bearer ')) {
         const token = authHeader.slice(7).trim();
         if (adminToken && safeEqual(token, adminToken)) return true;
-        if (adminPassword && safeEqual(token, adminPassword)) return true;
+        return false;
     }
 
-    // 2. HttpOnly Cookie session
+    // 2. HttpOnly Cookie session — random session id, or legacy ADMIN_API_TOKEN cookie
     const cookieToken = getSessionToken(req.headers?.cookie);
     if (cookieToken) {
+        if (isValidRandomSession(cookieToken)) return true;
         if (adminToken && safeEqual(cookieToken, adminToken)) return true;
-        if (adminPassword && safeEqual(cookieToken, adminPassword)) return true;
     }
 
     return false;

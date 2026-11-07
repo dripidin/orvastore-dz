@@ -6,9 +6,9 @@
       "id": "prod_pack_1_pro",
       "sku": "ORVA-P1-PRO",
       "slug": "pack1",
-      "title": "Pack 1 Pro 4-in-1",
+      "title": "باك كومبريسار و المفاتيح 4 في 1",
       "name": "PACK 4EN1 4950",
-      "shortTitle": "عرض 4 في 1 (PACK 4EN1)",
+      "shortTitle": "باك كومبريسار و المفاتيح 4 في 1",
       "desc": "منفاخ عجلات TOYOTA الأصلي + طقم مفاتيح 46 قطعة + مفك مرن 11 قطعة + طقم 6 مفكات",
       "sellingPrice": 4950,
       "status": "active",
@@ -19,9 +19,9 @@
       "id": "prod_pack_2_elite",
       "sku": "ORVA-P2-ELITE",
       "slug": "pack2",
-      "title": "Pack 2 Elite 6-in-1",
+      "title": "باك الفيسوز كراون Elite",
       "name": "PACK 5EN1 13390",
-      "shortTitle": "عرض 5 في 1 الفاخر (PACK 5EN1)",
+      "shortTitle": "باك الفيسوز كراون Elite",
       "desc": "ماكينة CROWN 20V ببطاريتين + طقم مفكات 6 قطع + علبة مفاتيح 46 قطعة + مفك مرن + قفازات",
       "sellingPrice": 13390,
       "status": "active",
@@ -32,9 +32,9 @@
       "id": "prod_pack_3_ultra",
       "sku": "ORVA-P3-ULTRA",
       "slug": "pack3",
-      "title": "Pack 3 Ultra Heavy Duty",
+      "title": "باك سودير كراون الصلب",
       "name": "PACK 3 ULTRA 15950",
-      "shortTitle": "عرض النخبة الشامل (PACK 3 ULTRA)",
+      "shortTitle": "باك سودير كراون الصلب",
       "desc": "طقم المعدات الثقيلة المتكامل للسيارات والورش مع ضمان الجودة والاستبدال",
       "sellingPrice": 15950,
       "status": "active",
@@ -102,9 +102,9 @@
       "shortTitle": "Last Item Test SKU",
       "desc": "",
       "sellingPrice": 5000,
-      "status": "active",
+      "status": "archived",
       "stockQuantity": 1,
-      "allowOrders": true
+      "allowOrders": false
     },
     "orva-race-test-sku": {
       "id": "prod_orva-race-test-sku",
@@ -115,9 +115,9 @@
       "shortTitle": "Race Condition Test Product",
       "desc": "",
       "sellingPrice": 5000,
-      "status": "active",
+      "status": "archived",
       "stockQuantity": 1,
-      "allowOrders": true
+      "allowOrders": false
     },
     "orva-drill-dynamo": {
       "id": "prod_orva-drill-dynamo",
@@ -128,9 +128,9 @@
       "shortTitle": "Drill Dynamo 7200",
       "desc": "",
       "sellingPrice": 7200,
-      "status": "active",
+      "status": "archived",
       "stockQuantity": 20,
-      "allowOrders": true
+      "allowOrders": false
     },
     "orva-p8e-test": {
       "id": "prod_orva-p8e-test",

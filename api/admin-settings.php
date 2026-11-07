@@ -488,38 +488,55 @@ if (php_sapi_name() === 'cli' && empty($_SERVER['REQUEST_METHOD'])) {
 }
 
 // ── Authentication Check ──────────────────────────────────────────────────────
+require_once dirname(__DIR__) . '/lib/admin-session.php';
 
 $adminToken = getenv('ADMIN_API_TOKEN') ?: ($config['admin']['token'] ?? '');
-$adminPass = getenv('ADMIN_PASSWORD') ?: ($config['admin']['password'] ?? '');
-$isAuthed = false;
-
-$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-if (str_starts_with($authHeader, 'Bearer ')) {
-    $token = trim(substr($authHeader, 7));
-    if ($adminToken !== '' && hash_equals($adminToken, $token)) $isAuthed = true;
-    if ($adminPass !== '' && hash_equals($adminPass, $token)) $isAuthed = true;
-}
-
-if (!$isAuthed && isset($_COOKIE['orva_admin_session'])) {
-    $cookieToken = trim($_COOKIE['orva_admin_session']);
-    if ($adminToken !== '' && hash_equals($adminToken, $cookieToken)) $isAuthed = true;
-    if ($adminPass !== '' && hash_equals($adminPass, $cookieToken)) $isAuthed = true;
-}
+$authResult = orva_admin_authorize(trim((string)$adminToken));
+$isAuthed = !empty($authResult['ok']);
+// Password is never accepted as Bearer or cookie credential.
 
 // ── 1. Anonymous Public Storefront Route ──────────────────────────────────────
 $actionQuery = $_GET['action'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $actionQuery === 'public') {
-    $overrides = readEncryptedOverrides($settingsFile, $config);
+    $defaultPages = ['/', '/pack1.html', '/pack2.html', '/pack3.html', '/yamaha-archive.html'];
+    $overrides = [];
+    try {
+        $overrides = readEncryptedOverrides($settingsFile, $config);
+    } catch (Throwable $e) {
+        // Public pixel config must not 500 if encryption key is missing locally.
+        $overrides = [];
+    }
     $meta = $overrides['metaPixel'] ?? [];
     $pid = $meta['pixelId'] ?? ($config['meta']['pixel_id'] ?? '');
     if ($pid === $legacyPixelId) $pid = '';
+    $pages = $meta['pages'] ?? $defaultPages;
+    if (!is_array($pages)) $pages = $defaultPages;
+    $scope = (($meta['scope'] ?? 'all') === 'selected') ? 'selected' : 'all';
+    $pagesOut = $scope === 'all'
+        ? $defaultPages
+        : (array_values(array_intersect($pages, $defaultPages)) ?: $defaultPages);
+    $browserActive = ($meta['enabled'] ?? true) && !empty($pid);
+    $capiActive = ($meta['capiEnabled'] ?? true) && !empty($meta['capiToken'] ?? ($config['meta']['access_token'] ?? ''));
     echo json_encode([
         'success' => true,
         'config' => [
-            'pixelId' => ($meta['enabled'] ?? true) ? $pid : '',
-            'browserPixelEnabled' => ($meta['enabled'] ?? true) && !empty($pid),
-            'scope' => $meta['scope'] ?? 'all',
-            'pages' => $meta['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/yamaha-archive.html'],
+            'pixelId' => $browserActive ? $pid : '',
+            'browserPixelEnabled' => $browserActive,
+            'scope' => $scope,
+            'pages' => $pagesOut,
+            'codeSources' => [
+                'browserPixel' => [
+                    'id' => 'meta-browser-pixel',
+                    'active' => $browserActive,
+                    'pixelId' => $browserActive ? $pid : '',
+                    'scope' => $scope,
+                    'pages' => $pagesOut,
+                ],
+                'serverCapi' => [
+                    'id' => 'meta-server-capi',
+                    'active' => $capiActive,
+                ],
+            ],
             'store' => [
                 'logoUrl' => $overrides['store']['logoUrl'] ?? '/images/orva-logo.svg',
                 'name' => $overrides['store']['name'] ?? 'ORVA STORE'
@@ -615,7 +632,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'capiEnabled' => $metaO['capiEnabled'] ?? true,
                 'capiConfigured' => !empty($metaO['capiToken'] ?? ($config['meta']['access_token'] ?? '')),
                 'scope' => $metaO['scope'] ?? 'all',
-                'pages' => $metaO['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/yamaha-archive.html'],
+                'pages' => $metaO['pages'] ?? ['/', '/pack1.html', '/pack2.html', '/pack3.html', '/yamaha-archive.html'],
                 'updatedAt' => $metaO['updatedAt'] ?? null,
                 'status' => !empty($pid) ? 'configured' : 'unconfigured'
             ],
@@ -1165,6 +1182,31 @@ if ($action === 'test') {
         exit;
     }
 
+    // Redex / Ecotrack (and other courier-like integrations)
+    if ($integration === 'redex' || $integration === 'ecotrack') {
+        $mockCourier = (getenv('MOCK_COURIER') === 'true' || !empty($_ENV['MOCK_COURIER']));
+        $overridesCourier = $overrides[$integration] ?? [];
+        $hasToken = !empty($overridesCourier['apiToken']) || !empty($config['ecotrack']['api_token']);
+        if ($mockCourier) {
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'testResult' => [
+                    'success' => true,
+                    'provider' => $integration,
+                    'configured' => $hasToken || true,
+                    'reachable' => true,
+                    'authenticated' => true,
+                    'operational' => true,
+                    'mocked' => true,
+                    'status' => 'operational',
+                    'message' => 'MOCK_COURIER: courier test simulated (no remote call).'
+                ]
+            ]);
+            exit;
+        }
+    }
+
     http_response_code(200);
     echo json_encode([
         'success' => true,
@@ -1243,6 +1285,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PUT
             if (isset($body['metaPixel']['capiEnabled'])) $current['capiEnabled'] = (bool)$body['metaPixel']['capiEnabled'];
             if (!empty($body['metaPixel']['clearCapiToken'])) $current['capiToken'] = '';
             elseif (!empty($body['metaPixel']['capiToken'])) $current['capiToken'] = trim($body['metaPixel']['capiToken']);
+            if (isset($body['metaPixel']['scope']) && in_array($body['metaPixel']['scope'], ['all', 'selected'], true)) {
+                $current['scope'] = $body['metaPixel']['scope'];
+            }
+            if (isset($body['metaPixel']['pages']) && is_array($body['metaPixel']['pages'])) {
+                $allowedPages = ['/', '/pack1.html', '/pack2.html', '/pack3.html', '/yamaha-archive.html'];
+                $current['pages'] = array_values(array_unique(array_filter(
+                    $body['metaPixel']['pages'],
+                    static fn($p) => in_array($p, $allowedPages, true)
+                )));
+            }
             $current['updatedAt'] = $now;
             $overrides['metaPixel'] = $current;
         }

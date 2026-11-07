@@ -1,2072 +1,2098 @@
 {
-  "version": 1,
-  "lastUpdated": "2026-11-04T12:28:19.617Z",
-  "inventory": {
-    "ORVA-P1-PRO": {
-      "sku": "ORVA-P1-PRO",
-      "available": 51,
-      "reserved": 49,
-      "totalPhysical": 100,
-      "lowStockThreshold": 5
-    },
-    "ORVA-P2-ELITE": {
-      "sku": "ORVA-P2-ELITE",
-      "available": 22,
-      "reserved": 0,
-      "totalPhysical": 22,
-      "lowStockThreshold": 5
-    },
-    "ORVA-P3-ULTRA": {
-      "sku": "ORVA-P3-ULTRA",
-      "available": 14,
-      "reserved": 0,
-      "totalPhysical": 14,
-      "lowStockThreshold": 5
-    },
-    "ORVA-SAC-YAM": {
-      "sku": "ORVA-SAC-YAM",
-      "available": 30,
-      "reserved": 0,
-      "totalPhysical": 30,
-      "lowStockThreshold": 5
-    },
-    "ORVA-SAC-BUNDLE": {
-      "sku": "ORVA-SAC-BUNDLE",
-      "available": 18,
-      "reserved": 0,
-      "totalPhysical": 18,
-      "lowStockThreshold": 5
-    },
-    "ORVA-DRILL-PRO": {
-      "sku": "ORVA-DRILL-PRO",
-      "available": 17,
-      "reserved": 3,
-      "totalPhysical": 20,
-      "lowStockThreshold": 5
-    },
-    "ORVA-LAST-ITEM-TEST": {
-      "sku": "ORVA-LAST-ITEM-TEST",
-      "available": 1,
-      "reserved": 0,
-      "totalPhysical": 1,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-TEST-SKU": {
-      "sku": "ORVA-RACE-TEST-SKU",
-      "available": 1,
-      "reserved": 0,
-      "totalPhysical": 1,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793657742307": {
-      "sku": "ORVA-RACE-SKU-1793657742307",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793657742585": {
-      "sku": "ORVA-MULTI-A-1793657742585",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793657742585": {
-      "sku": "ORVA-MULTI-B-1793657742585",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793657742774": {
-      "sku": "ORVA-ORPHAN-1793657742774",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793657742838": {
-      "sku": "ORVA-IDEMP-RES-1793657742838",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793657742849": {
-      "sku": "ORVA-IDEMP-REL-1793657742849",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793657742866": {
-      "sku": "ORVA-IDEMP-SETTLE-1793657742866",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-DRILL-DYNAMO": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "available": 20,
-      "reserved": 0,
-      "totalPhysical": 20,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793657772568": {
-      "sku": "ORVA-RACE-SKU-1793657772568",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793657772837": {
-      "sku": "ORVA-MULTI-A-1793657772837",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793657772837": {
-      "sku": "ORVA-MULTI-B-1793657772837",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793657773002": {
-      "sku": "ORVA-ORPHAN-1793657773002",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793657773066": {
-      "sku": "ORVA-IDEMP-RES-1793657773066",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793657773078": {
-      "sku": "ORVA-IDEMP-REL-1793657773078",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793657773094": {
-      "sku": "ORVA-IDEMP-SETTLE-1793657773094",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793657841617": {
-      "sku": "ORVA-RACE-SKU-1793657841617",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793657841904": {
-      "sku": "ORVA-MULTI-A-1793657841904",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793657841904": {
-      "sku": "ORVA-MULTI-B-1793657841904",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793657842093": {
-      "sku": "ORVA-ORPHAN-1793657842093",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793657842169": {
-      "sku": "ORVA-IDEMP-RES-1793657842169",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793657842180": {
-      "sku": "ORVA-IDEMP-REL-1793657842180",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793657842195": {
-      "sku": "ORVA-IDEMP-SETTLE-1793657842195",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793657929431": {
-      "sku": "ORVA-RACE-SKU-1793657929431",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793657929707": {
-      "sku": "ORVA-MULTI-A-1793657929707",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793657929707": {
-      "sku": "ORVA-MULTI-B-1793657929707",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793657929911": {
-      "sku": "ORVA-ORPHAN-1793657929911",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793657929979": {
-      "sku": "ORVA-IDEMP-RES-1793657929979",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793657929990": {
-      "sku": "ORVA-IDEMP-REL-1793657929990",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793657930008": {
-      "sku": "ORVA-IDEMP-SETTLE-1793657930008",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793662223625": {
-      "sku": "ORVA-RACE-SKU-1793662223625",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793662223919": {
-      "sku": "ORVA-MULTI-A-1793662223919",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793662223919": {
-      "sku": "ORVA-MULTI-B-1793662223919",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793662224140": {
-      "sku": "ORVA-ORPHAN-1793662224140",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793662224261": {
-      "sku": "ORVA-IDEMP-RES-1793662224261",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793662224273": {
-      "sku": "ORVA-IDEMP-REL-1793662224273",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793662224293": {
-      "sku": "ORVA-IDEMP-SETTLE-1793662224293",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793662622268": {
-      "sku": "ORVA-RACE-SKU-1793662622268",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793662622518": {
-      "sku": "ORVA-MULTI-A-1793662622518",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793662622518": {
-      "sku": "ORVA-MULTI-B-1793662622518",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793662622694": {
-      "sku": "ORVA-ORPHAN-1793662622694",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793662622787": {
-      "sku": "ORVA-IDEMP-RES-1793662622787",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793662622801": {
-      "sku": "ORVA-IDEMP-REL-1793662622801",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793662622821": {
-      "sku": "ORVA-IDEMP-SETTLE-1793662622821",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793664009644": {
-      "sku": "ORVA-RACE-SKU-1793664009644",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793664009938": {
-      "sku": "ORVA-MULTI-A-1793664009938",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793664009938": {
-      "sku": "ORVA-MULTI-B-1793664009938",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793664010117": {
-      "sku": "ORVA-ORPHAN-1793664010117",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793664010218": {
-      "sku": "ORVA-IDEMP-RES-1793664010218",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793664010232": {
-      "sku": "ORVA-IDEMP-REL-1793664010232",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793664010250": {
-      "sku": "ORVA-IDEMP-SETTLE-1793664010250",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793665438132": {
-      "sku": "ORVA-RACE-SKU-1793665438132",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793665438421": {
-      "sku": "ORVA-MULTI-A-1793665438421",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793665438421": {
-      "sku": "ORVA-MULTI-B-1793665438421",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793665438605": {
-      "sku": "ORVA-ORPHAN-1793665438605",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793665438712": {
-      "sku": "ORVA-IDEMP-RES-1793665438712",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793665438725": {
-      "sku": "ORVA-IDEMP-REL-1793665438725",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793665438744": {
-      "sku": "ORVA-IDEMP-SETTLE-1793665438744",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793667259620": {
-      "sku": "ORVA-RACE-SKU-1793667259620",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793667259966": {
-      "sku": "ORVA-MULTI-A-1793667259966",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793667259966": {
-      "sku": "ORVA-MULTI-B-1793667259966",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793667260174": {
-      "sku": "ORVA-ORPHAN-1793667260174",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793667260273": {
-      "sku": "ORVA-IDEMP-RES-1793667260273",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793667260285": {
-      "sku": "ORVA-IDEMP-REL-1793667260285",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793667260305": {
-      "sku": "ORVA-IDEMP-SETTLE-1793667260305",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793668936558": {
-      "sku": "ORVA-RACE-SKU-1793668936558",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793668936918": {
-      "sku": "ORVA-MULTI-A-1793668936918",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793668936918": {
-      "sku": "ORVA-MULTI-B-1793668936918",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793668937125": {
-      "sku": "ORVA-ORPHAN-1793668937125",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793668937238": {
-      "sku": "ORVA-IDEMP-RES-1793668937238",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793668937251": {
-      "sku": "ORVA-IDEMP-REL-1793668937251",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793668937272": {
-      "sku": "ORVA-IDEMP-SETTLE-1793668937272",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793670374944": {
-      "sku": "ORVA-RACE-SKU-1793670374944",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793670375266": {
-      "sku": "ORVA-MULTI-A-1793670375266",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793670375266": {
-      "sku": "ORVA-MULTI-B-1793670375266",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793670375461": {
-      "sku": "ORVA-ORPHAN-1793670375461",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793670375579": {
-      "sku": "ORVA-IDEMP-RES-1793670375579",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793670375592": {
-      "sku": "ORVA-IDEMP-REL-1793670375592",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793670375613": {
-      "sku": "ORVA-IDEMP-SETTLE-1793670375613",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
-    },
-    "ORVA-RACE-SKU-1793745381408": {
-      "sku": "ORVA-RACE-SKU-1793745381408",
-      "available": 4,
-      "reserved": 0,
-      "totalPhysical": 4,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-A-1793745381779": {
-      "sku": "ORVA-MULTI-A-1793745381779",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-MULTI-B-1793745381779": {
-      "sku": "ORVA-MULTI-B-1793745381779",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-ORPHAN-1793745382003": {
-      "sku": "ORVA-ORPHAN-1793745382003",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-RES-1793745382128": {
-      "sku": "ORVA-IDEMP-RES-1793745382128",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-REL-1793745382143": {
-      "sku": "ORVA-IDEMP-REL-1793745382143",
-      "available": 10,
-      "reserved": 0,
-      "totalPhysical": 10,
-      "lowStockThreshold": 5
-    },
-    "ORVA-IDEMP-SETTLE-1793745382162": {
-      "sku": "ORVA-IDEMP-SETTLE-1793745382162",
-      "available": 7,
-      "reserved": 0,
-      "totalPhysical": 7,
-      "lowStockThreshold": 5
+    "version": 1,
+    "lastUpdated": "2026-11-07T00:24:21+00:00",
+    "inventory": {
+        "ORVA-P1-PRO": {
+            "sku": "ORVA-P1-PRO",
+            "available": 50,
+            "reserved": 50,
+            "totalPhysical": 100,
+            "lowStockThreshold": 5
+        },
+        "ORVA-P2-ELITE": {
+            "sku": "ORVA-P2-ELITE",
+            "available": 21,
+            "reserved": 1,
+            "totalPhysical": 22,
+            "lowStockThreshold": 5
+        },
+        "ORVA-P3-ULTRA": {
+            "sku": "ORVA-P3-ULTRA",
+            "available": 14,
+            "reserved": 0,
+            "totalPhysical": 14,
+            "lowStockThreshold": 5
+        },
+        "ORVA-SAC-YAM": {
+            "sku": "ORVA-SAC-YAM",
+            "available": 30,
+            "reserved": 0,
+            "totalPhysical": 30,
+            "lowStockThreshold": 5
+        },
+        "ORVA-SAC-BUNDLE": {
+            "sku": "ORVA-SAC-BUNDLE",
+            "available": 18,
+            "reserved": 0,
+            "totalPhysical": 18,
+            "lowStockThreshold": 5
+        },
+        "ORVA-DRILL-PRO": {
+            "sku": "ORVA-DRILL-PRO",
+            "available": 17,
+            "reserved": 3,
+            "totalPhysical": 20,
+            "lowStockThreshold": 5
+        },
+        "ORVA-LAST-ITEM-TEST": {
+            "sku": "ORVA-LAST-ITEM-TEST",
+            "available": 1,
+            "reserved": 0,
+            "totalPhysical": 1,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-TEST-SKU": {
+            "sku": "ORVA-RACE-TEST-SKU",
+            "available": 1,
+            "reserved": 0,
+            "totalPhysical": 1,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793657742307": {
+            "sku": "ORVA-RACE-SKU-1793657742307",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793657742585": {
+            "sku": "ORVA-MULTI-A-1793657742585",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793657742585": {
+            "sku": "ORVA-MULTI-B-1793657742585",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793657742774": {
+            "sku": "ORVA-ORPHAN-1793657742774",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793657742838": {
+            "sku": "ORVA-IDEMP-RES-1793657742838",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793657742849": {
+            "sku": "ORVA-IDEMP-REL-1793657742849",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793657742866": {
+            "sku": "ORVA-IDEMP-SETTLE-1793657742866",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-DRILL-DYNAMO": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "available": 20,
+            "reserved": 0,
+            "totalPhysical": 20,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793657772568": {
+            "sku": "ORVA-RACE-SKU-1793657772568",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793657772837": {
+            "sku": "ORVA-MULTI-A-1793657772837",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793657772837": {
+            "sku": "ORVA-MULTI-B-1793657772837",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793657773002": {
+            "sku": "ORVA-ORPHAN-1793657773002",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793657773066": {
+            "sku": "ORVA-IDEMP-RES-1793657773066",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793657773078": {
+            "sku": "ORVA-IDEMP-REL-1793657773078",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793657773094": {
+            "sku": "ORVA-IDEMP-SETTLE-1793657773094",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793657841617": {
+            "sku": "ORVA-RACE-SKU-1793657841617",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793657841904": {
+            "sku": "ORVA-MULTI-A-1793657841904",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793657841904": {
+            "sku": "ORVA-MULTI-B-1793657841904",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793657842093": {
+            "sku": "ORVA-ORPHAN-1793657842093",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793657842169": {
+            "sku": "ORVA-IDEMP-RES-1793657842169",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793657842180": {
+            "sku": "ORVA-IDEMP-REL-1793657842180",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793657842195": {
+            "sku": "ORVA-IDEMP-SETTLE-1793657842195",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793657929431": {
+            "sku": "ORVA-RACE-SKU-1793657929431",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793657929707": {
+            "sku": "ORVA-MULTI-A-1793657929707",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793657929707": {
+            "sku": "ORVA-MULTI-B-1793657929707",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793657929911": {
+            "sku": "ORVA-ORPHAN-1793657929911",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793657929979": {
+            "sku": "ORVA-IDEMP-RES-1793657929979",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793657929990": {
+            "sku": "ORVA-IDEMP-REL-1793657929990",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793657930008": {
+            "sku": "ORVA-IDEMP-SETTLE-1793657930008",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793662223625": {
+            "sku": "ORVA-RACE-SKU-1793662223625",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793662223919": {
+            "sku": "ORVA-MULTI-A-1793662223919",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793662223919": {
+            "sku": "ORVA-MULTI-B-1793662223919",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793662224140": {
+            "sku": "ORVA-ORPHAN-1793662224140",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793662224261": {
+            "sku": "ORVA-IDEMP-RES-1793662224261",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793662224273": {
+            "sku": "ORVA-IDEMP-REL-1793662224273",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793662224293": {
+            "sku": "ORVA-IDEMP-SETTLE-1793662224293",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793662622268": {
+            "sku": "ORVA-RACE-SKU-1793662622268",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793662622518": {
+            "sku": "ORVA-MULTI-A-1793662622518",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793662622518": {
+            "sku": "ORVA-MULTI-B-1793662622518",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793662622694": {
+            "sku": "ORVA-ORPHAN-1793662622694",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793662622787": {
+            "sku": "ORVA-IDEMP-RES-1793662622787",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793662622801": {
+            "sku": "ORVA-IDEMP-REL-1793662622801",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793662622821": {
+            "sku": "ORVA-IDEMP-SETTLE-1793662622821",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793664009644": {
+            "sku": "ORVA-RACE-SKU-1793664009644",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793664009938": {
+            "sku": "ORVA-MULTI-A-1793664009938",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793664009938": {
+            "sku": "ORVA-MULTI-B-1793664009938",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793664010117": {
+            "sku": "ORVA-ORPHAN-1793664010117",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793664010218": {
+            "sku": "ORVA-IDEMP-RES-1793664010218",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793664010232": {
+            "sku": "ORVA-IDEMP-REL-1793664010232",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793664010250": {
+            "sku": "ORVA-IDEMP-SETTLE-1793664010250",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793665438132": {
+            "sku": "ORVA-RACE-SKU-1793665438132",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793665438421": {
+            "sku": "ORVA-MULTI-A-1793665438421",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793665438421": {
+            "sku": "ORVA-MULTI-B-1793665438421",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793665438605": {
+            "sku": "ORVA-ORPHAN-1793665438605",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793665438712": {
+            "sku": "ORVA-IDEMP-RES-1793665438712",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793665438725": {
+            "sku": "ORVA-IDEMP-REL-1793665438725",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793665438744": {
+            "sku": "ORVA-IDEMP-SETTLE-1793665438744",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793667259620": {
+            "sku": "ORVA-RACE-SKU-1793667259620",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793667259966": {
+            "sku": "ORVA-MULTI-A-1793667259966",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793667259966": {
+            "sku": "ORVA-MULTI-B-1793667259966",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793667260174": {
+            "sku": "ORVA-ORPHAN-1793667260174",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793667260273": {
+            "sku": "ORVA-IDEMP-RES-1793667260273",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793667260285": {
+            "sku": "ORVA-IDEMP-REL-1793667260285",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793667260305": {
+            "sku": "ORVA-IDEMP-SETTLE-1793667260305",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793668936558": {
+            "sku": "ORVA-RACE-SKU-1793668936558",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793668936918": {
+            "sku": "ORVA-MULTI-A-1793668936918",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793668936918": {
+            "sku": "ORVA-MULTI-B-1793668936918",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793668937125": {
+            "sku": "ORVA-ORPHAN-1793668937125",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793668937238": {
+            "sku": "ORVA-IDEMP-RES-1793668937238",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793668937251": {
+            "sku": "ORVA-IDEMP-REL-1793668937251",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793668937272": {
+            "sku": "ORVA-IDEMP-SETTLE-1793668937272",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793670374944": {
+            "sku": "ORVA-RACE-SKU-1793670374944",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793670375266": {
+            "sku": "ORVA-MULTI-A-1793670375266",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793670375266": {
+            "sku": "ORVA-MULTI-B-1793670375266",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793670375461": {
+            "sku": "ORVA-ORPHAN-1793670375461",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793670375579": {
+            "sku": "ORVA-IDEMP-RES-1793670375579",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793670375592": {
+            "sku": "ORVA-IDEMP-REL-1793670375592",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793670375613": {
+            "sku": "ORVA-IDEMP-SETTLE-1793670375613",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-RACE-SKU-1793745381408": {
+            "sku": "ORVA-RACE-SKU-1793745381408",
+            "available": 4,
+            "reserved": 0,
+            "totalPhysical": 4,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-A-1793745381779": {
+            "sku": "ORVA-MULTI-A-1793745381779",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-MULTI-B-1793745381779": {
+            "sku": "ORVA-MULTI-B-1793745381779",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-ORPHAN-1793745382003": {
+            "sku": "ORVA-ORPHAN-1793745382003",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-RES-1793745382128": {
+            "sku": "ORVA-IDEMP-RES-1793745382128",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-REL-1793745382143": {
+            "sku": "ORVA-IDEMP-REL-1793745382143",
+            "available": 10,
+            "reserved": 0,
+            "totalPhysical": 10,
+            "lowStockThreshold": 5
+        },
+        "ORVA-IDEMP-SETTLE-1793745382162": {
+            "sku": "ORVA-IDEMP-SETTLE-1793745382162",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        },
+        "ORVA-STAB-TEST": {
+            "sku": "ORVA-STAB-TEST",
+            "available": 7,
+            "reserved": 0,
+            "totalPhysical": 7,
+            "lowStockThreshold": 5
+        }
+    },
+    "reservations": {
+        "ORVA-16357": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:13:51.829Z",
+            "releasedAt": "2026-11-02T22:15:42.785Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-2": {
+            "sku": "ORVA-RACE-SKU-1793745381408",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.715Z",
+            "releasedAt": "2026-11-03T22:36:22.016Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-3": {
+            "sku": "ORVA-RACE-SKU-1793745381408",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.676Z",
+            "releasedAt": "2026-11-03T22:36:22.023Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-4": {
+            "sku": "ORVA-RACE-SKU-1793667259620",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:54:19.857Z",
+            "releasedAt": "2026-11-03T00:54:20.188Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-6": {
+            "sku": "ORVA-RACE-SKU-1793668936558",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T01:22:16.805Z",
+            "releasedAt": "2026-11-03T01:22:17.153Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORD-SKU-A": {
+            "sku": "ORVA-MULTI-A-1793745381779",
+            "quantity": 2,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.949Z",
+            "releasedAt": "2026-11-03T22:36:22.030Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORD-SKU-B": {
+            "sku": "ORVA-MULTI-B-1793745381779",
+            "quantity": 3,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.982Z",
+            "releasedAt": "2026-11-03T22:36:22.041Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "CRASHED-ORDER-999": {
+            "sku": "ORVA-ORPHAN-1793745382003",
+            "quantity": 2,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:22.009Z",
+            "releasedAt": "2026-11-03T22:36:22.051Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORD-REPEAT-RES-001": {
+            "sku": "ORVA-IDEMP-RES-1793745382128",
+            "quantity": 2,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:22.136Z",
+            "releasedAt": "2026-11-04T09:38:24.460Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORD-REPEAT-REL-001": {
+            "sku": "ORVA-IDEMP-REL-1793745382143",
+            "quantity": 2,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:22.149Z",
+            "releasedAt": "2026-11-03T22:36:22.155Z",
+            "releaseReason": "TEST_ROLLBACK"
+        },
+        "ORD-REPEAT-SETTLE-001": {
+            "sku": "ORVA-IDEMP-SETTLE-1793745382162",
+            "quantity": 3,
+            "status": "SETTLED",
+            "timestamp": "2026-11-03T22:36:22.169Z",
+            "settledAt": "2026-11-03T22:36:22.177Z"
+        },
+        "ORVA-25592": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:15:43.523Z",
+            "releasedAt": "2026-11-02T22:16:13.045Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-1": {
+            "sku": "ORVA-RACE-SKU-1793745381408",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.662Z",
+            "releasedAt": "2026-11-03T22:36:22.068Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-5": {
+            "sku": "ORVA-RACE-SKU-1793745381408",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:21.699Z",
+            "releasedAt": "2026-11-03T22:36:22.077Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-83710": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:16:13.712Z",
+            "releasedAt": "2026-11-02T22:17:22.143Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-91918": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:16:54.680Z",
+            "releasedAt": "2026-11-02T22:17:22.149Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-96264": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:17:22.751Z",
+            "releasedAt": "2026-11-02T22:18:49.967Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-61326": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T22:18:50.644Z",
+            "releasedAt": "2026-11-02T23:30:24.218Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-84772": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T23:29:55.701Z",
+            "releasedAt": "2026-11-02T23:30:24.228Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-96828": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T23:30:24.951Z",
+            "releasedAt": "2026-11-02T23:37:02.753Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-57360": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T23:36:39.272Z",
+            "releasedAt": "2026-11-02T23:37:02.759Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-86900": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T23:37:03.504Z",
+            "releasedAt": "2026-11-03T00:00:10.175Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-61712": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-02T23:59:44.996Z",
+            "releasedAt": "2026-11-03T00:00:10.184Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-7": {
+            "sku": "ORVA-RACE-SKU-1793664009644",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:00:09.887Z",
+            "releasedAt": "2026-11-03T00:00:10.204Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-22124": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:00:10.931Z",
+            "releasedAt": "2026-11-03T00:23:58.676Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-56323": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:23:30.056Z",
+            "releasedAt": "2026-11-03T00:23:58.683Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-53861": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:23:59.406Z",
+            "releasedAt": "2026-11-03T00:54:20.234Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-75261": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:53:53.356Z",
+            "releasedAt": "2026-11-03T00:54:20.241Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "RACE-ORD-8": {
+            "sku": "ORVA-RACE-SKU-1793667259620",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:54:19.887Z",
+            "releasedAt": "2026-11-03T00:54:20.260Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-68741": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T00:54:21.036Z",
+            "releasedAt": "2026-11-03T01:22:17.202Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-50911": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T01:21:40.916Z",
+            "releasedAt": "2026-11-03T01:22:17.209Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-46042": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T01:22:17.949Z",
+            "releasedAt": "2026-11-03T01:46:15.539Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-72933": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T01:45:50.647Z",
+            "releasedAt": "2026-11-03T01:46:15.548Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-87268": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T01:46:16.309Z",
+            "releasedAt": "2026-11-03T22:36:22.086Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-58417": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:35:58.950Z",
+            "releasedAt": "2026-11-03T22:36:22.095Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-30161": {
+            "sku": "ORVA-DRILL-DYNAMO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-03T22:36:22.944Z",
+            "releasedAt": "2026-11-04T09:38:24.464Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-89534": {
+            "sku": "ORVA-DRILL-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T00:40:30.998Z",
+            "releasedAt": "2026-11-04T09:38:24.466Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-81259": {
+            "sku": "ORVA-P2-ELITE",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T00:40:39.361Z",
+            "releasedAt": "2026-11-04T09:38:24.468Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-66448": {
+            "sku": "ORVA-LAST-ITEM-TEST",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T00:40:42.214Z",
+            "releasedAt": "2026-11-04T09:38:24.470Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-54905": {
+            "sku": "ORVA-RACE-TEST-SKU",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T00:40:43.775Z",
+            "releasedAt": "2026-11-04T09:38:24.472Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-45909": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T07:49:37.626Z",
+            "releasedAt": "2026-11-04T09:38:24.474Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-39923": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T07:49:39.759Z",
+            "releasedAt": "2026-11-04T09:38:24.476Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-66400": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T07:49:41.128Z",
+            "releasedAt": "2026-11-04T09:38:24.478Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-97797": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:27.091Z",
+            "releasedAt": "2026-11-04T09:38:24.480Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-84652": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:29.066Z",
+            "releasedAt": "2026-11-04T09:38:24.482Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-70641": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:30.594Z",
+            "releasedAt": "2026-11-04T09:38:24.484Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-84597": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:36.508Z",
+            "releasedAt": "2026-11-04T09:38:24.486Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-35167": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:38.707Z",
+            "releasedAt": "2026-11-04T09:38:24.488Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-94758": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:40.027Z",
+            "releasedAt": "2026-11-04T09:38:24.490Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-19220": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:09:41.354Z",
+            "releasedAt": "2026-11-04T09:38:24.492Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-23977": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:14:59.030Z",
+            "releasedAt": "2026-11-04T09:38:24.494Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-14946": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:15:01.449Z",
+            "releasedAt": "2026-11-04T09:38:24.496Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-91119": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:15:02.876Z",
+            "releasedAt": "2026-11-04T09:38:24.498Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-32666": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:15:52.078Z",
+            "releasedAt": "2026-11-04T09:38:24.501Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-93639": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:15:54.105Z",
+            "releasedAt": "2026-11-04T09:38:24.503Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-35169": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:15:55.660Z",
+            "releasedAt": "2026-11-04T09:38:24.504Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-58708": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:20.367Z",
+            "releasedAt": "2026-11-04T09:38:24.506Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-22502": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:22.287Z",
+            "releasedAt": "2026-11-04T09:38:24.508Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-12335": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:23.835Z",
+            "releasedAt": "2026-11-04T09:38:24.511Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-26609": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:25.550Z",
+            "releasedAt": "2026-11-04T09:38:24.513Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-65586": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:50.958Z",
+            "releasedAt": "2026-11-04T09:38:24.515Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-19541": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:52.735Z",
+            "releasedAt": "2026-11-04T09:38:24.517Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-42695": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:18:54.143Z",
+            "releasedAt": "2026-11-04T09:38:24.519Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-69010": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:22:04.477Z",
+            "releasedAt": "2026-11-04T09:38:24.521Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-79474": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:22:06.383Z",
+            "releasedAt": "2026-11-04T09:38:24.523Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-44511": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:22:07.692Z",
+            "releasedAt": "2026-11-04T09:38:24.525Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-72198": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:24:23.498Z",
+            "releasedAt": "2026-11-04T09:38:24.527Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-89168": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:24:25.467Z",
+            "releasedAt": "2026-11-04T09:38:24.530Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-85595": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:24:26.844Z",
+            "releasedAt": "2026-11-04T09:38:24.531Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-13157": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:26:07.796Z",
+            "releasedAt": "2026-11-04T09:38:24.533Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-29237": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:26:09.949Z",
+            "releasedAt": "2026-11-04T09:38:24.535Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-36657": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:26:11.371Z",
+            "releasedAt": "2026-11-04T09:38:24.537Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-25526": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:32:16.715Z",
+            "releasedAt": "2026-11-04T09:38:24.539Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-88864": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:32:18.920Z",
+            "releasedAt": "2026-11-04T09:38:24.541Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-70044": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:32:20.290Z",
+            "releasedAt": "2026-11-04T09:38:24.543Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-68992": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:34:44.104Z",
+            "releasedAt": "2026-11-04T09:38:24.545Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-76051": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:34:46.095Z",
+            "releasedAt": "2026-11-04T09:38:24.547Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-48761": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:34:47.500Z",
+            "releasedAt": "2026-11-04T09:38:24.549Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-86607": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:43:22.676Z",
+            "releasedAt": "2026-11-04T09:38:24.551Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-55469": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:43:24.970Z",
+            "releasedAt": "2026-11-04T09:38:24.553Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-68831": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:43:26.469Z",
+            "releasedAt": "2026-11-04T09:38:24.555Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-92328": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:47:40.766Z",
+            "releasedAt": "2026-11-04T09:38:24.557Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-76903": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:47:43.235Z",
+            "releasedAt": "2026-11-04T09:38:24.559Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-99816": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:47:44.735Z",
+            "releasedAt": "2026-11-04T09:38:24.561Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-71743": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:14.415Z",
+            "releasedAt": "2026-11-04T09:38:24.563Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-43464": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:16.452Z",
+            "releasedAt": "2026-11-04T09:38:24.565Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-24449": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:18.196Z",
+            "releasedAt": "2026-11-04T09:38:24.567Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-90581": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:49.171Z",
+            "releasedAt": "2026-11-04T09:38:24.570Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-25176": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:51.314Z",
+            "releasedAt": "2026-11-04T09:38:24.572Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-60950": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:52.946Z",
+            "releasedAt": "2026-11-04T09:38:24.574Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-96484": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:55:59.863Z",
+            "releasedAt": "2026-11-04T09:38:24.576Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-52029": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:56:01.862Z",
+            "releasedAt": "2026-11-04T09:38:24.578Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-67647": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:56:03.317Z",
+            "releasedAt": "2026-11-04T09:38:24.580Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-15579": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:57:12.849Z",
+            "releasedAt": "2026-11-04T09:38:24.582Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-94805": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:57:16.813Z",
+            "releasedAt": "2026-11-04T09:38:24.584Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-44101": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T08:57:18.269Z",
+            "releasedAt": "2026-11-04T09:38:24.586Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-15981": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:03:43.568Z",
+            "releasedAt": "2026-11-04T09:38:24.588Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-18405": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:03:45.782Z",
+            "releasedAt": "2026-11-04T09:38:24.590Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-66852": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:03:47.228Z",
+            "releasedAt": "2026-11-04T09:38:24.592Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-75283": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:09:25.687Z",
+            "releasedAt": "2026-11-04T09:38:24.594Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-53842": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:09:43.666Z",
+            "releasedAt": "2026-11-04T09:38:24.596Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-80509": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:09:53.330Z",
+            "releasedAt": "2026-11-04T09:38:24.598Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-96676": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:09:54.850Z",
+            "releasedAt": "2026-11-04T09:38:24.600Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-53005": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:10:29.867Z",
+            "releasedAt": "2026-11-04T09:38:24.602Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-98110": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:15.227Z",
+            "releasedAt": "2026-11-04T09:38:24.604Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-30107": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:17.742Z",
+            "releasedAt": "2026-11-04T09:38:24.606Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-87187": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:19.288Z",
+            "releasedAt": "2026-11-04T09:38:24.608Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-85097": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:20.941Z",
+            "releasedAt": "2026-11-04T09:38:24.610Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-39375": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:25.626Z",
+            "releasedAt": "2026-11-04T09:38:24.613Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-23892": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:27.916Z",
+            "releasedAt": "2026-11-04T09:38:24.615Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-30704": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:29.558Z",
+            "releasedAt": "2026-11-04T09:38:24.617Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-77832": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:12:31.864Z",
+            "releasedAt": "2026-11-04T09:38:24.619Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-91803": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:15.866Z",
+            "releasedAt": "2026-11-04T09:38:24.621Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-18903": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:28.662Z",
+            "releasedAt": "2026-11-04T09:38:24.623Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-11936": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:41.805Z",
+            "releasedAt": "2026-11-04T09:38:24.625Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-22393": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:43.792Z",
+            "releasedAt": "2026-11-04T09:38:24.627Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-69771": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:49.781Z",
+            "releasedAt": "2026-11-04T09:38:24.629Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-53480": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:51.706Z",
+            "releasedAt": "2026-11-04T09:38:24.632Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-36259": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:53.220Z",
+            "releasedAt": "2026-11-04T09:38:24.634Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-40264": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:14:54.659Z",
+            "releasedAt": "2026-11-04T09:38:24.636Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-47339": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:15:59.457Z",
+            "releasedAt": "2026-11-04T09:38:24.638Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-82310": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:17:02.840Z",
+            "releasedAt": "2026-11-04T09:38:24.640Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-31343": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:17:04.797Z",
+            "releasedAt": "2026-11-04T09:38:24.642Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-25616": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:17:06.269Z",
+            "releasedAt": "2026-11-04T09:38:24.644Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-69436": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:17:23.580Z",
+            "releasedAt": "2026-11-04T09:38:24.646Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-67529": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:17:43.386Z",
+            "releasedAt": "2026-11-04T09:38:24.648Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-18751": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:18:03.376Z",
+            "releasedAt": "2026-11-04T09:38:24.651Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-43343": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:18:19.289Z",
+            "releasedAt": "2026-11-04T09:38:24.653Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-89051": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:26:32.942Z",
+            "releasedAt": "2026-11-04T09:38:31.662Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-60345": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:26:35.170Z",
+            "releasedAt": "2026-11-04T09:38:31.665Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-99554": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:26:38.403Z",
+            "releasedAt": "2026-11-04T09:38:31.667Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-38345": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:26:46.813Z",
+            "releasedAt": "2026-11-04T09:38:31.670Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-37791": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:27:07.459Z",
+            "releasedAt": "2026-11-04T09:38:31.672Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-97569": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:27:09.388Z",
+            "releasedAt": "2026-11-04T09:38:31.674Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-90379": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:27:10.869Z",
+            "releasedAt": "2026-11-04T09:38:31.676Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-34048": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:34:53.466Z",
+            "releasedAt": "2026-11-04T09:38:31.678Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-15012": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:34:55.613Z",
+            "releasedAt": "2026-11-04T09:38:31.680Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-88560": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:34:57.169Z",
+            "releasedAt": "2026-11-04T09:38:31.683Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-25406": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:34:58.673Z",
+            "releasedAt": "2026-11-04T09:38:31.685Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-58636": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RELEASED",
+            "timestamp": "2026-11-04T09:36:10.511Z",
+            "releasedAt": "2026-11-04T09:38:31.687Z",
+            "releaseReason": "STALE_CRASH_RECOVERY"
+        },
+        "ORVA-21215": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:35.432Z"
+        },
+        "ORVA-63148": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:35.975Z"
+        },
+        "ORVA-47509": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:37.760Z"
+        },
+        "ORVA-40639": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:38.072Z"
+        },
+        "ORVA-81001": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:39.166Z"
+        },
+        "ORVA-55801": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:39.502Z"
+        },
+        "ORVA-76484": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:40.829Z"
+        },
+        "ORVA-30485": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:40.940Z"
+        },
+        "ORVA-30871": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:44.501Z"
+        },
+        "ORVA-13883": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:46.404Z"
+        },
+        "ORVA-80755": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:47.921Z"
+        },
+        "ORVA-69814": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:38:49.343Z"
+        },
+        "ORVA-53297": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:05.942Z"
+        },
+        "ORVA-80371": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:07.851Z"
+        },
+        "ORVA-93471": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:09.193Z"
+        },
+        "ORVA-17267": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:21.360Z"
+        },
+        "ORVA-14450": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:32.554Z"
+        },
+        "ORVA-63833": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:34.444Z"
+        },
+        "ORVA-95157": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:35.815Z"
+        },
+        "ORVA-39460": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:35.916Z"
+        },
+        "ORVA-77690": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:37.827Z"
+        },
+        "ORVA-78044": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:39.220Z"
+        },
+        "ORVA-42700": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:39:40.594Z"
+        },
+        "ORVA-70470": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:02.363Z"
+        },
+        "ORVA-29065": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:04.261Z"
+        },
+        "ORVA-74734": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:05.650Z"
+        },
+        "ORVA-41049": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:07.172Z"
+        },
+        "ORVA-19033": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:16.509Z"
+        },
+        "ORVA-61287": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:18.337Z"
+        },
+        "ORVA-61034": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:19.697Z"
+        },
+        "ORVA-32598": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:22.900Z"
+        },
+        "ORVA-49646": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:24.680Z"
+        },
+        "ORVA-11197": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:40:26.030Z"
+        },
+        "ORVA-28947": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:11.070Z"
+        },
+        "ORVA-81430": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:13.058Z"
+        },
+        "ORVA-32581": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:14.469Z"
+        },
+        "ORVA-26323": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:15.878Z"
+        },
+        "ORVA-49670": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:33.407Z"
+        },
+        "ORVA-27578": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:35.247Z"
+        },
+        "ORVA-45487": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:36.575Z"
+        },
+        "ORVA-73650": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:57.013Z"
+        },
+        "ORVA-68286": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:41:58.955Z"
+        },
+        "ORVA-70820": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T09:42:00.370Z"
+        },
+        "ORVA-50776": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:18:40.103Z"
+        },
+        "ORVA-95610": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:18:42.062Z"
+        },
+        "ORVA-25551": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:18:43.273Z"
+        },
+        "ORVA-73666": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:28:16.595Z"
+        },
+        "ORVA-62984": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:28:18.422Z"
+        },
+        "ORVA-96271": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-04T12:28:19.617Z"
+        },
+        "STAB-SHIP-1794002018028": {
+            "sku": "ORVA-STAB-TEST",
+            "quantity": 3,
+            "status": "SETTLED",
+            "timestamp": "2026-11-06T21:53:38.029Z",
+            "settledAt": "2026-11-06T21:53:38.032Z"
+        },
+        "PACK2-40288": {
+            "sku": "ORVA-P2-ELITE",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-06T23:28:25.790Z"
+        },
+        "LOCAL-PREV-5203300d": {
+            "sku": "ORVA-P1-PRO",
+            "quantity": 1,
+            "status": "RESERVED",
+            "timestamp": "2026-11-07T00:24:21+00:00"
+        }
     }
-  },
-  "reservations": {
-    "ORVA-16357": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:13:51.829Z",
-      "releasedAt": "2026-11-02T22:15:42.785Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-2": {
-      "sku": "ORVA-RACE-SKU-1793745381408",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.715Z",
-      "releasedAt": "2026-11-03T22:36:22.016Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-3": {
-      "sku": "ORVA-RACE-SKU-1793745381408",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.676Z",
-      "releasedAt": "2026-11-03T22:36:22.023Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-4": {
-      "sku": "ORVA-RACE-SKU-1793667259620",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:54:19.857Z",
-      "releasedAt": "2026-11-03T00:54:20.188Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-6": {
-      "sku": "ORVA-RACE-SKU-1793668936558",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T01:22:16.805Z",
-      "releasedAt": "2026-11-03T01:22:17.153Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORD-SKU-A": {
-      "sku": "ORVA-MULTI-A-1793745381779",
-      "quantity": 2,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.949Z",
-      "releasedAt": "2026-11-03T22:36:22.030Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORD-SKU-B": {
-      "sku": "ORVA-MULTI-B-1793745381779",
-      "quantity": 3,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.982Z",
-      "releasedAt": "2026-11-03T22:36:22.041Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "CRASHED-ORDER-999": {
-      "sku": "ORVA-ORPHAN-1793745382003",
-      "quantity": 2,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:22.009Z",
-      "releasedAt": "2026-11-03T22:36:22.051Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORD-REPEAT-RES-001": {
-      "sku": "ORVA-IDEMP-RES-1793745382128",
-      "quantity": 2,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:22.136Z",
-      "releasedAt": "2026-11-04T09:38:24.460Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORD-REPEAT-REL-001": {
-      "sku": "ORVA-IDEMP-REL-1793745382143",
-      "quantity": 2,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:22.149Z",
-      "releasedAt": "2026-11-03T22:36:22.155Z",
-      "releaseReason": "TEST_ROLLBACK"
-    },
-    "ORD-REPEAT-SETTLE-001": {
-      "sku": "ORVA-IDEMP-SETTLE-1793745382162",
-      "quantity": 3,
-      "status": "SETTLED",
-      "timestamp": "2026-11-03T22:36:22.169Z",
-      "settledAt": "2026-11-03T22:36:22.177Z"
-    },
-    "ORVA-25592": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:15:43.523Z",
-      "releasedAt": "2026-11-02T22:16:13.045Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-1": {
-      "sku": "ORVA-RACE-SKU-1793745381408",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.662Z",
-      "releasedAt": "2026-11-03T22:36:22.068Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-5": {
-      "sku": "ORVA-RACE-SKU-1793745381408",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:21.699Z",
-      "releasedAt": "2026-11-03T22:36:22.077Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-83710": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:16:13.712Z",
-      "releasedAt": "2026-11-02T22:17:22.143Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-91918": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:16:54.680Z",
-      "releasedAt": "2026-11-02T22:17:22.149Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-96264": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:17:22.751Z",
-      "releasedAt": "2026-11-02T22:18:49.967Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-61326": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T22:18:50.644Z",
-      "releasedAt": "2026-11-02T23:30:24.218Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-84772": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T23:29:55.701Z",
-      "releasedAt": "2026-11-02T23:30:24.228Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-96828": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T23:30:24.951Z",
-      "releasedAt": "2026-11-02T23:37:02.753Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-57360": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T23:36:39.272Z",
-      "releasedAt": "2026-11-02T23:37:02.759Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-86900": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T23:37:03.504Z",
-      "releasedAt": "2026-11-03T00:00:10.175Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-61712": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-02T23:59:44.996Z",
-      "releasedAt": "2026-11-03T00:00:10.184Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-7": {
-      "sku": "ORVA-RACE-SKU-1793664009644",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:00:09.887Z",
-      "releasedAt": "2026-11-03T00:00:10.204Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-22124": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:00:10.931Z",
-      "releasedAt": "2026-11-03T00:23:58.676Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-56323": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:23:30.056Z",
-      "releasedAt": "2026-11-03T00:23:58.683Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-53861": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:23:59.406Z",
-      "releasedAt": "2026-11-03T00:54:20.234Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-75261": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:53:53.356Z",
-      "releasedAt": "2026-11-03T00:54:20.241Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "RACE-ORD-8": {
-      "sku": "ORVA-RACE-SKU-1793667259620",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:54:19.887Z",
-      "releasedAt": "2026-11-03T00:54:20.260Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-68741": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T00:54:21.036Z",
-      "releasedAt": "2026-11-03T01:22:17.202Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-50911": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T01:21:40.916Z",
-      "releasedAt": "2026-11-03T01:22:17.209Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-46042": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T01:22:17.949Z",
-      "releasedAt": "2026-11-03T01:46:15.539Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-72933": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T01:45:50.647Z",
-      "releasedAt": "2026-11-03T01:46:15.548Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-87268": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T01:46:16.309Z",
-      "releasedAt": "2026-11-03T22:36:22.086Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-58417": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:35:58.950Z",
-      "releasedAt": "2026-11-03T22:36:22.095Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-30161": {
-      "sku": "ORVA-DRILL-DYNAMO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-03T22:36:22.944Z",
-      "releasedAt": "2026-11-04T09:38:24.464Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-89534": {
-      "sku": "ORVA-DRILL-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T00:40:30.998Z",
-      "releasedAt": "2026-11-04T09:38:24.466Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-81259": {
-      "sku": "ORVA-P2-ELITE",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T00:40:39.361Z",
-      "releasedAt": "2026-11-04T09:38:24.468Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-66448": {
-      "sku": "ORVA-LAST-ITEM-TEST",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T00:40:42.214Z",
-      "releasedAt": "2026-11-04T09:38:24.470Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-54905": {
-      "sku": "ORVA-RACE-TEST-SKU",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T00:40:43.775Z",
-      "releasedAt": "2026-11-04T09:38:24.472Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-45909": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T07:49:37.626Z",
-      "releasedAt": "2026-11-04T09:38:24.474Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-39923": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T07:49:39.759Z",
-      "releasedAt": "2026-11-04T09:38:24.476Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-66400": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T07:49:41.128Z",
-      "releasedAt": "2026-11-04T09:38:24.478Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-97797": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:27.091Z",
-      "releasedAt": "2026-11-04T09:38:24.480Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-84652": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:29.066Z",
-      "releasedAt": "2026-11-04T09:38:24.482Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-70641": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:30.594Z",
-      "releasedAt": "2026-11-04T09:38:24.484Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-84597": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:36.508Z",
-      "releasedAt": "2026-11-04T09:38:24.486Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-35167": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:38.707Z",
-      "releasedAt": "2026-11-04T09:38:24.488Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-94758": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:40.027Z",
-      "releasedAt": "2026-11-04T09:38:24.490Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-19220": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:09:41.354Z",
-      "releasedAt": "2026-11-04T09:38:24.492Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-23977": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:14:59.030Z",
-      "releasedAt": "2026-11-04T09:38:24.494Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-14946": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:15:01.449Z",
-      "releasedAt": "2026-11-04T09:38:24.496Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-91119": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:15:02.876Z",
-      "releasedAt": "2026-11-04T09:38:24.498Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-32666": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:15:52.078Z",
-      "releasedAt": "2026-11-04T09:38:24.501Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-93639": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:15:54.105Z",
-      "releasedAt": "2026-11-04T09:38:24.503Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-35169": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:15:55.660Z",
-      "releasedAt": "2026-11-04T09:38:24.504Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-58708": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:20.367Z",
-      "releasedAt": "2026-11-04T09:38:24.506Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-22502": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:22.287Z",
-      "releasedAt": "2026-11-04T09:38:24.508Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-12335": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:23.835Z",
-      "releasedAt": "2026-11-04T09:38:24.511Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-26609": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:25.550Z",
-      "releasedAt": "2026-11-04T09:38:24.513Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-65586": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:50.958Z",
-      "releasedAt": "2026-11-04T09:38:24.515Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-19541": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:52.735Z",
-      "releasedAt": "2026-11-04T09:38:24.517Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-42695": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:18:54.143Z",
-      "releasedAt": "2026-11-04T09:38:24.519Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-69010": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:22:04.477Z",
-      "releasedAt": "2026-11-04T09:38:24.521Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-79474": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:22:06.383Z",
-      "releasedAt": "2026-11-04T09:38:24.523Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-44511": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:22:07.692Z",
-      "releasedAt": "2026-11-04T09:38:24.525Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-72198": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:24:23.498Z",
-      "releasedAt": "2026-11-04T09:38:24.527Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-89168": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:24:25.467Z",
-      "releasedAt": "2026-11-04T09:38:24.530Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-85595": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:24:26.844Z",
-      "releasedAt": "2026-11-04T09:38:24.531Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-13157": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:26:07.796Z",
-      "releasedAt": "2026-11-04T09:38:24.533Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-29237": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:26:09.949Z",
-      "releasedAt": "2026-11-04T09:38:24.535Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-36657": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:26:11.371Z",
-      "releasedAt": "2026-11-04T09:38:24.537Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-25526": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:32:16.715Z",
-      "releasedAt": "2026-11-04T09:38:24.539Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-88864": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:32:18.920Z",
-      "releasedAt": "2026-11-04T09:38:24.541Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-70044": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:32:20.290Z",
-      "releasedAt": "2026-11-04T09:38:24.543Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-68992": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:34:44.104Z",
-      "releasedAt": "2026-11-04T09:38:24.545Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-76051": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:34:46.095Z",
-      "releasedAt": "2026-11-04T09:38:24.547Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-48761": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:34:47.500Z",
-      "releasedAt": "2026-11-04T09:38:24.549Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-86607": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:43:22.676Z",
-      "releasedAt": "2026-11-04T09:38:24.551Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-55469": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:43:24.970Z",
-      "releasedAt": "2026-11-04T09:38:24.553Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-68831": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:43:26.469Z",
-      "releasedAt": "2026-11-04T09:38:24.555Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-92328": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:47:40.766Z",
-      "releasedAt": "2026-11-04T09:38:24.557Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-76903": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:47:43.235Z",
-      "releasedAt": "2026-11-04T09:38:24.559Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-99816": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:47:44.735Z",
-      "releasedAt": "2026-11-04T09:38:24.561Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-71743": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:14.415Z",
-      "releasedAt": "2026-11-04T09:38:24.563Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-43464": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:16.452Z",
-      "releasedAt": "2026-11-04T09:38:24.565Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-24449": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:18.196Z",
-      "releasedAt": "2026-11-04T09:38:24.567Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-90581": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:49.171Z",
-      "releasedAt": "2026-11-04T09:38:24.570Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-25176": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:51.314Z",
-      "releasedAt": "2026-11-04T09:38:24.572Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-60950": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:52.946Z",
-      "releasedAt": "2026-11-04T09:38:24.574Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-96484": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:55:59.863Z",
-      "releasedAt": "2026-11-04T09:38:24.576Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-52029": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:56:01.862Z",
-      "releasedAt": "2026-11-04T09:38:24.578Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-67647": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:56:03.317Z",
-      "releasedAt": "2026-11-04T09:38:24.580Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-15579": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:57:12.849Z",
-      "releasedAt": "2026-11-04T09:38:24.582Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-94805": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:57:16.813Z",
-      "releasedAt": "2026-11-04T09:38:24.584Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-44101": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T08:57:18.269Z",
-      "releasedAt": "2026-11-04T09:38:24.586Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-15981": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:03:43.568Z",
-      "releasedAt": "2026-11-04T09:38:24.588Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-18405": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:03:45.782Z",
-      "releasedAt": "2026-11-04T09:38:24.590Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-66852": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:03:47.228Z",
-      "releasedAt": "2026-11-04T09:38:24.592Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-75283": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:09:25.687Z",
-      "releasedAt": "2026-11-04T09:38:24.594Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-53842": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:09:43.666Z",
-      "releasedAt": "2026-11-04T09:38:24.596Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-80509": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:09:53.330Z",
-      "releasedAt": "2026-11-04T09:38:24.598Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-96676": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:09:54.850Z",
-      "releasedAt": "2026-11-04T09:38:24.600Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-53005": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:10:29.867Z",
-      "releasedAt": "2026-11-04T09:38:24.602Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-98110": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:15.227Z",
-      "releasedAt": "2026-11-04T09:38:24.604Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-30107": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:17.742Z",
-      "releasedAt": "2026-11-04T09:38:24.606Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-87187": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:19.288Z",
-      "releasedAt": "2026-11-04T09:38:24.608Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-85097": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:20.941Z",
-      "releasedAt": "2026-11-04T09:38:24.610Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-39375": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:25.626Z",
-      "releasedAt": "2026-11-04T09:38:24.613Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-23892": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:27.916Z",
-      "releasedAt": "2026-11-04T09:38:24.615Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-30704": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:29.558Z",
-      "releasedAt": "2026-11-04T09:38:24.617Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-77832": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:12:31.864Z",
-      "releasedAt": "2026-11-04T09:38:24.619Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-91803": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:15.866Z",
-      "releasedAt": "2026-11-04T09:38:24.621Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-18903": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:28.662Z",
-      "releasedAt": "2026-11-04T09:38:24.623Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-11936": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:41.805Z",
-      "releasedAt": "2026-11-04T09:38:24.625Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-22393": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:43.792Z",
-      "releasedAt": "2026-11-04T09:38:24.627Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-69771": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:49.781Z",
-      "releasedAt": "2026-11-04T09:38:24.629Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-53480": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:51.706Z",
-      "releasedAt": "2026-11-04T09:38:24.632Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-36259": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:53.220Z",
-      "releasedAt": "2026-11-04T09:38:24.634Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-40264": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:14:54.659Z",
-      "releasedAt": "2026-11-04T09:38:24.636Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-47339": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:15:59.457Z",
-      "releasedAt": "2026-11-04T09:38:24.638Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-82310": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:17:02.840Z",
-      "releasedAt": "2026-11-04T09:38:24.640Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-31343": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:17:04.797Z",
-      "releasedAt": "2026-11-04T09:38:24.642Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-25616": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:17:06.269Z",
-      "releasedAt": "2026-11-04T09:38:24.644Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-69436": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:17:23.580Z",
-      "releasedAt": "2026-11-04T09:38:24.646Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-67529": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:17:43.386Z",
-      "releasedAt": "2026-11-04T09:38:24.648Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-18751": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:18:03.376Z",
-      "releasedAt": "2026-11-04T09:38:24.651Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-43343": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:18:19.289Z",
-      "releasedAt": "2026-11-04T09:38:24.653Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-89051": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:26:32.942Z",
-      "releasedAt": "2026-11-04T09:38:31.662Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-60345": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:26:35.170Z",
-      "releasedAt": "2026-11-04T09:38:31.665Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-99554": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:26:38.403Z",
-      "releasedAt": "2026-11-04T09:38:31.667Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-38345": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:26:46.813Z",
-      "releasedAt": "2026-11-04T09:38:31.670Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-37791": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:27:07.459Z",
-      "releasedAt": "2026-11-04T09:38:31.672Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-97569": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:27:09.388Z",
-      "releasedAt": "2026-11-04T09:38:31.674Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-90379": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:27:10.869Z",
-      "releasedAt": "2026-11-04T09:38:31.676Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-34048": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:34:53.466Z",
-      "releasedAt": "2026-11-04T09:38:31.678Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-15012": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:34:55.613Z",
-      "releasedAt": "2026-11-04T09:38:31.680Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-88560": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:34:57.169Z",
-      "releasedAt": "2026-11-04T09:38:31.683Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-25406": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:34:58.673Z",
-      "releasedAt": "2026-11-04T09:38:31.685Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-58636": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RELEASED",
-      "timestamp": "2026-11-04T09:36:10.511Z",
-      "releasedAt": "2026-11-04T09:38:31.687Z",
-      "releaseReason": "STALE_CRASH_RECOVERY"
-    },
-    "ORVA-21215": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:35.432Z"
-    },
-    "ORVA-63148": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:35.975Z"
-    },
-    "ORVA-47509": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:37.760Z"
-    },
-    "ORVA-40639": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:38.072Z"
-    },
-    "ORVA-81001": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:39.166Z"
-    },
-    "ORVA-55801": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:39.502Z"
-    },
-    "ORVA-76484": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:40.829Z"
-    },
-    "ORVA-30485": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:40.940Z"
-    },
-    "ORVA-30871": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:44.501Z"
-    },
-    "ORVA-13883": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:46.404Z"
-    },
-    "ORVA-80755": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:47.921Z"
-    },
-    "ORVA-69814": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:38:49.343Z"
-    },
-    "ORVA-53297": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:05.942Z"
-    },
-    "ORVA-80371": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:07.851Z"
-    },
-    "ORVA-93471": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:09.193Z"
-    },
-    "ORVA-17267": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:21.360Z"
-    },
-    "ORVA-14450": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:32.554Z"
-    },
-    "ORVA-63833": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:34.444Z"
-    },
-    "ORVA-95157": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:35.815Z"
-    },
-    "ORVA-39460": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:35.916Z"
-    },
-    "ORVA-77690": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:37.827Z"
-    },
-    "ORVA-78044": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:39.220Z"
-    },
-    "ORVA-42700": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:39:40.594Z"
-    },
-    "ORVA-70470": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:02.363Z"
-    },
-    "ORVA-29065": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:04.261Z"
-    },
-    "ORVA-74734": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:05.650Z"
-    },
-    "ORVA-41049": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:07.172Z"
-    },
-    "ORVA-19033": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:16.509Z"
-    },
-    "ORVA-61287": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:18.337Z"
-    },
-    "ORVA-61034": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:19.697Z"
-    },
-    "ORVA-32598": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:22.900Z"
-    },
-    "ORVA-49646": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:24.680Z"
-    },
-    "ORVA-11197": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:40:26.030Z"
-    },
-    "ORVA-28947": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:11.070Z"
-    },
-    "ORVA-81430": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:13.058Z"
-    },
-    "ORVA-32581": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:14.469Z"
-    },
-    "ORVA-26323": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:15.878Z"
-    },
-    "ORVA-49670": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:33.407Z"
-    },
-    "ORVA-27578": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:35.247Z"
-    },
-    "ORVA-45487": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:36.575Z"
-    },
-    "ORVA-73650": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:57.013Z"
-    },
-    "ORVA-68286": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:41:58.955Z"
-    },
-    "ORVA-70820": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T09:42:00.370Z"
-    },
-    "ORVA-50776": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:18:40.103Z"
-    },
-    "ORVA-95610": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:18:42.062Z"
-    },
-    "ORVA-25551": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:18:43.273Z"
-    },
-    "ORVA-73666": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:28:16.595Z"
-    },
-    "ORVA-62984": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:28:18.422Z"
-    },
-    "ORVA-96271": {
-      "sku": "ORVA-P1-PRO",
-      "quantity": 1,
-      "status": "RESERVED",
-      "timestamp": "2026-11-04T12:28:19.617Z"
-    }
-  }
 }

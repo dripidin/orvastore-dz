@@ -87,7 +87,13 @@ module.exports = async (req, res) => {
         // ── 2. Unique Idempotency Key Resolution ─────────────────────────────
         const explicitKey = extractIdempotencyKey(req);
         const idempotencyKey = explicitKey || `dedup_${phone.replace(/\D/g, '')}_${product.sku}_${wilayaObj.id}_${Math.floor(Date.now() / 300000)}`;
-        const cleanOrderId = orderId || (explicitKey && explicitKey.startsWith('ORVA-') ? explicitKey : ('ORVA-' + Math.floor(10000 + Math.random() * 90000)));
+        const crypto = require('crypto');
+        let cleanOrderId = orderId && /^[A-Za-z0-9._:-]{6,64}$/.test(String(orderId))
+            ? String(orderId).trim()
+            : ('ORVA-' + crypto.randomBytes(6).toString('hex').toUpperCase());
+        if (!orderId) {
+            cleanOrderId = 'ORVA-' + crypto.randomBytes(6).toString('hex').toUpperCase();
+        }
         const finalEventId = eventId || event_id || `order_${cleanOrderId}_${Date.now()}`;
         const activeTestCode = testEventCode || test_event_code || process.env.META_TEST_EVENT_CODE || null;
         const cleanLocation = `${wilayaObj.canonicalName} — ${cleanCommune}`;
@@ -136,15 +142,31 @@ module.exports = async (req, res) => {
         const executionResult = await withIdempotencyLock(idempotencyKey, async () => {
             // A. Atomic Inventory Reservation
             let reservedState;
+            let createdReservation = false;
             try {
                 reservedState = await reserveStock(product.sku, validQty, cleanOrderId);
+                if (reservedState && reservedState.alreadyReserved) {
+                    const err = new Error('DUPLICATE_ORDER_ID');
+                    err.statusCode = 409;
+                    err.code = 'DUPLICATE_ORDER_ID';
+                    err.message = 'معرف الطلب مستخدم مسبقاً. يرجى إعادة المحاولة.';
+                    throw err;
+                }
+                createdReservation = !!(reservedState && reservedState.created);
             } catch (invErr) {
                 console.warn('[send-order] Stock reservation failed:', invErr.message);
-                if (invErr.message === 'INSUFFICIENT_STOCK') {
+                if (invErr.message === 'INSUFFICIENT_STOCK' || invErr.code === 'INSUFFICIENT_STOCK') {
                     const err = new Error('INSUFFICIENT_STOCK');
                     err.statusCode = 400;
                     err.code = 'INSUFFICIENT_STOCK';
                     err.message = 'عذراً، الكمية المطلوبة غير متوفرة حالياً في المخزون.';
+                    throw err;
+                }
+                if (invErr.message === 'INVENTORY_SKU_MISSING' || invErr.code === 'INVENTORY_SKU_MISSING') {
+                    const err = new Error('INVENTORY_SKU_MISSING');
+                    err.statusCode = 409;
+                    err.code = 'INVENTORY_SKU_MISSING';
+                    err.message = 'المخزون غير مهيأ لهذا المنتج. يرجى المحاولة لاحقاً.';
                     throw err;
                 }
                 throw invErr;
@@ -184,8 +206,10 @@ module.exports = async (req, res) => {
                 });
             } catch (dbErr) {
                 console.error('[send-order] DB Persistence Failed:', dbErr.message);
-                // Roll back atomic inventory reservation
-                await releaseStock(product.sku, validQty, cleanOrderId, 'DB_PERSISTENCE_FAILED');
+                // Roll back ONLY a reservation created by this request
+                if (createdReservation) {
+                    await releaseStock(product.sku, validQty, cleanOrderId, 'DB_PERSISTENCE_FAILED');
+                }
                 const err = new Error('STORAGE_UNAVAILABLE');
                 err.statusCode = 503;
                 err.code = 'STORAGE_UNAVAILABLE';
@@ -208,12 +232,14 @@ module.exports = async (req, res) => {
             const userFbc = fbc || getCookieValue(cookieHeader, '_fbc') || undefined;
 
             try {
-                let effectivePixelId = process.env.META_PIXEL_ID;
-                if (!effectivePixelId) {
-                    try {
-                        effectivePixelId = getEffectiveSettings().metaPixel.pixelId;
-                    } catch (_) {}
-                }
+                let metaCfg = null;
+                try {
+                    metaCfg = getEffectiveSettings().metaPixel;
+                } catch (_) {}
+                if (metaCfg && metaCfg.capiEnabled === false) {
+                    // Admin deactivated server CAPI code source
+                } else {
+                let effectivePixelId = (metaCfg && metaCfg.pixelId) || process.env.META_PIXEL_ID;
 
                 sendMetaPurchaseEvent({
                     pixelId:        effectivePixelId || undefined,
@@ -237,6 +263,7 @@ module.exports = async (req, res) => {
                 }).catch(capiErr => {
                     console.warn('[Meta CAPI Async Warning]:', capiErr ? capiErr.message : capiErr);
                 });
+                }
             } catch (capiDispatchErr) {
                 console.warn('[Meta CAPI Dispatch Warning]:', capiDispatchErr.message);
             }

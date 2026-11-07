@@ -472,12 +472,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const fbcCookie = getCookie('_fbc') || undefined;
             const eventId = `order_${orderId}_${Date.now()}`;
 
+            // Commercial decision pending: page shows 4200 DZD; catalog has
+            // ORVA-SAC-YAM (4400, archived) and ORVA-SAC-BUNDLE (4900, active).
+            // Send explicit identifier; server rejects archived / mismatched prices.
+            const YAMAHA_PACK_ID = 'yamaha';
             const payload = {
                 orderId,
                 eventId,
+                packId: YAMAHA_PACK_ID,
+                sku: YAMAHA_PACK_ID,
                 fullName: nameVal,
                 phone: phoneVal,
-                wilaya: fullLocationText,
+                wilayaId: selectedWilayaObj ? selectedWilayaObj.id : undefined,
+                wilaya: selectedWilayaObj ? String(selectedWilayaObj.id) : fullLocationText,
+                commune: communeVal,
                 deliveryType: deliveryTypeLabel,
                 quantity: currentQty,
                 productTotal: `${productTotal} د.ج`,

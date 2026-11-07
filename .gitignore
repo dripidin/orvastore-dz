@@ -62,7 +62,15 @@ data/idempotency-records.json
 data/inventory-audit.json
 data/shipments-registry.json
 data/telegram-dispatch-ledger.json
+data/risk-events.json
+data/risk-events.json.tmp
 data/preview/
+data/local-fixtures/orders-store.json
+data/local-fixtures/orders-store.test.json
+data/local-fixtures/*.runtime.json
+data/locks/
+# Mutable inventory remains on disk; future commits should prefer seeds under data/seeds/
+# (tracked copies are preserved for now — do not delete local inventory files)
 products/*
 !products/.gitkeep
 
@@ -77,7 +85,12 @@ docs/proposals/
 
 # 7. Build Artifacts, Backups & Archives
 dist-hostinger/
+dist-staging-full/
+dist-staging-stabilization/
+tmp-staging-redeploy/
+tmp-staging-tests/
 backups/
+data/local-fixtures/admin-static-backup-*/
 *.backup
 *.legacy_backup
 *.enc.backup
@@ -98,3 +111,12 @@ node.cmd
 .mcp.json
 skills-lock.json
 *.code-workspace
+
+# Local AI / large reference trees kept off remote
+opencode.json
+pack3 15950/
+codflow-main/
+scripts/mint-staging-user-jwt.js
+scripts/install-staging-token-remote.js
+scripts/run-staging-jwt-provision.ps1
+

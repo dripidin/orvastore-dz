@@ -1,0 +1,351 @@
+{
+  "generatedAt": "2026-11-06T22:05:47.421Z",
+  "mode": "READ_ONLY_NO_MUTATION",
+  "note": "Supabase match blocked: no hosted credentials in this session. Hostinger MCP unavailable. Do not RELEASE/SETTLE without approval.",
+  "count": 49,
+  "rows": [
+    {
+      "orderId": "ORVA-21215",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-63148",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-47509",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-40639",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-81001",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-55801",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-76484",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-30485",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-30871",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-13883",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-80755",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-69814",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-53297",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-80371",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-93471",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-17267",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-14450",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-63833",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-95157",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-39460",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-77690",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-78044",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-42700",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-70470",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-29065",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-74734",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-41049",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-19033",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-61287",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-61034",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-32598",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-49646",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-11197",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-28947",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-81430",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-32581",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-26323",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-49670",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-27578",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-45487",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-73650",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-68286",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-70820",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-50776",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-95610",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-25551",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-73666",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-62984",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    },
+    {
+      "orderId": "ORVA-96271",
+      "qty": 1,
+      "supabaseFound": "NOT_TESTED",
+      "status": "NOT_TESTED",
+      "recommendedAction": "INVESTIGATE"
+    }
+  ]
+}

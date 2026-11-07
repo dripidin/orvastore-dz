@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "Example seed only. Copy to data/inventory-state.json for a fresh local runtime. Do not overwrite live inventory without a backup.",
+  "products": {}
+}

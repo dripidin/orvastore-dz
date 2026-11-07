@@ -18,7 +18,9 @@ $config = [
     // ── Supabase Cloud Database ──────────────────────────────────────────────
     'supabase' => [
         'url' => getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? 'https://olmsjkhdfghyydogcvvy.supabase.co'),
+        // Publishable/anon key may remain for non-sensitive reads. Never hardcode service_role.
         'anon_key' => getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? 'sb_publishable_7c9dtcV6aM5B32hwxWxPGw_JLLC7tmu'),
+        'service_role_key' => getenv('SUPABASE_SERVICE_ROLE_KEY') ?: ($_ENV['SUPABASE_SERVICE_ROLE_KEY'] ?? ''),
         'schema' => getenv('SUPABASE_SCHEMA') ?: ($_ENV['SUPABASE_SCHEMA'] ?? 'public'),
         'staging_token' => getenv('SUPABASE_STAGING_TOKEN') ?: ($_ENV['SUPABASE_STAGING_TOKEN'] ?? ''),
     ],
@@ -51,7 +53,33 @@ $config = [
     'admin' => [
         'password' => getenv('ADMIN_PASSWORD') ?: ($_ENV['ADMIN_PASSWORD'] ?? ''),
         'token' => getenv('ADMIN_API_TOKEN') ?: ($_ENV['ADMIN_API_TOKEN'] ?? ''),
-    ]
+    ],
+
+    // ── CodFlow Integration Bridge (Phase 0) ─────────────────────────────────
+    // CODFLOW_API_KEY is server-side only. It must never be exposed to the
+    // browser or inlined into the static dashboard bundle.
+    'codflow' => [
+        'api_url' => getenv('CODFLOW_API_URL') ?: ($_ENV['CODFLOW_API_URL'] ?? ''),
+        'api_key' => getenv('CODFLOW_API_KEY') ?: ($_ENV['CODFLOW_API_KEY'] ?? ''),
+        'timeout_ms' => getenv('CODFLOW_TIMEOUT_MS') ?: ($_ENV['CODFLOW_TIMEOUT_MS'] ?? '20000'),
+        'flags' => getenv('CODFLOW_FLAGS') ?: ($_ENV['CODFLOW_FLAGS'] ?? ''),
+        'allow_insecure_local' => getenv('CODFLOW_ALLOW_INSECURE_LOCAL') ?: ($_ENV['CODFLOW_ALLOW_INSECURE_LOCAL'] ?? 'false'),
+    ],
+
+    // ── Staging PDO (opt-in; Production PostgREST unchanged when disabled) ───
+    // Password / DSN must come from env or outside-webroot secure config only.
+    'staging_pdo' => [
+        'enabled' => getenv('STAGING_USE_PDO') ?: ($_ENV['STAGING_USE_PDO'] ?? 'false'),
+        'mode' => getenv('STAGING_PDO_MODE') ?: ($_ENV['STAGING_PDO_MODE'] ?? 'auto'), // auto|mock|pdo
+        'dsn' => getenv('STAGING_PDO_DSN') ?: ($_ENV['STAGING_PDO_DSN'] ?? ''),
+        'user' => getenv('STAGING_PDO_USER') ?: ($_ENV['STAGING_PDO_USER'] ?? ''),
+        'password' => getenv('STAGING_PDO_PASSWORD') ?: ($_ENV['STAGING_PDO_PASSWORD'] ?? ''),
+        'connect_timeout' => getenv('STAGING_PDO_TIMEOUT') ?: ($_ENV['STAGING_PDO_TIMEOUT'] ?? '5'),
+        'sslmode' => getenv('STAGING_PDO_SSLMODE') ?: ($_ENV['STAGING_PDO_SSLMODE'] ?? 'require'),
+        // Must stay false for local work — blocks hosted Supabase DSNs.
+        'allow_live' => getenv('STAGING_PDO_ALLOW_LIVE') ?: ($_ENV['STAGING_PDO_ALLOW_LIVE'] ?? 'false'),
+        'fixture_path' => getenv('STAGING_PDO_FIXTURE') ?: ($_ENV['STAGING_PDO_FIXTURE'] ?? (dirname(__DIR__) . '/data/local-fixtures/orders-store.json')),
+    ],
 ];
 
 // Check for external protected configuration outside web root or in data/private
@@ -77,6 +105,7 @@ if (is_array($extConf)) {
     if (!empty($extConf['APP_ENV'])) $config['app_env'] = $extConf['APP_ENV'];
     if (!empty($extConf['SUPABASE_URL'])) $config['supabase']['url'] = $extConf['SUPABASE_URL'];
     if (!empty($extConf['SUPABASE_ANON_KEY'])) $config['supabase']['anon_key'] = $extConf['SUPABASE_ANON_KEY'];
+    if (!empty($extConf['SUPABASE_SERVICE_ROLE_KEY'])) $config['supabase']['service_role_key'] = $extConf['SUPABASE_SERVICE_ROLE_KEY'];
     if (!empty($extConf['SUPABASE_SCHEMA'])) $config['supabase']['schema'] = $extConf['SUPABASE_SCHEMA'];
     if (!empty($extConf['SUPABASE_STAGING_TOKEN'])) $config['supabase']['staging_token'] = $extConf['SUPABASE_STAGING_TOKEN'];
     if (!empty($extConf['ADMIN_PASSWORD'])) $config['admin']['password'] = $extConf['ADMIN_PASSWORD'];
@@ -93,7 +122,45 @@ if (is_array($extConf)) {
     if (isset($extConf['ecotrack']) && is_array($extConf['ecotrack'])) {
         $config['ecotrack'] = array_merge($config['ecotrack'], $extConf['ecotrack']);
     }
+    if (isset($extConf['codflow']) && is_array($extConf['codflow'])) {
+        $config['codflow'] = array_merge($config['codflow'], $extConf['codflow']);
+    }
+    if (!empty($extConf['CODFLOW_API_URL'])) $config['codflow']['api_url'] = $extConf['CODFLOW_API_URL'];
+    if (!empty($extConf['CODFLOW_API_KEY'])) $config['codflow']['api_key'] = $extConf['CODFLOW_API_KEY'];
+    if (!empty($extConf['CODFLOW_TIMEOUT_MS'])) $config['codflow']['timeout_ms'] = $extConf['CODFLOW_TIMEOUT_MS'];
+    if (!empty($extConf['CODFLOW_FLAGS'])) $config['codflow']['flags'] = $extConf['CODFLOW_FLAGS'];
+    if (isset($extConf['CODFLOW_ALLOW_INSECURE_LOCAL'])) $config['codflow']['allow_insecure_local'] = $extConf['CODFLOW_ALLOW_INSECURE_LOCAL'];
+    if (isset($extConf['staging_pdo']) && is_array($extConf['staging_pdo'])) {
+        $config['staging_pdo'] = array_merge($config['staging_pdo'], $extConf['staging_pdo']);
+    }
+    if (isset($extConf['STAGING_USE_PDO'])) $config['staging_pdo']['enabled'] = $extConf['STAGING_USE_PDO'];
+    if (!empty($extConf['STAGING_PDO_DSN'])) $config['staging_pdo']['dsn'] = $extConf['STAGING_PDO_DSN'];
+    if (!empty($extConf['STAGING_PDO_USER'])) $config['staging_pdo']['user'] = $extConf['STAGING_PDO_USER'];
+    if (array_key_exists('STAGING_PDO_PASSWORD', $extConf)) $config['staging_pdo']['password'] = $extConf['STAGING_PDO_PASSWORD'];
+    if (!empty($extConf['STAGING_PDO_MODE'])) $config['staging_pdo']['mode'] = $extConf['STAGING_PDO_MODE'];
+    if (isset($extConf['STAGING_PDO_ALLOW_LIVE'])) $config['staging_pdo']['allow_live'] = $extConf['STAGING_PDO_ALLOW_LIVE'];
 }
+
+// Local-only secure config (gitignored) for localhost preview — never deploy this file.
+$localSecure = dirname(__DIR__) . '/data/private/local-secure-config.php';
+if (is_readable($localSecure)) {
+    $localConf = @include $localSecure;
+    if (is_array($localConf)) {
+        if (!empty($localConf['APP_ENV'])) $config['app_env'] = $localConf['APP_ENV'];
+        if (!empty($localConf['SUPABASE_SCHEMA'])) $config['supabase']['schema'] = $localConf['SUPABASE_SCHEMA'];
+        if (isset($localConf['admin']) && is_array($localConf['admin'])) {
+            $config['admin'] = array_merge($config['admin'], $localConf['admin']);
+        }
+        if (isset($localConf['staging_pdo']) && is_array($localConf['staging_pdo'])) {
+            $config['staging_pdo'] = array_merge($config['staging_pdo'], $localConf['staging_pdo']);
+        }
+        if (!empty($localConf['ADMIN_PASSWORD'])) $config['admin']['password'] = $localConf['ADMIN_PASSWORD'];
+        if (!empty($localConf['ADMIN_API_TOKEN'])) $config['admin']['token'] = $localConf['ADMIN_API_TOKEN'];
+    }
+}
+
+require_once dirname(__DIR__) . '/lib/mbstring-polyfill.php';
+require_once dirname(__DIR__) . '/lib/staging-db.php';
 
 // ── Strict Staging / Production Schema Isolation Guard ───────────────────────
 if (($config['app_env'] ?? '') === 'staging') {
@@ -210,9 +277,25 @@ if (!function_exists('orva_supabase_rest_request')) {
         }
 
         $supabaseKey = $runtimeConfig['supabase']['anon_key'] ?? '';
+        $serviceKey = trim((string)($runtimeConfig['supabase']['service_role_key'] ?? ''));
+        $stagingToken = trim((string)($runtimeConfig['supabase']['staging_token'] ?? ''));
         $authToken = $supabaseKey;
-        if ($schema === 'staging' && !empty($runtimeConfig['supabase']['staging_token'])) {
-            $authToken = $runtimeConfig['supabase']['staging_token'];
+
+        // Credential selection (never expose service_role to browsers):
+        // 1) Staging schema MUST use staging_user JWT (staging_token). Never silently
+        //    substitute service_role — that bypasses RLS and can touch public.
+        // 2) Production may use service_role only when explicitly configured and
+        //    schema is public. Prefer least privilege until merchant approval.
+        if ($schema === 'staging') {
+            if ($stagingToken === '') {
+                throw new RuntimeException('STAGING_TOKEN_REQUIRED: Staging requests require SUPABASE_STAGING_TOKEN (staging_user).');
+            }
+            $authToken = $stagingToken;
+            // apikey header still uses the project publishable/anon key for PostgREST gateway
+        } elseif ($serviceKey !== '' && ($schema === '' || $schema === 'public')) {
+            // Approved production server path only — still requires Content-Profile control above
+            $authToken = $serviceKey;
+            $supabaseKey = $serviceKey;
         }
 
         $headers = [

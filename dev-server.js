@@ -23,7 +23,8 @@ const routes = {
     '/api/risk': require('./api/risk'),
     '/api/auth': require('./api/auth'),
     '/api/admin-settings': require('./api/admin-settings'),
-    '/api/publish-page': require('./api/publish-page')
+    '/api/publish-page': require('./api/publish-page'),
+    '/api/products-catalog': require('./api/products-catalog')
 };
 
 const MIME_TYPES = {
@@ -45,12 +46,14 @@ const MIME_TYPES = {
 function storefrontPageForFile(filePath) {
     const relative = path.relative(PUBLIC_DIR, filePath).replace(/\\/g, '/');
     if (relative === 'index.html') return '/';
-    if (['pack1.html', 'pack2.html', 'yamaha-archive.html'].includes(relative)) return `/${relative}`;
+    if (['pack1.html', 'pack2.html', 'pack3.html', 'yamaha-archive.html'].includes(relative)) return `/${relative}`;
     if (relative.startsWith('products/') && relative.endsWith('.html')) return `/${relative}`;
     return null;
 }
 
 function applyMetaPixelSettings(html, storefrontPage) {
+    // Client loader owns injection on Hostinger/static pages — avoid double-firing on Node.
+    if (html.includes('meta-pixel-loader.js')) return html;
     const pixel = getEffectiveSettings().metaPixel;
     const included = pixel.enabled && (pixel.scope === 'all' || pixel.pages.includes(storefrontPage));
     const marker = /<!-- Meta Pixel Code -->[\s\S]*?<!-- End Meta Pixel Code -->/i;

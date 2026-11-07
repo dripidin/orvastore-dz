@@ -50,6 +50,7 @@ ErrorDocument 404 /admin/404.html
 RewriteRule ^api/send-order/?$ api/send-order.php [L,QSA]
 RewriteRule ^api/auth/?$ api/auth.php [L,QSA]
 RewriteRule ^api/delivery/?$ api/delivery.php [L,QSA]
+RewriteRule ^api/codflow/?$ api/codflow.php [L,QSA]
 RewriteRule ^api/publish-page/?$ api/publish-page.php [L,QSA]
 RewriteRule ^api/admin-settings/?$ api/admin-settings.php [L,QSA]
 RewriteRule ^api/analytics/?$ api/analytics.php [L,QSA]

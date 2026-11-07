@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-11-06T21:52:52.374Z",
+  "mode": "READ_ONLY",
+  "note": "No reservations were released or deleted by this script.",
+  "reservedCount": 49,
+  "bySku": {
+    "ORVA-P1-PRO": {
+      "count": 49,
+      "quantity": 49,
+      "orderIds": [
+        "ORVA-21215",
+        "ORVA-63148",
+        "ORVA-47509",
+        "ORVA-40639",
+        "ORVA-81001",
+        "ORVA-55801",
+        "ORVA-76484",
+        "ORVA-30485",
+        "ORVA-30871",
+        "ORVA-13883",
+        "ORVA-80755",
+        "ORVA-69814",
+        "ORVA-53297",
+        "ORVA-80371",
+        "ORVA-93471",
+        "ORVA-17267",
+        "ORVA-14450",
+        "ORVA-63833",
+        "ORVA-95157",
+        "ORVA-39460",
+        "ORVA-77690",
+        "ORVA-78044",
+        "ORVA-42700",
+        "ORVA-70470",
+        "ORVA-29065",
+        "ORVA-74734",
+        "ORVA-41049",
+        "ORVA-19033",
+        "ORVA-61287",
+        "ORVA-61034",
+        "ORVA-32598",
+        "ORVA-49646",
+        "ORVA-11197",
+        "ORVA-28947",
+        "ORVA-81430",
+        "ORVA-32581",
+        "ORVA-26323",
+        "ORVA-49670",
+        "ORVA-27578",
+        "ORVA-45487",
+        "ORVA-73650",
+        "ORVA-68286",
+        "ORVA-70820",
+        "ORVA-50776",
+        "ORVA-95610",
+        "ORVA-25551",
+        "ORVA-73666",
+        "ORVA-62984",
+        "ORVA-96271"
+      ]
+    }
+  },
+  "sampleOldest": [
+    {
+      "orderId": "ORVA-21215",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:35.432Z"
+    },
+    {
+      "orderId": "ORVA-63148",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:35.975Z"
+    },
+    {
+      "orderId": "ORVA-47509",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:37.760Z"
+    },
+    {
+      "orderId": "ORVA-40639",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:38.072Z"
+    },
+    {
+      "orderId": "ORVA-81001",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:39.166Z"
+    },
+    {
+      "orderId": "ORVA-55801",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:39.502Z"
+    },
+    {
+      "orderId": "ORVA-76484",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:40.829Z"
+    },
+    {
+      "orderId": "ORVA-30485",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:40.940Z"
+    },
+    {
+      "orderId": "ORVA-30871",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:44.501Z"
+    },
+    {
+      "orderId": "ORVA-13883",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:46.404Z"
+    },
+    {
+      "orderId": "ORVA-80755",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:47.921Z"
+    },
+    {
+      "orderId": "ORVA-69814",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:38:49.343Z"
+    },
+    {
+      "orderId": "ORVA-53297",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:05.942Z"
+    },
+    {
+      "orderId": "ORVA-80371",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:07.851Z"
+    },
+    {
+      "orderId": "ORVA-93471",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:09.193Z"
+    },
+    {
+      "orderId": "ORVA-17267",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:21.360Z"
+    },
+    {
+      "orderId": "ORVA-14450",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:32.554Z"
+    },
+    {
+      "orderId": "ORVA-63833",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:34.444Z"
+    },
+    {
+      "orderId": "ORVA-95157",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:35.815Z"
+    },
+    {
+      "orderId": "ORVA-39460",
+      "sku": "ORVA-P1-PRO",
+      "quantity": 1,
+      "timestamp": "2026-11-04T09:39:35.916Z"
+    }
+  ],
+  "supabase": {
+    "inspected": false,
+    "reason": "SUPABASE_URL / server key not configured in this environment"
+  }
+}
