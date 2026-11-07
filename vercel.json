@@ -3,8 +3,11 @@
   "cleanUrls": true,
   "redirects": [
     { "source": "/admin", "destination": "/admin/dashboard/default/", "permanent": false },
+    { "source": "/admin/", "destination": "/admin/dashboard/default/", "permanent": false },
     { "source": "/dashboard", "destination": "/admin/dashboard/default/", "permanent": false },
-    { "source": "/dashboard/:path*", "destination": "/admin/dashboard/:path*", "permanent": false },
+    { "source": "/dashboard/", "destination": "/admin/dashboard/default/", "permanent": false },
+    { "source": "/dashboard/:path+/", "destination": "/admin/dashboard/:path+/", "permanent": false },
+    { "source": "/dashboard/:path+", "destination": "/admin/dashboard/:path+/", "permanent": false },
     { "source": "/classic-admin", "destination": "/classic-admin.html", "permanent": false }
   ],
   "rewrites": [
