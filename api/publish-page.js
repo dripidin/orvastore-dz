@@ -110,24 +110,11 @@ function sanitizePageId(pageId) {
 }
 
 function isAuthorized(req) {
-    const adminToken = process.env.ADMIN_API_TOKEN || '';
-
-    // Check Authorization header (Bearer token)
-    const authHeader = req.headers?.authorization || '';
-    if (authHeader.startsWith('Bearer ')) {
-        const token = authHeader.slice(7).trim();
-        if (adminToken && safeEqual(token, adminToken)) return true;
-    }
-
-    // Check Cookie
-    const cookieHeader = String(req.headers?.cookie || '');
-    const sessionMatch = cookieHeader.match(/(?:^|;\s*)orva_admin_session=([^;]*)/);
-    if (sessionMatch) {
-        const token = decodeURIComponent(sessionMatch[1]);
-        if (adminToken && safeEqual(token, adminToken)) return true;
-    }
+    const { authorizeAdmin } = require('../lib/admin-session-auth');
+    if (authorizeAdmin(req).ok) return true;
 
     // Check local development mode (strictly loopback IP, never trust forged host headers)
+    const adminToken = process.env.ADMIN_API_TOKEN || '';
     const remoteAddr = req.socket?.remoteAddress || '';
     const isLocalDev = remoteAddr === '127.0.0.1' || remoteAddr === '::1' || remoteAddr === '::ffff:127.0.0.1';
     if (isLocalDev && (!adminToken || process.env.NODE_ENV !== 'production')) {

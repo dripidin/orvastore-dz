@@ -1,8 +1,14 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/admin", "destination": "/admin/dashboard/default/", "permanent": false },
+    { "source": "/classic-admin", "destination": "/classic-admin.html", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/_next/:path*", "destination": "/admin/_next/:path*" },
+    { "source": "/dashboard/:path*", "destination": "/admin/dashboard/:path*" },
     { "source": "/pack1", "destination": "/pack1.html" },
     { "source": "/pack2", "destination": "/pack2.html" },
     { "source": "/pack3", "destination": "/pack3.html" }

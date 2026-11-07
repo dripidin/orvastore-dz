@@ -55,8 +55,8 @@ function req(method, path, { headers = {}, body } = {}) {
     const r = await req('GET', '/dashboard/products/');
     return { ok: r.status === 200, status: r.status };
   });
-  await check('GET /admin.html classic', async () => {
-    const r = await req('GET', '/admin.html');
+  await check('GET /classic-admin.html classic', async () => {
+    const r = await req('GET', '/classic-admin.html');
     return { ok: r.status === 200, status: r.status };
   });
   await check('catalog unauthorized', async () => {

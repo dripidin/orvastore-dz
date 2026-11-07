@@ -311,15 +311,18 @@ function addBlacklistedOrder(orderId) {
 module.exports = async (req, res) => {
     // Restricted CORS origins (Exact matching, no wildcard when credentials used)
     const origin = req.headers?.origin || '';
+    const { authorizeAdmin, isTrustedAdminOrigin } = require('../lib/admin-session-auth');
     const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:3001',
         'http://localhost:8080',
         'http://127.0.0.1:3000',
         'https://orva-store.com',
-        'https://www.orva-store.com'
+        'https://www.orva-store.com',
+        'https://orvastore.vercel.app',
+        'https://orvastore-dripalpha.vercel.app'
     ];
-    if (allowedOrigins.includes(origin)) {
+    if (isTrustedAdminOrigin(origin) || allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Vary', 'Origin');
@@ -410,38 +413,10 @@ module.exports = async (req, res) => {
     ];
 
     try {
-        const adminToken = (process.env.ADMIN_API_TOKEN || '').trim();
-        const authHeader = (req.headers && (req.headers['authorization'] || req.headers['Authorization'])) || '';
-        const cookieHeader = String(req.headers?.cookie || '');
-        const sessionCookie = cookieHeader
-            .split(';')
-            .map((part) => part.trim())
-            .find((part) => part.startsWith('orva_admin_session='))
-            ?.slice('orva_admin_session='.length);
-        let sessionToken = '';
-        try {
-            sessionToken = decodeURIComponent(sessionCookie || '');
-        } catch (_) {
-            sessionToken = '';
-        }
-
-        const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-
-        function safeTokenEqual(a, b) {
-            if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
-            const lenA = Buffer.byteLength(a, 'utf8');
-            const lenB = Buffer.byteLength(b, 'utf8');
-            const maxLen = Math.max(lenA, lenB, 1);
-            const bufA = Buffer.alloc(maxLen);
-            const bufB = Buffer.alloc(maxLen);
-            bufA.write(a, 'utf8');
-            bufB.write(b, 'utf8');
-            return crypto.timingSafeEqual(bufA, bufB) && lenA === lenB;
-        }
-
-        // Distinct Authentication Pathways
-        const isBearerAuth = Boolean(bearerToken && safeTokenEqual(bearerToken, adminToken));
-        const isCookieAuth = Boolean(sessionToken && safeTokenEqual(sessionToken, adminToken));
+        const authz = authorizeAdmin(req);
+        const adminToken = authz.token;
+        const isBearerAuth = authz.type === 'bearer';
+        const isCookieAuth = authz.ok && authz.type !== 'bearer';
 
         // State-changing actions definition
         const stateChangingActions = [
@@ -499,7 +474,7 @@ module.exports = async (req, res) => {
                             message: 'Origin header is required for state-changing browser sessions.'
                         });
                     }
-                    if (!allowedOrigins.includes(origin)) {
+                    if (!isTrustedAdminOrigin(origin) && !allowedOrigins.includes(origin)) {
                         return res.status(403).json({
                             success: false,
                             error: 'CSRF_ORIGIN_DISALLOWED',

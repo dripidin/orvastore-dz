@@ -52,36 +52,11 @@ module.exports = async (req, res) => {
     }
     const { id, orderId, search, status, limit } = req.query || {};
 
-    const adminToken = (process.env.ADMIN_API_TOKEN || '').trim();
-    const authHeader = (req.headers && (req.headers['authorization'] || req.headers['Authorization'])) || '';
-    const cookieHeader = String(req.headers?.cookie || '');
-    const sessionCookie = cookieHeader
-        .split(';')
-        .map((part) => part.trim())
-        .find((part) => part.startsWith('orva_admin_session='))
-        ?.slice('orva_admin_session='.length);
-    let sessionToken = '';
-    try {
-        sessionToken = decodeURIComponent(sessionCookie || '');
-    } catch (_) {
-        sessionToken = '';
-    }
-    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-
-    function safeTokenEqual(a, b) {
-        if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
-        const lenA = Buffer.byteLength(a, 'utf8');
-        const lenB = Buffer.byteLength(b, 'utf8');
-        const maxLen = Math.max(lenA, lenB, 1);
-        const bufA = Buffer.alloc(maxLen);
-        const bufB = Buffer.alloc(maxLen);
-        bufA.write(a, 'utf8');
-        bufB.write(b, 'utf8');
-        return crypto.timingSafeEqual(bufA, bufB) && lenA === lenB;
-    }
-
-    const isBearerAuth = Boolean(bearerToken && safeTokenEqual(bearerToken, adminToken));
-    const isCookieAuth = Boolean(sessionToken && safeTokenEqual(sessionToken, adminToken));
+    const { authorizeAdmin } = require('../lib/admin-session-auth');
+    const authz = authorizeAdmin(req);
+    const adminToken = authz.token;
+    const isBearerAuth = authz.type === 'bearer';
+    const isCookieAuth = authz.ok && authz.type !== 'bearer';
 
     // Administrative operations (GET, PUT, PATCH, DELETE) require admin token
     if (['GET', 'PUT', 'PATCH', 'DELETE'].includes(method)) {

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ORVA Store — Tableau de bord & Logistique Algérie</title>
+    
+    <!-- Google Fonts: Cairo for Arabic & Plus Jakarta Sans / Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Dashboard Core CSS -->
+    <link rel="stylesheet" href="admin.css?v=2.4.0">
+</head>
+<body class="light-theme">
+
+    <!-- ===================================================================== -->
+    <!-- 🔐 PASSWORD AUTHENTICATION GATE                                       -->
+    <!-- ===================================================================== -->
+    <div id="adminAuthOverlay" class="admin-auth-overlay">
+        <div class="admin-auth-card">
+            <div class="auth-icon-wrap">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2>ORVA STORE</h2>
+            <p>لوحة التحكم والإدارة — يرجى إدخال كلمة السر للمتابعة</p>
+            <form onsubmit="event.preventDefault(); if (window.storeAdmin && window.storeAdmin.handleAuthSubmit) { window.storeAdmin.handleAuthSubmit(event); } return false;">
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="adminAuthPassword" placeholder="أدخل كلمة المرور..." autocomplete="current-password" required>
+                </div>
+                <div id="adminAuthError" class="auth-error-msg" style="display:none;"></div>
+                <button type="submit" class="auth-btn-submit">
+                    <span>تسجيل الدخول</span> <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-layout-wrapper" id="appLayoutWrapper">
+        <!-- ===================================================================== -->
+        <!-- TOP NAVBAR                                                            -->
+        <!-- ===================================================================== -->
+        <header class="app-navbar">
+            <div class="navbar-top-row">
+                <div class="navbar-brand-wrapper">
+                    <button class="navbar-toggler-btn" id="sidebarToggleBtn" type="button" title="Menu Navigation" onclick="storeAdmin.toggleMobileNav()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <a class="navbar-brand" href="#dashboard">
+                        <div class="brand-icon-box">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div class="brand-titles">
+                            <span class="brand-main">ORVA<span class="brand-highlight">STORE</span></span>
+                            <span class="brand-sub" data-i18n="brandSub">Tableau de bord</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="navbar-menu-wrapper">
+                    <!-- Search bar -->
+                    <div class="navbar-search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="globalSearchInput" placeholder="Rechercher par commande, nom, téléphone, wilaya..." onkeyup="storeAdmin.handleSearch(this.value)" data-i18n-placeholder="searchPlaceholder">
+                    </div>
+
+                    <!-- Right Toolbar Elements -->
+                    <ul class="navbar-actions-list">
+                        <!-- A/B Test Switcher: Modern Next.js Dashboard Pill -->
+                        <li class="action-item">
+                            <a href="/admin" class="status-pill" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15)); border: 1px solid rgba(139, 92, 246, 0.4); text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9999px; font-weight: 600; font-size: 12px; color: #7c3aed; transition: all 0.2s ease;" title="تجربة لوحة التحكم الحديثة Next.js 16 Base UI">
+                                <span>✨</span>
+                                <span>تجربة اللوحة الحديثة (Next.js v2) ❯</span>
+                            </a>
+                        </li>
+
+                        <!-- Courier Live Status Pill -->
+                        <li class="action-item hide-on-sm">
+                            <div class="status-pill courier-pill" onclick="storeAdmin.openSettingsModal()" title="Passerelle Logistique Algérie">
+                                <span class="live-dot pulse-green"></span>
+                                <span class="pill-text"><i class="fa-solid fa-truck-fast"></i> <span id="navCourierName">Ecotrack DZ</span>: <strong data-i18n="statusConnected">Connecté</strong></span>
+                            </div>
+                        </li>
+
+                        <!-- Excel DB Status Pill -->
+                        <li class="action-item hide-on-sm">
+                            <div class="status-pill excel-pill" onclick="storeAdmin.exportExcel()" title="Base de données Excel & Google Sheets">
+                                <i class="fa-solid fa-file-excel text-emerald"></i>
+                                <span class="pill-text">Excel & Sheets: <strong data-i18n="statusSync">Synchronisé</strong></span>
+                            </div>
+                        </li>
+
+                        <!-- Refresh Button -->
+                        <li class="action-item">
+                            <button class="icon-circle-btn" id="refreshBtn" onclick="storeAdmin.fetchOrders(true)" title="Actualiser les données">
+                                <i class="fa-solid fa-arrows-rotate" id="refreshIcon"></i>
+                            </button>
+                        </li>
+
+                        <!-- Language Submenu Dropdown -->
+                        <li class="action-item">
+                            <div class="navbar-lang-wrapper" id="navbarLangWrapper">
+                                <button class="lang-submenu-trigger" id="langSubmenuBtn" onclick="storeAdmin.toggleLangDropdown()" type="button" title="Changer la langue">
+                                    <i class="fa-solid fa-globe"></i>
+                                    <span id="currentLangLabel">FR</span>
+                                    <i class="fa-solid fa-chevron-down caret-icon"></i>
+                                </button>
+                                <div class="lang-submenu-dropdown" id="langSubmenuDropdown">
+                                    <button class="lang-dropdown-opt active" data-lang="fr" onclick="storeAdmin.setLanguage('fr'); storeAdmin.toggleLangDropdown(false);">
+                                        <span>🇫🇷 Français</span>
+                                        <i class="fa-solid fa-check check-mark"></i>
+                                    </button>
+                                    <button class="lang-dropdown-opt" data-lang="ar" onclick="storeAdmin.setLanguage('ar'); storeAdmin.toggleLangDropdown(false);">
+                                        <span>🇩🇿 العربية (RTL)</span>
+                                        <i class="fa-solid fa-check check-mark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Admin Profile Badge -->
+                        <li class="action-item hide-on-sm">
+                            <div class="user-profile-badge">
+                                <div class="avatar-ring">
+                                    <span class="avatar-initials">OA</span>
+                                    <span class="online-indicator"></span>
+                                </div>
+                                <div class="user-meta">
+                                    <span class="user-name">Admin ORVA</span>
+                                    <span class="user-role">Super Admin</span>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Logout Button -->
+                        <li class="action-item">
+                            <button class="icon-circle-btn text-rose" onclick="storeAdmin.logout()" title="تسجيل الخروج (Déconnexion)">
+                                <i class="fa-solid fa-power-off"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Store Pages Navigation -->
+            <div class="store-quick-nav">
+                <a href="/" target="_blank" class="store-nav-pill" title="زيارة المتجر الرئيسي">
+                    <i class="fa-solid fa-house"></i> <span>المتجر</span>
+                </a>
+                <a href="/pack1.html" target="_blank" class="store-nav-pill" title="زيارة صفحة باك 1">
+                    <i class="fa-solid fa-box-open"></i> <span>باك 1 (4950 دج)</span>
+                </a>
+                <a href="/pack2.html" target="_blank" class="store-nav-pill" title="زيارة صفحة باك 2">
+                    <i class="fa-solid fa-bolt"></i> <span>باك 2 (13390 دج)</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- ===================================================================== -->
+        <!-- FULL-PAGE BLURRY MOBILE NAVIGATION OVERLAY                            -->
+        <!-- ===================================================================== -->
+        <div class="mobile-nav-fullscreen" id="mobileNavFullscreen">
+            <div class="mobile-nav-top">
+                <div class="brand-titles">
+                    <span class="brand-main">ORVA<span class="brand-highlight">STORE</span></span>
+                    <span class="brand-sub" data-i18n="brandSub">Tableau de bord</span>
+                </div>
+                <button class="mobile-nav-close-btn" onclick="storeAdmin.closeMobileNav()" title="Fermer le menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="mobile-nav-scroll-container">
+                <nav class="mobile-nav-links-centered">
+                    <a href="#dashboard" class="mobile-nav-item active" onclick="storeAdmin.switchTab('dashboard'); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                        <span data-i18n="navDashboard">Aperçu & Statistiques</span>
+                    </a>
+
+                    <a href="#orders" class="mobile-nav-item" onclick="storeAdmin.switchTab('orders'); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon"><i class="fa-solid fa-boxes-packing"></i></div>
+                        <span data-i18n="navOrders">Gestion des Commandes</span>
+                    </a>
+
+                    <a href="#analytics" class="mobile-nav-item" onclick="storeAdmin.switchTab('analytics'); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon text-cyan"><i class="fa-solid fa-chart-simple"></i></div>
+                        <span data-i18n="navAnalytics">Website Analytics</span>
+                    </a>
+
+                    <a href="javascript:void(0)" class="mobile-nav-item" onclick="storeAdmin.openRiskDashboard(); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon text-rose"><i class="fa-solid fa-shield-halved"></i></div>
+                        <span data-i18n="navRisk">Bouclier Anti-Fraude & Trust</span>
+                    </a>
+
+                    <a href="javascript:void(0)" class="mobile-nav-item" onclick="storeAdmin.openCreateModal(); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon text-emerald"><i class="fa-solid fa-circle-plus"></i></div>
+                        <span data-i18n="navCreate">Créer un Colis</span>
+                    </a>
+
+                    <a href="javascript:void(0)" class="mobile-nav-item" onclick="storeAdmin.openTariffsModal(); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon text-amber"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <span data-i18n="navTariffs">Tarifs 58 Wilayas</span>
+                    </a>
+
+                    <a href="javascript:void(0)" class="mobile-nav-item" onclick="storeAdmin.openSettingsModal(); storeAdmin.closeMobileNav();">
+                        <div class="m-nav-icon text-purple"><i class="fa-solid fa-sliders"></i></div>
+                        <span data-i18n="navSettings">Configuration Transporteurs</span>
+                    </a>
+                </nav>
+
+                <div class="mobile-nav-bottom-actions">
+                    <div class="mobile-lang-pills">
+                        <button class="mobile-lang-btn active" data-lang="fr" onclick="storeAdmin.setLanguage('fr'); storeAdmin.closeMobileNav();">Français</button>
+                        <button class="mobile-lang-btn" data-lang="ar" onclick="storeAdmin.setLanguage('ar'); storeAdmin.closeMobileNav();">العربية</button>
+                    </div>
+
+                    <div class="mobile-nav-status-strip">
+                        <span><i class="fa-solid fa-truck-fast text-cyan"></i> <strong id="mobileNavCourierName">Ecotrack DZ</strong></span>
+                        <span><i class="fa-solid fa-file-excel text-emerald"></i> <strong>Excel & Sheets</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-page-body">
+            <!-- Sidebar Overlay Backdrop (Mobile) -->
+            <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="storeAdmin.closeMobileSidebar()"></div>
+
+            <!-- ===================================================================== -->
+            <!-- SIDEBAR NAVIGATION                                                    -->
+            <!-- ===================================================================== -->
+            <aside class="app-sidebar" id="appSidebar">
+                <div class="sidebar-user-card">
+                    <div class="user-avatar-large">
+                        <i class="fa-solid fa-boxes-stacked text-primary"></i>
+                    </div>
+                    <div class="user-info">
+                        <h4>ORVA Store DZ</h4>
+                        <span class="badge-store">Yamaha Sac Pro • COD</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-category-header" data-i18n="catMain">MENU PRINCIPAL</div>
+                    
+                    <a href="#dashboard" class="nav-link active" onclick="storeAdmin.switchTab('dashboard')">
+                        <div class="nav-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                        <span class="nav-title" data-i18n="navDashboard">Aperçu & Statistiques</span>
+                        <span class="nav-badge" id="sideTotalBadge">0</span>
+                    </a>
+
+                    <a href="#orders" class="nav-link" onclick="storeAdmin.switchTab('orders')">
+                        <div class="nav-icon"><i class="fa-solid fa-boxes-packing"></i></div>
+                        <span class="nav-title" data-i18n="navOrders">Gestion des Commandes</span>
+                        <span class="nav-badge badge-warning" id="sidePendingBadge">0</span>
+                    </a>
+
+                    <a href="#analytics" class="nav-link" onclick="storeAdmin.switchTab('analytics')">
+                        <div class="nav-icon text-cyan"><i class="fa-solid fa-chart-simple"></i></div>
+                        <span class="nav-title" data-i18n="navAnalytics">Website Analytics</span>
+                    </a>
+
+                    <div class="nav-category-header" data-i18n="catDataSecurity">SÉCURITÉ & ANTI-FRAUDE</div>
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="storeAdmin.openRiskDashboard()">
+                        <div class="nav-icon text-rose"><i class="fa-solid fa-shield-halved"></i></div>
+                        <span class="nav-title" data-i18n="navRisk">Bouclier Anti-Fraude & Trust</span>
+                    </a>
+
+                    <div class="nav-category-header" data-i18n="catLogistics">LOGISTIQUE & TRANSPORTEURS</div>
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="storeAdmin.openCreateModal()">
+                        <div class="nav-icon text-emerald"><i class="fa-solid fa-circle-plus"></i></div>
+                        <span class="nav-title" data-i18n="navCreate">Créer un Colis</span>
+                    </a>
+
+                    <a href="#tariffs" class="nav-link" onclick="storeAdmin.openTariffsModal()">
+                        <div class="nav-icon text-amber"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <span class="nav-title" data-i18n="navTariffs">Tarifs 58 Wilayas</span>
+                    </a>
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="storeAdmin.openSettingsModal()">
+                        <div class="nav-icon text-purple"><i class="fa-solid fa-sliders"></i></div>
+                        <span class="nav-title" data-i18n="navSettings">Configuration Transporteurs</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer-card">
+                    <div class="footer-card-inner">
+                        <div class="icon-wrap"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="text-wrap">
+                            <h5>Transporteurs Algérie</h5>
+                            <p>Yalidine, Redex, ZR, DHD, Noest</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ===================================================================== -->
+            <!-- MAIN VIEWPORT CONTENT                                                 -->
+            <!-- ===================================================================== -->
+            <main class="app-main-content">
+                <!-- Welcome Banner -->
+                <div class="app-banner-card">
+                    <div class="banner-content">
+                        <div class="banner-tag">
+                            <i class="fa-solid fa-check-circle text-emerald"></i>
+                            <span data-i18n="bannerTag">Système de Gestion Intégré • Algérie 58 Wilayas</span>
+                        </div>
+                        <h2 data-i18n="bannerTitle">Tableau de bord logistique & Suivi des Ventes</h2>
+                        <p data-i18n="bannerDesc">Passerelle multicanal connectée aux transporteurs locaux, Google Sheets et Facebook Meta CAPI.</p>
+                    </div>
+                    <div class="banner-actions">
+                        <button class="app-btn app-btn-primary" onclick="storeAdmin.openCreateModal()">
+                            <i class="fa-solid fa-plus"></i> <span data-i18n="btnNewColis">Nouveau Colis</span>
+                        </button>
+                        <button class="app-btn app-btn-outline" onclick="storeAdmin.exportExcel()">
+                            <i class="fa-solid fa-file-excel"></i> <span data-i18n="btnExport">Exporter Excel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================================================================= -->
+                <!-- 1. KPI SUMMARY METRIC CARDS                                      -->
+                <!-- ================================================================= -->
+                <section class="app-kpi-grid">
+                    <!-- Total Orders -->
+                    <div class="app-kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-title" data-i18n="kpiTotal">Total Commandes</span>
+                            <div class="kpi-icon-box blue-box"><i class="fa-solid fa-bag-shopping"></i></div>
+                        </div>
+                        <div class="kpi-bottom">
+                            <h3 class="kpi-number" id="kpiTotalOrders">0</h3>
+                            <span class="kpi-subtext text-primary"><i class="fa-solid fa-circle-check"></i> <span data-i18n="kpiLiveSync">Synchronisé</span></span>
+                        </div>
+                    </div>
+
+                    <!-- COD Revenue -->
+                    <div class="app-kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-title" data-i18n="kpiRevenue">Chiffre d'Affaires COD</span>
+                            <div class="kpi-icon-box emerald-box"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        </div>
+                        <div class="kpi-bottom">
+                            <h3 class="kpi-number" id="kpiRevenue">0 DZD</h3>
+                            <span class="kpi-subtext text-emerald"><i class="fa-solid fa-coins"></i> 58 Wilayas</span>
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders -->
+                    <div class="app-kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-title" data-i18n="kpiPending">En Attente / Préparation</span>
+                            <div class="kpi-icon-box amber-box"><i class="fa-solid fa-clock"></i></div>
+                        </div>
+                        <div class="kpi-bottom">
+                            <h3 class="kpi-number" id="kpiPending">0</h3>
+                            <span class="kpi-subtext text-amber"><i class="fa-solid fa-hourglass-half"></i> <span data-i18n="kpiToShip">À expédier</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Shipped Orders -->
+                    <div class="app-kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-title" data-i18n="kpiShipped">En Livraison (Transporteurs)</span>
+                            <div class="kpi-icon-box cyan-box"><i class="fa-solid fa-truck-fast"></i></div>
+                        </div>
+                        <div class="kpi-bottom">
+                            <h3 class="kpi-number" id="kpiShipped">0</h3>
+                            <span class="kpi-subtext text-cyan"><i class="fa-solid fa-route"></i> En tournée</span>
+                        </div>
+                    </div>
+
+                    <!-- Returned Orders (Retours Fix) -->
+                    <div class="app-kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-title" data-i18n="kpiReturned">Retours (Retournés)</span>
+                            <div class="kpi-icon-box rose-box"><i class="fa-solid fa-arrow-rotate-left"></i></div>
+                        </div>
+                        <div class="kpi-bottom">
+                            <h3 class="kpi-number" id="kpiReturned">0</h3>
+                            <span class="kpi-subtext text-rose"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="kpiReturnRate">Colis non aboutis</span></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Mobile Concise View Toggle Bar -->
+                <div class="mobile-charts-toggle-bar hide-on-lg" style="margin-bottom: 16px;">
+                    <button type="button" class="app-btn app-btn-outline w-100" id="toggleChartsBtn" onclick="storeAdmin.toggleMobileCharts()">
+                        <i class="fa-solid fa-chart-pie"></i> <span id="toggleChartsBtnText">عرض الرسوم البيانية والتحليلات المتقدمة</span>
+                    </button>
+                </div>
+
+                <!-- ================================================================= -->
+                <!-- 2. ANALYTICS CHARTS SECTION                                       -->
+                <!-- ================================================================= -->
+                <section class="app-charts-row" id="appChartsRow">
+                    <!-- Daily Orders Trend Chart -->
+                    <div class="app-card chart-card-lg">
+                        <div class="app-card-header">
+                            <div class="card-title-wrap">
+                                <i class="fa-solid fa-chart-line text-primary"></i>
+                                <h4 data-i18n="chartTrendTitle">Tendance Quotidienne des Commandes (7 Derniers Jours)</h4>
+                            </div>
+                            <span class="badge-pill bg-primary-soft" data-i18n="liveDataBadge">Données en direct</span>
+                        </div>
+                        <div class="app-card-body">
+                            <div class="canvas-container">
+                                <canvas id="trendChartCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Wilayas Chart -->
+                    <div class="app-card chart-card-sm">
+                        <div class="app-card-header">
+                            <div class="card-title-wrap">
+                                <i class="fa-solid fa-map-pin text-emerald"></i>
+                                <h4 data-i18n="chartWilayasTitle">Top Wilayas les Plus Demandées</h4>
+                            </div>
+                        </div>
+                        <div class="app-card-body">
+                            <div class="canvas-container">
+                                <canvas id="wilayaChartCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- 3. WEBSITE ANALYTICS & VERCEL TELEMETRY                           -->
+                <!-- ================================================================= -->
+                <section class="app-card analytics-section-card" id="analyticsSection">
+                    <div class="app-card-header">
+                        <div class="card-title-wrap">
+                            <i class="fa-solid fa-chart-simple text-cyan"></i>
+                            <h4 data-i18n="analyticsTitle">Website Analytics</h4>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="badge-pill bg-primary-soft"><i class="fa-solid fa-bolt"></i> Vercel Edge: Actif</span>
+                            <span class="badge-pill bg-emerald-soft"><i class="fa-brands fa-facebook"></i> Meta CAPI: Connecté</span>
+                        </div>
+                    </div>
+                    <div class="app-card-body">
+                        <!-- Vercel KPI Mini Row -->
+                        <div class="app-kpi-grid mb-4" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                            <div class="analytics-col-card" style="padding:10px 14px;">
+                                <small style="color:var(--text-muted); font-size:10px; font-weight:700;">VISITEURS UNIQUES</small>
+                                <h3 style="font-size:18px; font-weight:800; color:var(--primary);" id="anTotalVisitors">1,480</h3>
+                                <small style="color:var(--emerald); font-size:9px; font-weight:700;"><i class="fa-solid fa-arrow-trend-up"></i> +18.4% cette semaine</small>
+                            </div>
+                            <div class="analytics-col-card" style="padding:10px 14px;">
+                                <small style="color:var(--text-muted); font-size:10px; font-weight:700;">PAGES VUES (TOTAL)</small>
+                                <h3 style="font-size:18px; font-weight:800; color:var(--cyan);" id="anPageViews">4,620</h3>
+                                <small style="color:var(--cyan); font-size:9px; font-weight:700;"><i class="fa-solid fa-eye"></i> 3.1 pages / visiteur</small>
+                            </div>
+                            <div class="analytics-col-card" style="padding:10px 14px;">
+                                <small style="color:var(--text-muted); font-size:10px; font-weight:700;">TAUX DE CONVERSION</small>
+                                <h3 style="font-size:18px; font-weight:800; color:var(--emerald);" id="anConversionRate">3.8%</h3>
+                                <small style="color:var(--emerald); font-size:9px; font-weight:700;"><i class="fa-solid fa-check-double"></i> Élevé (E-com DZ)</small>
+                            </div>
+                            <div class="analytics-col-card" style="padding:10px 14px;">
+                                <small style="color:var(--text-muted); font-size:10px; font-weight:700;">DURÉE MOYENNE</small>
+                                <h3 style="font-size:18px; font-weight:800; color:var(--purple);" id="anAvgDuration">2m 45s</h3>
+                                <small style="color:var(--purple); font-size:9px; font-weight:700;"><i class="fa-solid fa-stopwatch"></i> Engagement optimal</small>
+                            </div>
+                        </div>
+
+                        <div class="analytics-grid">
+                            <!-- Referrers Breakdown -->
+                            <div class="analytics-col-card">
+                                <h5 class="analytics-subtitle"><i class="fa-solid fa-share-nodes text-primary"></i> <span data-i18n="lblReferrers">Sources de Trafic (Référents)</span></h5>
+                                <div class="analytics-list" id="referrersList">
+                                    <div class="analytics-row"><span>Facebook Ads / Instagram (CAPI)</span><strong>64%</strong></div>
+                                    <div class="analytics-row"><span>TikTok Ads Algérie</span><strong>24%</strong></div>
+                                    <div class="analytics-row"><span>Lien Direct / WhatsApp</span><strong>8%</strong></div>
+                                    <div class="analytics-row"><span>Google Search DZ (Organique)</span><strong>4%</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Devices Breakdown -->
+                            <div class="analytics-col-card">
+                                <h5 class="analytics-subtitle"><i class="fa-solid fa-mobile-screen-button text-emerald"></i> <span data-i18n="lblDevices">Appareils & Systèmes</span></h5>
+                                <div class="analytics-list" id="devicesList">
+                                    <div class="analytics-row"><span>Smartphones (Android)</span><strong>82%</strong></div>
+                                    <div class="analytics-row"><span>iPhone (Apple iOS)</span><strong>11%</strong></div>
+                                    <div class="analytics-row"><span>Ordinateurs (Windows PC / Mac)</span><strong>7%</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Top Wilayas & Cities Traffic -->
+                            <div class="analytics-col-card">
+                                <h5 class="analytics-subtitle"><i class="fa-solid fa-map-location-dot text-amber"></i> <span data-i18n="lblTopCities">Villes & Wilayas Principales</span></h5>
+                                <div class="analytics-list" id="citiesList">
+                                    <div class="analytics-row"><span>16 - Alger (العاصمة)</span><strong>32%</strong></div>
+                                    <div class="analytics-row"><span>31 - Oran (وهران)</span><strong>16%</strong></div>
+                                    <div class="analytics-row"><span>25 - Constantine (قسنطينة)</span><strong>11%</strong></div>
+                                    <div class="analytics-row"><span>19 - Sétif & 09 - Blida</span><strong>17%</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Browsers & Network -->
+                            <div class="analytics-col-card">
+                                <h5 class="analytics-subtitle"><i class="fa-solid fa-compass text-purple"></i> <span data-i18n="lblBrowsers">Navigateurs & Réseau Edge</span></h5>
+                                <div class="analytics-list" id="browsersList">
+                                    <div class="analytics-row"><span>Chrome Mobile DZ</span><strong>54%</strong></div>
+                                    <div class="analytics-row"><span>Facebook In-App Browser</span><strong>28%</strong></div>
+                                    <div class="analytics-row"><span>Safari Mobile (iOS)</span><strong>11%</strong></div>
+                                    <div class="analytics-row"><span>TikTok In-App & Autres</span><strong>7%</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================================= -->
+                <!-- 4. ORDERS & SHIPMENTS DATA TABLE                                  -->
+                <!-- ================================================================= -->
+                <section class="app-card table-section-card" id="ordersSection">
+                    <div class="app-card-header table-header-flex">
+                        <div class="header-left-title">
+                            <i class="fa-solid fa-table-list text-primary"></i>
+                            <h4 data-i18n="tableTitle">Journal des Commandes & Expéditions</h4>
+                            <span class="count-badge" id="tableOrdersCount">0 commandes</span>
+                        </div>
+
+                        <!-- Status Filter Tabs -->
+                        <div class="status-filter-tabs">
+                            <button class="tab-btn active" data-status="all" onclick="storeAdmin.filterByStatus('all')" data-i18n="tabAll">Toutes</button>
+                            <button class="tab-btn" data-status="pending" onclick="storeAdmin.filterByStatus('pending')" data-i18n="tabPending">⏳ En Attente</button>
+                            <button class="tab-btn" data-status="confirmed" onclick="storeAdmin.filterByStatus('confirmed')" data-i18n="tabConfirmed">📞 Confirmées</button>
+                            <button class="tab-btn" data-status="shipped" onclick="storeAdmin.filterByStatus('shipped')" data-i18n="tabShipped">🚚 Expédiées</button>
+                            <button class="tab-btn" data-status="delivered" onclick="storeAdmin.filterByStatus('delivered')" data-i18n="tabDelivered">✅ Livrées</button>
+                            <button class="tab-btn" data-status="returned" onclick="storeAdmin.filterByStatus('returned')" data-i18n="tabReturned">⚠️ Retours</button>
+                            <button class="tab-btn" data-status="cancelled" onclick="storeAdmin.filterByStatus('cancelled')" data-i18n="tabCancelled">❌ Annulées</button>
+                            <button class="tab-btn" data-status="risk" onclick="storeAdmin.filterByStatus('risk')" data-i18n="tabRisk">🛡️ Risque & Fraude</button>
+                        </div>
+                    </div>
+
+                    <!-- Table Toolbar -->
+                    <div class="table-toolbar">
+                        <div class="toolbar-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="tableSearchInput" placeholder="Filtrer par nom, téléphone, commune, code..." onkeyup="storeAdmin.handleSearch(this.value)" data-i18n-placeholder="tableFilterPlaceholder">
+                        </div>
+
+                        <div class="toolbar-actions">
+                            <select id="wilayaFilterSelect" class="app-select" onchange="storeAdmin.filterByWilaya(this.value)">
+                                <option value="" data-i18n="allWilayasOption">Toutes les Wilayas (58 Wilayas)</option>
+                            </select>
+
+                            <button class="app-btn app-btn-sm app-btn-secondary" onclick="storeAdmin.openTariffsModal()">
+                                <i class="fa-solid fa-map-location-dot"></i> <span data-i18n="btnTariffs">Grille Tarifaire</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Responsive Container -->
+                    <div class="table-responsive">
+                        <table class="app-table" id="ordersTable">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="thOrder">Réf / Tracking</th>
+                                    <th data-i18n="thCustomer">Client</th>
+                                    <th data-i18n="thPhone">Téléphone</th>
+                                    <th data-i18n="thDestination">Wilaya & Commune</th>
+                                    <th data-i18n="thAmount">Montant COD</th>
+                                    <th data-i18n="thCarrierStatus">Statut Transporteur</th>
+                                    <th data-i18n="thOrderStatus">État Commande</th>
+                                    <th data-i18n="thActions">Actions Logistiques</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        <div class="loading-state">
+                                            <i class="fa-solid fa-spinner fa-spin"></i>
+                                            <span data-i18n="loadingOrders">Chargement des commandes...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Mobile Touch-friendly Orders Cards Container -->
+                        <div id="mobileOrdersContainer" class="mobile-orders-container"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: CREATE / EDIT PARCEL                                         -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="packageModal">
+        <div class="app-modal-dialog">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-box-open text-primary"></i>
+                    <h3 id="packageModalTitle" data-i18n="modalCreateTitle">Créer et expédier un colis vers le transporteur</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('packageModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="packageForm" onsubmit="storeAdmin.handlePackageSubmit(event)">
+                <input type="hidden" id="formOrderId">
+                
+                <div class="app-modal-body">
+                    <!-- Auto Fill Dropdown -->
+                    <div class="form-group mb-4" id="autoFillWrapper">
+                        <label class="form-label text-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="lblAutoFill">Sélectionner une commande boutique pour pré-remplir :</span></label>
+                        <select id="autoFillOrderSelect" class="app-input" onchange="storeAdmin.onSelectOrderToAutoFill(this.value)">
+                            <option value="" data-i18n="optSelectOrder">-- Sélectionner une commande --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblFullName">Nom complet du client *</label>
+                            <input type="text" id="formClientName" class="app-input" placeholder="ex: Yasmine Merabet" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblPhone">Numéro de téléphone *</label>
+                            <input type="tel" id="formClientPhone" class="app-input" placeholder="05 / 06 / 07XXXXXXXX" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblWilaya">Wilaya (58 Wilayas) *</label>
+                            <select id="formWilayaCode" class="app-input" onchange="storeAdmin.onWilayaChange(this.value)" required>
+                                <option value="">-- Choisir la Wilaya --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblCommune">Commune *</label>
+                            <select id="formCommuneSelect" class="app-input" onchange="storeAdmin.onCommuneChange(this.value)" required>
+                                <option value="">-- Choisir la Commune --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblDeliveryType">Type de livraison</label>
+                            <select id="formDeliveryType" class="app-input" onchange="storeAdmin.updateTariffDisplay()">
+                                <option value="home" data-i18n="optHome">🏠 Livraison à domicile (Domicile)</option>
+                                <option value="stopdesk" data-i18n="optDesk">🏢 Récupération au bureau (Stop Desk)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="lblPrice">Montant à encaisser (COD DZD) *</label>
+                            <input type="number" id="formPrice" class="app-input" value="4400" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblAddress">Adresse détaillée / Quartier</label>
+                        <input type="text" id="formAddress" class="app-input" placeholder="ex: Cité 5 Juillet, Bâtiment 12">
+                    </div>
+
+                    <!-- Calculated Tariff Banner -->
+                    <div class="tariff-calculation-banner" id="tariffCalculationBanner">
+                        <div class="banner-icon"><i class="fa-solid fa-calculator"></i></div>
+                        <div class="banner-details">
+                            <span data-i18n="lblTariffApplied">Frais de livraison appliqués :</span>
+                            <strong id="tariffDisplayPrice">500 DZD</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="app-modal-footer">
+                    <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('packageModal')" data-i18n="btnCancel">Annuler</button>
+                    <button type="submit" class="app-btn app-btn-primary" id="btnSubmitPackage">
+                        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="btnSendToCourier">Expédier au transporteur ⚡</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: LIVE TRACKING TIMELINE                                       -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="trackingModal">
+        <div class="app-modal-dialog modal-md">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-route text-cyan"></i>
+                    <h3 data-i18n="modalTrackTitle">Suivi en direct du colis (Tracking)</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('trackingModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="app-modal-body">
+                <div class="tracking-summary-card">
+                    <div class="code-box">
+                        <span data-i18n="lblTrackingCode">Code de suivi :</span>
+                        <strong id="trackModalCode" class="tracking-font">ECEOSK...</strong>
+                    </div>
+                    <div class="status-box">
+                        <span data-i18n="lblCurrentStatus">État actuel :</span>
+                        <span class="status-badge badge-shipped" id="trackModalStatus">En cours</span>
+                    </div>
+                </div>
+
+                <div class="tracking-timeline" id="trackTimeline"></div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('trackingModal')" data-i18n="btnClose">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: OFFICIAL CARRIER LABEL (BORDEREAU OFFICIEL)                  -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="labelModal">
+        <div class="app-modal-dialog modal-md">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-print text-emerald"></i>
+                    <h3 data-i18n="modalLabelTitle">Étiquette Officielle du Transporteur</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('labelModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="app-modal-body p-3">
+                <!-- Printable Official Shipping Label (Thermal A6 & Standard A4) -->
+                <div class="official-shipping-label" id="printableOfficialLabel">
+                    <div class="label-header">
+                        <div class="label-carrier">
+                            <span class="carrier-tag" id="lblCarrierTag">REDEX ECOTRACK DZ</span>
+                            <small id="lblDateStamp">2026-08-21</small>
+                        </div>
+                        <div class="label-store">
+                            <strong>ORVA STORE DZ</strong>
+                            <small>Expéditeur Express</small>
+                        </div>
+                    </div>
+
+                    <div class="label-barcode-zone">
+                        <div class="barcode-lines">||||| | |||| ||| ||||| || |||||| |||| |||</div>
+                        <strong class="barcode-num" id="lblBarcodeCode">ECEOSK26082145362</strong>
+                        <span class="label-ref-tag" id="lblOrderRefTag">Réf: ORVA-59067</span>
+                    </div>
+
+                    <div class="label-body-grid">
+                        <div class="label-section">
+                            <span class="sec-label">DESTINATAIRE / الزبون</span>
+                            <h4 id="lblClientNameText">Samir Deriadi</h4>
+                            <p id="lblClientPhoneText" class="phone-highlight">0772552823</p>
+                        </div>
+
+                        <div class="label-section">
+                            <span class="sec-label">DESTINATION / العنوان</span>
+                            <h4 id="lblDestinationText">16 - Alger (Cheraga)</h4>
+                            <p id="lblAddressText">Cheraga Centre</p>
+                        </div>
+                    </div>
+
+                    <div class="label-footer-grid">
+                        <div class="label-type-box" id="lblDeliveryTypeBadge">
+                            🏠 À DOMICILE (DOMICILE)
+                        </div>
+                        <div class="label-amount-box">
+                            <span>TOTAL COD À ENCAISSER :</span>
+                            <h3 id="lblAmountText">4,900 DZD</h3>
+                        </div>
+                    </div>
+
+                    <div class="label-product-note" id="lblProductNote">
+                        📦 Contenu: Sac Banane Moto Yamaha (كرطابل يماها)
+                    </div>
+                </div>
+
+                <div class="label-actions-row mt-3">
+                    <button type="button" class="app-btn app-btn-primary flex-1" onclick="storeAdmin.triggerPrintLabel()">
+                        <i class="fa-solid fa-print"></i> <span data-i18n="btnPrintLabelDirect">Imprimer l'Étiquette (Bordereau)</span>
+                    </button>
+                    <a id="btnCarrierPortalLink" href="https://redex.ecotrack.dz" target="_blank" class="app-btn app-btn-outline">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="btnCarrierPortal">Portail Transporteur</span>
+                    </a>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('labelModal')" data-i18n="btnClose">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 4: ALGERIAN COURIERS & LOGISTICS CONFIGURATION                  -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="settingsModal">
+        <div class="app-modal-dialog modal-lg">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-sliders text-purple"></i>
+                    <h3 data-i18n="modalSettingsTitle">Configuration des Transporteurs & Passerelles Algérie</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('settingsModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="app-modal-body">
+                <div class="form-group mb-4">
+                    <label class="form-label" data-i18n="lblActiveCarrier">Sélectionner le transporteur actif pour les expéditions :</label>
+                    <select id="settingsCarrierSelect" class="app-input" onchange="storeAdmin.onCarrierChange(this.value)">
+                        <option value="redex">Redex Delivery (Plateforme Ecotrack DZ)</option>
+                        <option value="dhd">DHD Express (Plateforme Ecotrack DZ)</option>
+                        <option value="conexlog">Conexlog Express (Plateforme Ecotrack DZ)</option>
+                        <option value="msmgo">MSM Go Express (Plateforme Ecotrack DZ)</option>
+                        <option value="yalidine">Yalidine Express (Yalitec / Guepex)</option>
+                        <option value="zrexpress">ZR Express (Procolis)</option>
+                        <option value="noest">Noest Delivery</option>
+                        <option value="maystro">Maystro Delivery</option>
+                        <option value="anderson">Anderson Express</option>
+                    </select>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">URL Passerelle / API Endpoint :</label>
+                        <input type="text" id="settingsBaseUrl" class="app-input" value="https://redex.ecotrack.dz">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Clé / Jeton API (API Token) :</label>
+                        <input type="text" id="settingsApiToken" class="app-input" value="" placeholder="Collez votre jeton Redex Ecotrack DZ...">
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label" data-i18n="lblStorageMode">Moteur de Données & Synchronisation :</label>
+                    <input type="text" class="app-input" value="Google Cloud Sheets API + Base Locale Excel (.xlsx) Synchronisés" readonly>
+                </div>
+
+                <button type="button" class="app-btn app-btn-outline w-100 mb-2" onclick="storeAdmin.testCarrierConnection()">
+                    <i class="fa-solid fa-network-wired"></i> <span data-i18n="btnTestCarrier">Tester la connexion API avec le transporteur ⚡</span>
+                </button>
+                <div id="settingsTestResult" class="mt-2"></div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('settingsModal')" data-i18n="btnClose">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 5: 58 WILAYAS TARIFF RATE CARD                                  -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="tariffsModal">
+        <div class="app-modal-dialog modal-lg">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-map-location-dot text-amber"></i>
+                    <h3 data-i18n="modalTariffsTitle">Grille Tarifaire des 58 Wilayas d'Algérie</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('tariffsModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="app-modal-body">
+                <div class="table-responsive max-h-400">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="thWilaya">Wilaya</th>
+                                <th data-i18n="thHomeRate">Livraison à Domicile</th>
+                                <th data-i18n="thDeskRate">Récupération au Bureau (Stop Desk)</th>
+                                <th data-i18n="thCoverage">Couverture</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tariffsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('tariffsModal')" data-i18n="btnClose">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 6: TRUST & RISK SHIELD AUDIT (AI Fraud Detection)               -->
+    <!-- ===================================================================== -->
+    <div class="app-modal-backdrop" id="riskModal">
+        <div class="app-modal-dialog modal-md">
+            <div class="app-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fa-solid fa-shield-halved text-rose"></i>
+                    <h3 data-i18n="modalRiskTitle">Bouclier Anti-Fraude & Évaluation de Confiance</h3>
+                </div>
+                <button class="modal-close-btn" onclick="storeAdmin.closeModal('riskModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="app-modal-body" id="riskModalBody">
+                <div class="loading-state text-center py-4">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" class="app-btn app-btn-secondary" onclick="storeAdmin.closeModal('riskModal')" data-i18n="btnClose">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="algeria-communes.js?v=2.4.0"></script>
+    <script src="admin.js?v=2.4.0"></script>
+</body>
+</html>

@@ -25,10 +25,13 @@ const {
 
 const { testConnection, validateCourierUrl } = require('../lib/courier-client');
 
+const { authorizeAdmin, isTrustedAdminOrigin } = require('../lib/admin-session-auth');
 const ALLOWED_ORIGINS = new Set([
     'https://orva-store.com',
     'https://www.orva-store.com',
     'https://staging.orva-store.com',
+    'https://orvastore.vercel.app',
+    'https://orvastore-dripalpha.vercel.app',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8080'
@@ -74,24 +77,7 @@ function isValidRandomSession(cookieToken) {
 }
 
 function isAuthorized(req) {
-    const adminToken = process.env.ADMIN_API_TOKEN || '';
-
-    // 1. Authorization header — ADMIN_API_TOKEN only (never ADMIN_PASSWORD)
-    const authHeader = req.headers?.authorization || req.headers?.Authorization || '';
-    if (authHeader.startsWith('Bearer ')) {
-        const token = authHeader.slice(7).trim();
-        if (adminToken && safeEqual(token, adminToken)) return true;
-        return false;
-    }
-
-    // 2. HttpOnly Cookie session — random session id, or legacy ADMIN_API_TOKEN cookie
-    const cookieToken = getSessionToken(req.headers?.cookie);
-    if (cookieToken) {
-        if (isValidRandomSession(cookieToken)) return true;
-        if (adminToken && safeEqual(cookieToken, adminToken)) return true;
-    }
-
-    return false;
+    return authorizeAdmin(req).ok;
 }
 
 function isTrustedOrigin(req) {
@@ -105,7 +91,7 @@ function isTrustedOrigin(req) {
     const host = req.headers?.host;
 
     if (origin) {
-        if (ALLOWED_ORIGINS.has(origin)) return true;
+        if (ALLOWED_ORIGINS.has(origin) || isTrustedAdminOrigin(origin)) return true;
         try {
             const parsed = new URL(origin);
             if (host && parsed.host.toLowerCase() === host.toLowerCase()) return true;
@@ -117,7 +103,7 @@ function isTrustedOrigin(req) {
         try {
             const parsed = new URL(referer);
             const originStr = `${parsed.protocol}//${parsed.host}`;
-            if (ALLOWED_ORIGINS.has(originStr)) return true;
+            if (ALLOWED_ORIGINS.has(originStr) || isTrustedAdminOrigin(originStr)) return true;
             if (host && parsed.host.toLowerCase() === host.toLowerCase()) return true;
         } catch (_) {}
     }
@@ -639,7 +625,7 @@ const adminSettingsHandler = async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
     const origin = req.headers?.origin || '';
-    if (ALLOWED_ORIGINS.has(origin)) {
+    if (ALLOWED_ORIGINS.has(origin) || isTrustedAdminOrigin(origin)) {
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Vary', 'Origin');

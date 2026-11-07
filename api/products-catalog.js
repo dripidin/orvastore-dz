@@ -5,48 +5,13 @@
  */
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
+const { authorizeAdmin } = require('../lib/admin-session-auth');
 
 const ROOT = path.join(__dirname, '..');
-const SESSIONS_FILE = path.join(ROOT, 'data', 'private', 'admin-sessions.json');
-
-function safeEqual(a, b) {
-    if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
-    const max = Math.max(Buffer.byteLength(a), Buffer.byteLength(b), 1);
-    const ba = Buffer.alloc(max);
-    const bb = Buffer.alloc(max);
-    ba.write(a);
-    bb.write(b);
-    return crypto.timingSafeEqual(ba, bb) && Buffer.byteLength(a) === Buffer.byteLength(b);
-}
 
 function authorize(req) {
-    const expected = String(process.env.ADMIN_API_TOKEN || '').trim();
-    const auth = String(req.headers.authorization || '');
-    const bearer = auth.replace(/^bearer\s+/i, '').trim();
-    if (expected && bearer && safeEqual(bearer, expected)) return { ok: true, type: 'bearer' };
-
-    const cookie = String(req.headers.cookie || '');
-    const match = cookie.split(';').map((p) => p.trim()).find((p) => p.startsWith('orva_admin_session='));
-    let session = '';
-    try {
-        session = decodeURIComponent((match || '').slice('orva_admin_session='.length));
-    } catch (_) {
-        session = '';
-    }
-    if (!session) return { ok: false };
-    if (expected && safeEqual(session, expected)) return { ok: true, type: 'cookie_legacy' };
-    try {
-        if (!fs.existsSync(SESSIONS_FILE)) return { ok: false };
-        const sessions = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8') || '{}');
-        const row = sessions[session];
-        if (row && Number(row.expiresAt || 0) > Math.floor(Date.now() / 1000)) {
-            return { ok: true, type: 'cookie' };
-        }
-    } catch (_) {
-        /* ignore */
-    }
-    return { ok: false };
+    const authz = authorizeAdmin(req);
+    return authz.ok ? { ok: true, type: authz.type } : { ok: false };
 }
 
 function catalogPath(useTest, host) {

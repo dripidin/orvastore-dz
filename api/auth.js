@@ -31,8 +31,11 @@ function requireEnv(key) {
     return val.length > 0 ? val : null;
 }
 
+const { isTrustedAdminOrigin } = require('../lib/admin-session-auth');
+
 function isAllowedOrigin(origin) {
     if (!origin) return false;
+    if (isTrustedAdminOrigin(origin)) return true;
     const allowedPatterns = [
         /^https?:\/\/localhost(:\d+)?$/,
         /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
