@@ -9,6 +9,20 @@ $workspaceRoot = "E:\Websites On Line\yamahasac"
 $distDir = Join-Path $workspaceRoot "dist-hostinger"
 $zipFile = Join-Path $workspaceRoot "orva-store-hostinger.zip"
 
+
+$dashboardOut = Join-Path $workspaceRoot "orvastore Dashbaord v0.9\next-shadcn-admin-dashboard-baseui-main\out"
+$adminDir = Join-Path $workspaceRoot "admin"
+
+# 0. Sync latest Next.js dashboard build to admin/ before packaging
+Write-Host "Syncing dashboard build (out/ -> admin/)..."
+if (Test-Path $dashboardOut) {
+    if (Test-Path $adminDir) { Remove-Item -Recurse -Force $adminDir }
+    Copy-Item -Path $dashboardOut -Destination $adminDir -Recurse
+    Write-Host "  OK: admin/ synced from latest build ($((Get-ChildItem -Recurse -File $adminDir).Count) files)"
+} else {
+    Write-Warning "  Dashboard out/ not found - run 'npm run build' in the dashboard project first. Skipping sync."
+}
+
 Write-Host "Packaging ORVA STORE for Hostinger (orva-store.com)..."
 
 # 1. Clean previous build
@@ -27,6 +41,7 @@ $rootFiles = @(
     "index.html",
     "pack1.html",
     "pack2.html",
+    "pack3.html",
     "yamaha-archive.html",
     "styles.css",
     "packs-styles.css",
@@ -97,6 +112,7 @@ $assetDirs = @(
     "products",
     "pack 1 4950",
     "pack2 12950",
+    "pack3 15950",
     "images",
     "images products",
     "product images",
